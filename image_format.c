@@ -28,7 +28,7 @@
 #include <memory.h>
 #include <sys/file.h>
 
-#include "CLIcore.h"
+#include "CommandLineInterface/CLIcore.h"
 #include "00CORE/00CORE.h"
 #include "COREMOD_memory/COREMOD_memory.h"
 #include "COREMOD_arith/COREMOD_arith.h"
