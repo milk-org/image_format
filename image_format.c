@@ -257,7 +257,7 @@ int_fast8_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 void __attribute__ ((constructor)) libinit_image_format()
 {
 	init_image_format();
-	printf(" ...... Loading module %s\n", __FILE__);
+//	printf(" ...... Loading module %s\n", __FILE__);
 }
 
 
