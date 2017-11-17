@@ -266,7 +266,7 @@ void __attribute__ ((constructor)) libinit_image_format()
 int_fast8_t init_image_format()
 {
   strcpy(data.module[data.NBmodule].name, __FILE__);
-  strcpy(data.module[data.NBmodule].info, "conversion between image format, I/O");
+  strcpy(data.module[data.NBmodule].info, "milk    - Conversion between image format, I/O");
   data.NBmodule++;
   
   strcpy(data.cmd[data.NBcmd].key,"im2ascii");
