@@ -107,6 +107,8 @@ typedef struct {
 
 extern DATA data;
 
+static int INITSTATUS_image_format = 0;
+
 
 static int CR2toFITS_NORM = 0; // 1 if FITS should be normalized to ISO = 1, exposure = 1 sec, and F/1.0
 static float FLUXFACTOR = 1.0;
@@ -256,8 +258,12 @@ int_fast8_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 
 void __attribute__ ((constructor)) libinit_image_format()
 {
-	init_image_format();
-	RegisterModule(__FILE__, "milk", "Conversion between image format, I/O");
+	if ( INITSTATUS_image_format == 0 )
+	{
+		init_image_format();
+		RegisterModule(__FILE__, "milk", "Conversion between image format, I/O");
+		INITSTATUS_image_format = 1;
+	}
 }
 
 
