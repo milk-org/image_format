@@ -257,12 +257,7 @@ int_fast8_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 void __attribute__ ((constructor)) libinit_image_format()
 {
 	init_image_format();
-
-	if(data.progStatus>0)
-	{
-		printf("  Found unloaded shared object in ./libs/ -> LOADING module %s\n", __FILE__);
-		fflush(stdout);
-	}	
+	RegisterModule(__FILE__, "milk", "Conversion between image format, I/O");
 }
 
 
@@ -270,11 +265,7 @@ void __attribute__ ((constructor)) libinit_image_format()
 
 int_fast8_t init_image_format()
 {
-  strcpy(data.module[data.NBmodule].name, __FILE__);
-  strcpy(data.module[data.NBmodule].package, "milk");
-  strcpy(data.module[data.NBmodule].info, "Conversion between image format, I/O");
-  data.NBmodule++;
-  
+
   strcpy(data.cmd[data.NBcmd].key,"im2ascii");
   strcpy(data.cmd[data.NBcmd].module,__FILE__);
   data.cmd[data.NBcmd].fp = IMAGE_FORMAT_im_to_ASCII_cli;
