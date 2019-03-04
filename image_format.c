@@ -395,13 +395,33 @@ int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
 		
         for(k=0; k<naxis; k++)
             fprintf(fpout, "%4ld ", coord[k]);
-        switch ( data.image[ID].md[0].atype ) {
+        switch ( data.image[ID].md[0].datatype ) {
         case _DATATYPE_UINT8:
-            fprintf(fpout, " %5d\n", data.image[ID].array.UI8[ii]);
+            fprintf(fpout, " %5u\n", data.image[ID].array.UI8[ii]);
+            break;
+        case _DATATYPE_UINT16:
+            fprintf(fpout, " %5u\n", data.image[ID].array.UI16[ii]);
+            break;
+        case _DATATYPE_UINT32:
+            fprintf(fpout, " %lu\n", data.image[ID].array.UI32[ii]);
+            break;
+        case _DATATYPE_UINT64:
+            fprintf(fpout, " %lu\n", data.image[ID].array.UI64[ii]);
+            break;
+
+        case _DATATYPE_INT8:
+            fprintf(fpout, " %5d\n", data.image[ID].array.SI8[ii]);
             break;
         case _DATATYPE_INT16:
             fprintf(fpout, " %5d\n", data.image[ID].array.SI16[ii]);
             break;
+        case _DATATYPE_INT32:
+            fprintf(fpout, " %5d\n", data.image[ID].array.SI32[ii]);
+            break;
+        case _DATATYPE_INT64:
+            fprintf(fpout, " %5d\n", data.image[ID].array.SI64[ii]);
+            break;
+            
         case _DATATYPE_FLOAT:
             fprintf(fpout, " %f\n", data.image[ID].array.F[ii]);
             break;
@@ -2824,13 +2844,13 @@ long IMAGE_FORMAT_FITS_to_ushortintbin_lock( const char *IDname, const char *fna
 
     valarray = (unsigned short int*) malloc(sizeof(unsigned short int)*xsize*ysize);
 
-    if(data.image[ID].md[0].atype == _DATATYPE_FLOAT)
+    if(data.image[ID].md[0].datatype == _DATATYPE_FLOAT)
     {
         printf("float -> unsigned short int array\n");
         for(ii=0; ii<xsize*ysize; ii++)
             valarray[ii] = (unsigned short int) data.image[ID].array.F[ii];
     }
-    if(data.image[ID].md[0].atype == _DATATYPE_DOUBLE)
+    if(data.image[ID].md[0].datatype == _DATATYPE_DOUBLE)
     {
         printf("double -> unsigned short int array\n");
         for(ii=0; ii<xsize*ysize; ii++)
@@ -2874,13 +2894,13 @@ long IMAGE_FORMAT_FITS_to_floatbin_lock(  const char *IDname, const char *fname 
 
     valarray = (float*) malloc(sizeof(float)*xsize*ysize);
 
-    if(data.image[ID].md[0].atype == _DATATYPE_FLOAT)
+    if(data.image[ID].md[0].datatype == _DATATYPE_FLOAT)
     {
         printf("WRITING float array\n");
         for(ii=0; ii<xsize*ysize; ii++)
             valarray[ii] = data.image[ID].array.F[ii];
     }
-    if(data.image[ID].md[0].atype == _DATATYPE_DOUBLE)
+    if(data.image[ID].md[0].datatype == _DATATYPE_DOUBLE)
     {
         printf("WRITING double array\n");
         for(ii=0; ii<xsize*ysize; ii++)
