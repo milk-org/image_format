@@ -403,7 +403,7 @@ int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
             fprintf(fpout, " %5u\n", data.image[ID].array.UI16[ii]);
             break;
         case _DATATYPE_UINT32:
-            fprintf(fpout, " %lu\n", data.image[ID].array.UI32[ii]);
+            fprintf(fpout, " %u\n", data.image[ID].array.UI32[ii]);
             break;
         case _DATATYPE_UINT64:
             fprintf(fpout, " %lu\n", data.image[ID].array.UI64[ii]);
@@ -419,7 +419,7 @@ int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
             fprintf(fpout, " %5d\n", data.image[ID].array.SI32[ii]);
             break;
         case _DATATYPE_INT64:
-            fprintf(fpout, " %5d\n", data.image[ID].array.SI64[ii]);
+            fprintf(fpout, " %5ld\n", data.image[ID].array.SI64[ii]);
             break;
             
         case _DATATYPE_FLOAT:
