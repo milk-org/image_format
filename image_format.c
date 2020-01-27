@@ -149,10 +149,10 @@ errno_t image_writeBMP_auto_cli()
   if(CLI_checkarg(1,4)+CLI_checkarg(2,4)+CLI_checkarg(3,4)+CLI_checkarg(4,3)==0)
     {
       image_writeBMP_auto(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string);
-      return 0;
+      return RETURN_SUCCESS;
     }
   else
-    return 1;
+    return RETURN_FAILURE;
 }
 
 
@@ -163,10 +163,10 @@ errno_t IMAGE_FORMAT_im_to_ASCII_cli()
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
     {
       IMAGE_FORMAT_im_to_ASCII(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
-      return 0;
+      return RETURN_SUCCESS;
     }
   else
-    return 1;
+    return RETURN_FAILURE;
 }
 
 
@@ -176,6 +176,8 @@ errno_t CR2toFITS_cli()
   CR2toFITS(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
   // else
   // return(0);
+  
+  return RETURN_SUCCESS;
 }
 
 
@@ -184,10 +186,10 @@ errno_t IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli()
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
     {
       IMAGE_FORMAT_FITS_to_ushortintbin_lock(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
-      return 0;
+      return RETURN_SUCCESS;
     }
   else
-    return 1;
+    return RETURN_FAILURE;
 }
 
 
@@ -196,10 +198,10 @@ errno_t IMAGE_FORMAT_FITS_to_floatbin_lock_cli()
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
     {
       IMAGE_FORMAT_FITS_to_floatbin_lock(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
-      return 0;
+      return RETURN_SUCCESS;
     }
   else
-    return 1;
+    return RETURN_FAILURE;
 }
 
 
@@ -208,10 +210,10 @@ errno_t IMAGE_FORMAT_read_binary32f_cli()
   if(CLI_checkarg(1,3)+CLI_checkarg(2,2)+CLI_checkarg(3,2)+CLI_checkarg(4,3)==0)
     {
       IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.numl, data.cmdargtoken[3].val.numl, data.cmdargtoken[4].val.string);
-      return 0;
+      return RETURN_SUCCESS;
     }
   else
-    return 1;
+    return RETURN_FAILURE;
 }
 
 
@@ -220,10 +222,10 @@ errno_t IMAGE_FORMAT_extract_RGGBchan_cli()
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)+CLI_checkarg(3,3)+CLI_checkarg(4,3)+CLI_checkarg(5,3)==0)
     {
       image_format_extract_RGGBchan(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string, data.cmdargtoken[5].val.string);
-      return 0;
+      return RETURN_SUCCESS;
     }
   else
-    return 1;
+    return RETURN_FAILURE;
 }
 
 errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
@@ -231,10 +233,10 @@ errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)+CLI_checkarg(3,3)+CLI_checkarg(4,3)==0)
     {
       loadCR2toFITSRGB(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string);
-      return 0;
+      return RETURN_SUCCESS;
     }
   else
-    return 1;
+    return RETURN_FAILURE;
 }
 
 
@@ -927,18 +929,18 @@ imageID read_PGMimage(
         char line1[100];
         long xsize, ysize;
         long maxval;
-        int r;
         long ii, jj;
         double val;
         
-        r = fscanf(fp,"%s",line1);
+        fscanf(fp,"%s",line1);
+        
         if(strcmp(line1,"P5")!=0)
             fprintf(stderr,"ERROR: File is not PGM image\n");
         else
         {
-            r = fscanf(fp,"%ld %ld", &xsize, &ysize);
+            fscanf(fp,"%ld %ld", &xsize, &ysize);
             printf("PGM image size: %ld x %ld\n",xsize,ysize);
-            r = fscanf(fp,"%ld",&maxval);
+            fscanf(fp,"%ld",&maxval);
             if(maxval!=65535)
                 fprintf(stderr,"Not 16-bit image. Cannot read\n");
             else
@@ -1075,7 +1077,6 @@ imageID loadCR2(
 )
 {
     char command[200];
-    FILE *fp;
     imageID ID;
 
 
@@ -1099,13 +1100,11 @@ long CR2toFITS_strfilter(
     const char *strfilter
 )
 {
-    long i;
     long cnt = 0;
     char command[200];
     char fname[200];
     char fname1[200];
     FILE *fp;
-    int r;
 
     sprintf(command,"ls %s.CR2 > flist.tmp\n",strfilter);
     if(system(command) != 0)
@@ -1129,7 +1128,7 @@ long CR2toFITS_strfilter(
     }
 
     fclose(fp);
-    r = system("rm flist.tmp");
+    system("rm flist.tmp");
 
     printf("%ld files converted\n",cnt);
 
@@ -1890,9 +1889,8 @@ errno_t loadCR2toFITSRGB(
 		float iso;
 		float shutter;
 		float aperture;
-		imageID ID;
-		long xsize,ysize;
-		long ii;
+		//imageID ID;
+		//long xsize,ysize;
     
         sprintf(command,"dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt",fnameCR2);
         if(system(command) != 0)
@@ -1937,9 +1935,9 @@ errno_t loadCR2toFITSRGB(
             printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
         printf("aperture = %f\n",aperture);
 
-        ID = image_ID("tmpfits1");
-        xsize = data.image[ID].md[0].size[0];
-        ysize = data.image[ID].md[0].size[1];
+        //ID = image_ID("tmpfits1");
+//        xsize = data.image[ID].md[0].size[0];
+//        ysize = data.image[ID].md[0].size[1];
 
         FLUXFACTOR = aperture*aperture/(shutter*iso);
     }
@@ -1992,9 +1990,9 @@ errno_t CR2tomov()
     long IDgtot;
     long IDbtot;
 
-    double tot;
+    //double tot;
 
-    double alpha = 0.7;
+    //double alpha = 0.7;
 
 
     // conversion from CR2 to FITS RGB
@@ -2053,15 +2051,18 @@ errno_t CR2tomov()
     double value,valuecnt;
     long boxsize;
     double sigma;
-    long j,jstart,jend,j1;
+    long j;
+    long jstart;
+    //long jend;
+    long j1;
 
-    int NLCONV;
-    double  NLCONV_OFFSET;
-    double  NLCONV_LIMIT;
-    double  NLCONV_FACT;
-    double NLCONV_POW;
-    double NLCONV_SIGMA;
-    long IDr1,IDg1,IDb1,IDrp,IDgp,IDbp;
+    //int NLCONV;
+    //double  NLCONV_OFFSET;
+    //double  NLCONV_LIMIT;
+    //double  NLCONV_FACT;
+    //double  NLCONV_POW;
+    //double  NLCONV_SIGMA;
+    //imageID IDr1, IDg1, IDb1, IDrp, IDgp, IDbp;
 
     long SKIP, SKIPcnt;
     long SKIP_FITStoJPEG, SKIPcnt_FITStoJPEG;
@@ -2098,7 +2099,7 @@ errno_t CR2tomov()
     MAX_PERC50_COEFF = read_config_parameter_float(configfile,"MAX_PERC50_COEFF");
     MAX_PERC80_COEFF = read_config_parameter_float(configfile,"MAX_PERC80_COEFF");
     MAX_PERC90_COEFF = read_config_parameter_float(configfile,"MAX_PERC90_COEFF");
-    MAX_PERC90_COEFF = read_config_parameter_float(configfile,"MAX_PERC95_COEFF");
+    MAX_PERC95_COEFF = read_config_parameter_float(configfile,"MAX_PERC95_COEFF");
     MAX_PERC99_COEFF = read_config_parameter_float(configfile,"MAX_PERC99_COEFF");
     MAX_PERC995_COEFF = read_config_parameter_float(configfile,"MAX_PERC995_COEFF");
     MAX_PERC998_COEFF = read_config_parameter_float(configfile,"MAX_PERC998_COEFF");
@@ -2120,8 +2121,8 @@ errno_t CR2tomov()
     COLORSAT = read_config_parameter_float(configfile,"COLORSAT");
 
 
-    NLCONV = 0;
-    if(read_config_parameter_exists(configfile,"NLCONV")==1)
+    //NLCONV = 0;
+    /*if(read_config_parameter_exists(configfile,"NLCONV")==1)
     {
         NLCONV = read_config_parameter_int(configfile,"NLCONV");
         NLCONV_OFFSET = read_config_parameter_float(configfile,"NLCONV_OFFSET");
@@ -2129,7 +2130,7 @@ errno_t CR2tomov()
         NLCONV_FACT = read_config_parameter_float(configfile,"NLCONV_FACT");
         NLCONV_POW = read_config_parameter_float(configfile,"NLCONV_POW");
         NLCONV_SIGMA = read_config_parameter_float(configfile,"NLCONV_SIGMA");
-    }
+    }*/
 
     ALPHA = read_config_parameter_float(configfile,"ALPHA");
 
@@ -2424,7 +2425,7 @@ errno_t CR2tomov()
             for(i=0; i<cntmax; i++)
             {
                 jstart = i-boxsize;
-                jend = i+boxsize+1;
+                //jend = i+boxsize+1;
                 /*	  jcent = 0;
 
                 while(jstart<0)
@@ -2808,7 +2809,7 @@ imageID IMAGE_FORMAT_read_binary16(
     FILE *fp;
     char *buffer;
     unsigned long fileLen;
-    long i, ii, jj;
+    long ii, jj;
     imageID ID = -1;
 
     //Open file
@@ -2840,13 +2841,13 @@ imageID IMAGE_FORMAT_read_binary16(
 
     ID = create_2Dimage_ID(IDname, xsize, ysize);
 
-    i = 0;
+    unsigned long i = 0;
     for(jj=0; jj<ysize; jj++)
         for(ii=0; ii<xsize; ii++)
         {
             long v1;
 
-            if(i<fileLen+1)
+            if(i < fileLen+1)
                 v1 = (long) (((unsigned const char *)buffer)[i]) +  (long) (256*((unsigned const char *)buffer)[i+1]);
             data.image[ID].array.F[jj*xsize+ii] = (float) v1;
             i += 2;
@@ -2872,7 +2873,7 @@ imageID IMAGE_FORMAT_read_binary32f(
     unsigned long fileLen;
     long i, ii, jj;
     imageID ID;
-    long v1;
+   //long v1;
 
     //Open file
     if((fp = fopen(fname, "rb"))==NULL) {
