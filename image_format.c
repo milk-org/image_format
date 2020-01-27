@@ -3,12 +3,6 @@
  * @brief   Convert between image formats
  * 
  * read and write images other than FITS
- *  
- * @author  O. Guyon
- * @date    7 Jul 2017
- *
- * 
- * @bug No known bugs.
  * 
  */
 
@@ -150,7 +144,7 @@ typedef struct {int rows; int cols; unsigned char* data;} sImage;
 //int IMAGE_FORMAT_2Dim_to_ASCII(const char *IDname, const char *fname)
 
 
-int_fast8_t image_writeBMP_auto_cli()
+errno_t image_writeBMP_auto_cli()
 {
   if(CLI_checkarg(1,4)+CLI_checkarg(2,4)+CLI_checkarg(3,4)+CLI_checkarg(4,3)==0)
     {
@@ -164,7 +158,7 @@ int_fast8_t image_writeBMP_auto_cli()
 
 
 
-int_fast8_t IMAGE_FORMAT_im_to_ASCII_cli()
+errno_t IMAGE_FORMAT_im_to_ASCII_cli()
 {
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
     {
@@ -176,7 +170,7 @@ int_fast8_t IMAGE_FORMAT_im_to_ASCII_cli()
 }
 
 
-int_fast8_t CR2toFITS_cli()
+errno_t CR2toFITS_cli()
 {
   //  if(CLI_checkarg(1, 3)+CLI_checkarg(2, 3))
   CR2toFITS(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
@@ -185,7 +179,7 @@ int_fast8_t CR2toFITS_cli()
 }
 
 
-int_fast8_t IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli()
+errno_t IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli()
 {
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
     {
@@ -197,7 +191,7 @@ int_fast8_t IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli()
 }
 
 
-int_fast8_t IMAGE_FORMAT_FITS_to_floatbin_lock_cli()
+errno_t IMAGE_FORMAT_FITS_to_floatbin_lock_cli()
 {
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
     {
@@ -209,7 +203,7 @@ int_fast8_t IMAGE_FORMAT_FITS_to_floatbin_lock_cli()
 }
 
 
-int_fast8_t IMAGE_FORMAT_read_binary32f_cli()
+errno_t IMAGE_FORMAT_read_binary32f_cli()
 {
   if(CLI_checkarg(1,3)+CLI_checkarg(2,2)+CLI_checkarg(3,2)+CLI_checkarg(4,3)==0)
     {
@@ -221,7 +215,7 @@ int_fast8_t IMAGE_FORMAT_read_binary32f_cli()
 }
 
 
-int_fast8_t IMAGE_FORMAT_extract_RGGBchan_cli()
+errno_t IMAGE_FORMAT_extract_RGGBchan_cli()
 {
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)+CLI_checkarg(3,3)+CLI_checkarg(4,3)+CLI_checkarg(5,3)==0)
     {
@@ -232,7 +226,7 @@ int_fast8_t IMAGE_FORMAT_extract_RGGBchan_cli()
     return 1;
 }
 
-int_fast8_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
+errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 {
   if(CLI_checkarg(1,4)+CLI_checkarg(2,3)+CLI_checkarg(3,3)+CLI_checkarg(4,3)==0)
     {
@@ -269,7 +263,7 @@ void __attribute__ ((constructor)) libinit_image_format()
 
 /** @name Module initialization */
 
-int_fast8_t init_image_format()
+errno_t init_image_format()
 {
 
   strcpy(data.cmd[data.NBcmd].key,"im2ascii");
@@ -348,7 +342,7 @@ int_fast8_t init_image_format()
 
  // add atexit functions here
 
-  return 0;
+  return RETURN_SUCCESS;
 
 }
 
@@ -365,16 +359,19 @@ int_fast8_t init_image_format()
 
 
 
-int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
+errno_t IMAGE_FORMAT_im_to_ASCII(
+    const char *IDname,
+    const char *foutname
+)
 {
-	long ii;
+    long ii;
     long k;
-    long ID;
+    imageID ID;
     FILE *fpout;
     long naxis;
     long *coord;
     long npix;
-	
+
     ID = image_ID(IDname);
     naxis = data.image[ID].md[0].naxis;
     coord = (long*) malloc(sizeof(long)*naxis);
@@ -385,14 +382,14 @@ int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
         coord[k] = 0;
     }
 
-	printf("npix = %ld\n", npix);
+    printf("npix = %ld\n", npix);
 
     fpout = fopen(foutname, "w");
 
     for(ii=0; ii<npix; ii++)
     {
-		int kOK;
-		
+        int kOK;
+
         for(k=0; k<naxis; k++)
             fprintf(fpout, "%4ld ", coord[k]);
         switch ( data.image[ID].md[0].datatype ) {
@@ -421,7 +418,7 @@ int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
         case _DATATYPE_INT64:
             fprintf(fpout, " %5ld\n", data.image[ID].array.SI64[ii]);
             break;
-            
+
         case _DATATYPE_FLOAT:
             fprintf(fpout, " %f\n", data.image[ID].array.F[ii]);
             break;
@@ -436,10 +433,10 @@ int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
         while((kOK==0)&&(k<naxis))
         {
             if(coord[k]==data.image[ID].md[0].size[k])
-                {
-					coord[k] = 0;
-					coord[k+1]++;
-				}
+            {
+                coord[k] = 0;
+                coord[k+1]++;
+            }
             else
                 kOK = 1;
             k++;
@@ -447,9 +444,9 @@ int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *foutname)
     }
     fclose(fpout);
 
-	free(coord);
+    free(coord);
 
-    return 0;
+    return RETURN_SUCCESS;
 }
 
 
@@ -482,32 +479,37 @@ uint32 setUint32(uint32 x)
 
 /**
  * ## Purpose
- * 
+ *
  * This function writes out a 24-bit Windows bitmap file that is readable by Microsoft Paint. \n
  * The image data is a 1D array of (r, g, b) triples, where individual (r, g, b) values can \n
  * each take on values between 0 and 255, inclusive.
- * 
+ *
  * ## Arguments
- * 
+ *
  * @param[in]
  * filename		char*
  * 				A string representing the filename that will be written
- * 
+ *
  * @param[in]
  * width		uint32
  * 				The width, in pixels, of the bitmap
- * 
+ *
  * @param[in[
  * height		uint32
  * 				The height, in pixels, of the bitmap
- * 
+ *
  * @param[in]
  * image		image*
  * 				The image data, where each pixel is 3 unsigned chars (r, g, b)
- * 
+ *
  * @note Written by Greg Slabaugh (slabaugh@ece.gatech.edu), 10/19/00
 */
-uint32 write24BitBmpFile(const char *filename, uint32 width, uint32 height, unsigned char *image)
+static uint32 write24BitBmpFile(
+    const char    *filename,
+    uint32         width,
+    uint32         height,
+    unsigned char *image
+)
 {
     BITMAPINFOHEADER bmpInfoHeader;
     BITMAPFILEHEADER bmpFileHeader;
@@ -614,9 +616,14 @@ uint32 write24BitBmpFile(const char *filename, uint32 width, uint32 height, unsi
 
 
 
-int image_writeBMP_auto(const char *IDnameR, const char *IDnameG, const char *IDnameB, const char *outname)
+errno_t image_writeBMP_auto(
+    const char *IDnameR,
+    const char *IDnameG,
+    const char *IDnameB,
+    const char *outname
+)
 {
-    long IDR,IDG,IDB;
+    imageID IDR,IDG,IDB;
     uint32 width;
     uint32 height;
     unsigned char *array;
@@ -649,13 +656,18 @@ int image_writeBMP_auto(const char *IDnameR, const char *IDnameG, const char *ID
     write24BitBmpFile(outname,width,height,array);
     free(array);
 
-    return(0);
+    return RETURN_SUCCESS;
 }
 
 
-int image_writeBMP(const char *IDnameR, const char *IDnameG, const char *IDnameB, const char *outname)
+static errno_t image_writeBMP(
+    const char *IDnameR,
+    const char *IDnameG,
+    const char *IDnameB,
+    const char *outname
+)
 {
-    long IDR,IDG,IDB;
+    imageID IDR,IDG,IDB;
     uint32 width;
     uint32 height;
     unsigned char *array;
@@ -678,14 +690,18 @@ int image_writeBMP(const char *IDnameR, const char *IDnameG, const char *IDnameB
     write24BitBmpFile(outname,width,height,array);
     free(array);
 
-    return(0);
+    return RETURN_SUCCESS;
 }
 
 
 
 
 
-long getImageInfo(FILE* inputFile, long offset, int numberOfChars)
+long getImageInfo(
+    FILE* inputFile,
+    long  offset,
+    int   numberOfChars
+)
 {
     unsigned char			*ptrC;
     long				value=0L;
@@ -700,8 +716,8 @@ long getImageInfo(FILE* inputFile, long offset, int numberOfChars)
     for(i=1; i<=numberOfChars; i++)
     {
         if(fread(ptrC, sizeof(char), 1, inputFile) < 1)
-			printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
-        
+            printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+
         /* calculate value based on adding bytes */
         value = (long)(value + (*ptrC)*(pow(256, (i-1))));
     }
@@ -716,7 +732,12 @@ long getImageInfo(FILE* inputFile, long offset, int numberOfChars)
 // ASCII format:
 // ii jj value
 // one line per pixel
-long read_ASCIIimage(const char *filename, const char *ID_name, long xsize, long ysize)
+imageID read_ASCIIimage(
+    const char *filename,
+    const char *ID_name,
+    long        xsize,
+    long        ysize
+)
 {
     long ID;
     FILE *fp;
@@ -730,8 +751,8 @@ long read_ASCIIimage(const char *filename, const char *ID_name, long xsize, long
     }
     else
     {
-		long iipix, jjpix;
-		float value;
+        long iipix, jjpix;
+        float value;
 
 
         while((fscanf(fp,"%ld %ld %f\n", &iipix, &jjpix, &value)) == 3)
@@ -748,9 +769,14 @@ long read_ASCIIimage(const char *filename, const char *ID_name, long xsize, long
 
 // ASCII format:
 // value
-long read_ASCIIimage1(const char *filename, const char *ID_name, long xsize, long ysize)
+imageID read_ASCIIimage1(
+    const char *filename,
+    const char *ID_name,
+    long        xsize,
+    long        ysize
+)
 {
-    long ID;
+    imageID ID;
     FILE *fp;
 
     ID = create_2Dimage_ID(ID_name,xsize,ysize);
@@ -762,9 +788,9 @@ long read_ASCIIimage1(const char *filename, const char *ID_name, long xsize, lon
     }
     else
     {
-		long ii, jj;
-		double value;
-		
+        long ii, jj;
+        double value;
+
         for(ii=0; ii<xsize; ii++)
             for(jj=0; jj<ysize; jj++)
             {
@@ -785,7 +811,12 @@ long read_ASCIIimage1(const char *filename, const char *ID_name, long xsize, lon
 
 
 
-int read_BMPimage(char* filename, const char *IDname_R, const char *IDname_G, const char *IDname_B)
+errno_t read_BMPimage(
+    char       *filename,
+    const char *IDname_R,
+    const char *IDname_G,
+    const char *IDname_B
+)
 {
     FILE				*bmpInput, *rasterOutput;
     sImage			originalImage;
@@ -840,17 +871,17 @@ int read_BMPimage(char* filename, const char *IDname_R, const char *IDname_G, co
 
             /*----READ FIRST BYTE TO GET BLUE VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
-				printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+                printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
             BlueValue = *pChar;
 
             /*-----READ NEXT BYTE TO GET GREEN VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
-				printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+                printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
             GreenValue = *pChar;
 
             /*-----READ NEXT BYTE TO GET RED VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
-				printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+                printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
             RedValue = *pChar;
 
             /*---------WRITE TO FILES ---------*/
@@ -865,7 +896,7 @@ int read_BMPimage(char* filename, const char *IDname_R, const char *IDname_G, co
     fclose(bmpInput);
     fclose(rasterOutput);
 
-    return 0;
+    return RETURN_SUCCESS;
 }
 
 
@@ -873,29 +904,33 @@ int read_BMPimage(char* filename, const char *IDname_R, const char *IDname_G, co
 
 /**
  * ## Purpose
- * 
+ *
  *  reads PGM images (16 bit only)
- * 
+ *
  * @note written to read output of "dcraw -t 0 -D -4 xxx.CR2" into FITS
  */
-int read_PGMimage(const char *fname, const char *ID_name)
+imageID read_PGMimage(
+    const char *fname,
+    const char *ID_name
+)
 {
     FILE *fp;
+    imageID ID;
 
     if((fp=fopen(fname, "r"))==NULL)
     {
         fprintf(stderr,"ERROR: cannot open file \"%s\"\n",fname);
+        ID = -1;
     }
     else
     {
-		char line1[100];
-		long xsize, ysize;
-		long maxval;
-		int r;
-		long ii, jj;
-		double val;
-		long ID;
-		
+        char line1[100];
+        long xsize, ysize;
+        long maxval;
+        int r;
+        long ii, jj;
+        double val;
+        
         r = fscanf(fp,"%s",line1);
         if(strcmp(line1,"P5")!=0)
             fprintf(stderr,"ERROR: File is not PGM image\n");
@@ -924,19 +959,22 @@ int read_PGMimage(const char *fname, const char *ID_name)
         fclose(fp);
     }
 
-    return(0);
+    return ID;
 }
 
 
 
 /**
  * ## Purpose
- * 
+ *
  *  Convert CR2 to FITS
- * 
+ *
  * @note assumes dcraw is installed
- */ 
-int CR2toFITS(const char *fnameCR2, const char *fnameFITS)
+ */
+imageID CR2toFITS(
+    const char *fnameCR2,
+    const char *fnameFITS
+)
 {
     char command[200];
     FILE *fp;
@@ -944,24 +982,22 @@ int CR2toFITS(const char *fnameCR2, const char *fnameFITS)
     float iso;
     float shutter;
     float aperture;
-    long ID;
+    imageID ID;
     long xsize,ysize;
     long ii;
-    
+
 
     sprintf(command,"dcraw -t 0 -D -4 -c %s > _tmppgm.pgm",fnameCR2);
     if(system(command) != 0)
         printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
 
 
-    read_PGMimage("_tmppgm.pgm","tmpfits1");
+    ID = read_PGMimage("_tmppgm.pgm", "tmpfits1");
     if(system("rm _tmppgm.pgm") != 0)
         printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
 
     if(CR2toFITS_NORM==1)
     {
-		
-		
         sprintf(command,"dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt",fnameCR2);
         if(system(command) != 0)
             printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
@@ -1020,7 +1056,7 @@ int CR2toFITS(const char *fnameCR2, const char *fnameFITS)
     save_fl_fits("tmpfits1", fnameFITS);
     delete_image_ID("tmpfits1");
 
-    return(0);
+    return ID;
 }
 
 
@@ -1028,26 +1064,30 @@ int CR2toFITS(const char *fnameCR2, const char *fnameFITS)
 
 /**
  * ## Purpose
- * 
+ *
  * load CR2 file
- * 
+ *
  * @note assumes dcraw is installed
  */
-long loadCR2(const char *fnameCR2, const char *IDname)
+imageID loadCR2(
+    const char *fnameCR2,
+    const char *IDname
+)
 {
     char command[200];
     FILE *fp;
-    
+    imageID ID;
+
 
     sprintf(command,"dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
     if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
 
-    read_PGMimage("_tmppgm.pgm", IDname);
+    ID = read_PGMimage("_tmppgm.pgm", IDname);
     if(system("rm _tmppgm.pgm") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
 
-    return(0);
+    return ID;
 }
 
 
@@ -1055,7 +1095,9 @@ long loadCR2(const char *fnameCR2, const char *IDname)
 // load all images matching strfilter + .CR2
 // return number of images converted
 // FITS image name = CR2 image name with .CR2 -> .fits
-long CR2toFITS_strfilter(const char *strfilter)
+long CR2toFITS_strfilter(
+    const char *strfilter
+)
 {
     long i;
     long cnt = 0;
@@ -1067,7 +1109,7 @@ long CR2toFITS_strfilter(const char *strfilter)
 
     sprintf(command,"ls %s.CR2 > flist.tmp\n",strfilter);
     if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
 
     fp = fopen("flist.tmp","r");
     while(fgets(fname,200,fp)!=NULL)
@@ -1101,15 +1143,21 @@ long CR2toFITS_strfilter(const char *strfilter)
 // separates a single RGB image into its 4 channels
 // output written in im_r, im_g1, im_g2 and im_b
 //
-int image_format_extract_RGGBchan(const char *ID_name, const char *IDoutR_name, const char *IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)
+errno_t image_format_extract_RGGBchan(
+    const char *ID_name,
+    const char *IDoutR_name,
+    const char *IDoutG1_name,
+    const char *IDoutG2_name,
+    const char *IDoutB_name
+)
 {
-    long ID;
+    imageID ID;
     long Xsize, Ysize;
-    long IDr, IDg1, IDg2, IDb;
+    imageID IDr, IDg1, IDg2, IDb;
     long xsize2, ysize2;
     long ii, jj, ii1, jj1;
     int RGBmode = 0;
-    long ID00, ID01, ID10, ID11;
+    imageID ID00, ID01, ID10, ID11;
 
     ID = image_ID(ID_name);
     Xsize = data.image[ID].md[0].size[0];
@@ -1175,20 +1223,26 @@ int image_format_extract_RGGBchan(const char *ID_name, const char *IDoutR_name, 
             data.image[ID10].array.F[jj*xsize2+ii] = data.image[ID].array.F[jj1*Xsize+(ii1+1)];
         }
 
-    return(0);
+    return RETURN_SUCCESS;
 }
 
 //
 // assembles 4 channels into a single image (inverse operation of routine above)
 //
-int image_format_reconstruct_from_RGGBchan(const char *IDr_name, const char *IDg1_name, const char *IDg2_name, const char *IDb_name, const char *IDout_name)
+imageID image_format_reconstruct_from_RGGBchan(
+    const char *IDr_name,
+    const char *IDg1_name,
+    const char *IDg2_name,
+    const char *IDb_name,
+    const char *IDout_name
+)
 {
-    long ID;
-    long IDr, IDg1, IDg2, IDb;
+    imageID ID;
+    imageID IDr, IDg1, IDg2, IDb;
     long xsize1, ysize1, xsize2, ysize2;
     long ii1,jj1;
     int RGBmode = 0;
-    long ID00, ID01, ID10, ID11;
+    imageID ID00, ID01, ID10, ID11;
 
 
     IDr = image_ID(IDr_name);
@@ -1251,21 +1305,27 @@ int image_format_reconstruct_from_RGGBchan(const char *IDr_name, const char *IDg
 // IMPORTANT: input will be modified
 // Sampling factor : 0=full resolution (slow), 1=half resolution (fast), 2=quarter resolution (very fast)
 // Fast mode does not reject bad pixels
-int convert_rawbayerFITStorgbFITS_simple(const char *ID_name, const char *ID_name_r, const char *ID_name_g, const char *ID_name_b, int SamplFactor)
+errno_t convert_rawbayerFITStorgbFITS_simple(
+    const char *ID_name,
+    const char *ID_name_r,
+    const char *ID_name_g,
+    const char *ID_name_b,
+    int         SamplFactor
+)
 {
-    long ID;
+    imageID ID;
     long Xsize,Ysize;
-    long IDr,IDg,IDb,IDrc,IDgc,IDbc,IDbp;
-    long IDbadpix;
-    long IDflat;
-    long IDdark;
-    long IDbias;
+    imageID IDr,IDg,IDb,IDrc,IDgc,IDbc,IDbp;
+    imageID IDbadpix;
+    imageID IDflat;
+    imageID IDdark;
+    imageID IDbias;
     long ii,jj,ii1,jj1,ii2,jj2,iistart,iiend,jjstart,jjend,dii,djj;
     double v1,v2,v,vc,tmp1;
     long cnt;
     double coeff;
-    long ID00, ID01, ID10, ID11;
-    long ID00c, ID01c, ID10c, ID11c;
+    imageID ID00, ID01, ID10, ID11;
+    imageID ID00c, ID01c, ID10c, ID11c;
     double eps = 1.0e-8;
     int RGBmode = 0;
 
@@ -1792,7 +1852,7 @@ int convert_rawbayerFITStorgbFITS_simple(const char *ID_name, const char *ID_nam
     }
 
 
-    return(0);
+    return RETURN_SUCCESS;
 }
 
 
@@ -1805,9 +1865,14 @@ int convert_rawbayerFITStorgbFITS_simple(const char *ID_name, const char *ID_nam
 
 
 // assumes dcraw is installed
-int loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *fnameFITSg, const char *fnameFITSb)
+errno_t loadCR2toFITSRGB(
+    const char *fnameCR2,
+    const char *fnameFITSr,
+    const char *fnameFITSg,
+    const char *fnameFITSb
+)
 {
-    char command[200];   
+    char command[200];
 
 
     sprintf(command,"dcraw -t 0 -D -4 -c %s > _tmppgm.pgm",fnameCR2);
@@ -1825,7 +1890,7 @@ int loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *f
 		float iso;
 		float shutter;
 		float aperture;
-		long ID;
+		imageID ID;
 		long xsize,ysize;
 		long ii;
     
@@ -1892,7 +1957,7 @@ int loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *f
 
     FLUXFACTOR = 1.0;
 
-    return(0);
+    return RETURN_SUCCESS;
 }
 
 
@@ -1901,7 +1966,7 @@ int loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *f
 
 
 
-int CR2tomov()
+errno_t CR2tomov()
 {
     char configfile[200];
     long ID,IDr,IDg,IDb;
@@ -2643,7 +2708,7 @@ int CR2tomov()
     }
     free(maxlevel);
 
-    return(0);
+    return RETURN_SUCCESS;
 }
 
 
@@ -2653,9 +2718,16 @@ int CR2tomov()
 // gain: in e-/ADU
 // alpha: 0 - 1, sets quantization noise at alpha x overall noise
 // bias: image bias in ADU
-long IMAGE_FORMAT_requantize(const char *IDin_name, const char *IDout_name, double alpha, double ron, double gain, double bias)
+imageID IMAGE_FORMAT_requantize(
+    const char *IDin_name,
+    const char *IDout_name,
+    double      alpha,
+    double      RON,
+    double      gain,
+    double      bias
+)
 {
-    long IDin, IDout;
+    imageID IDin, IDout;
     long ii;
     long xsize,ysize;
 
@@ -2666,14 +2738,14 @@ long IMAGE_FORMAT_requantize(const char *IDin_name, const char *IDout_name, doub
     IDout = create_2Dimage_ID(IDout_name,xsize,ysize);
     for(ii=0; ii<xsize*ysize; ii++)
     {
-		double value;
-		
+        double value;
+
         value = data.image[IDin].array.F[ii];
         value = value - bias;
         if(value < 0.0)
-            value = value/(alpha*ron);
+            value = value/(alpha*RON);
         else
-            value = 2.0/alpha*sqrt(gain)*(sqrt(gain*ron*ron+value)-sqrt(gain)*ron);
+            value = 2.0/alpha*sqrt(gain)*(sqrt(gain*RON*RON+value)-sqrt(gain)*RON);
         data.image[IDout].array.F[ii] = value+0.5;
     }
 
@@ -2686,9 +2758,16 @@ long IMAGE_FORMAT_requantize(const char *IDin_name, const char *IDout_name, doub
 
 
 
-long IMAGE_FORMAT_dequantize(const char *IDin_name, const char *IDout_name, double alpha, double ron, double gain, double bias)
+imageID IMAGE_FORMAT_dequantize(
+    const char *IDin_name,
+    const char *IDout_name,
+    double alpha,
+    double RON,
+    double gain,
+    double bias
+)
 {
-    long IDin, IDout;
+    imageID IDin, IDout;
     long ii;
     long xsize,ysize;
 
@@ -2699,16 +2778,16 @@ long IMAGE_FORMAT_dequantize(const char *IDin_name, const char *IDout_name, doub
     IDout = create_2Dimage_ID(IDout_name,xsize,ysize);
     for(ii=0; ii<xsize*ysize; ii++)
     {
-		double value;
-		
+        double value;
+
         value = data.image[IDin].array.F[ii];
         if(value < 0.0)
-            value = value*alpha*ron + bias;
+            value = value*alpha*RON + bias;
         else
         {
-            value = alpha/2.0*value/sqrt(gain)+ron*sqrt(gain);
+            value = alpha/2.0*value/sqrt(gain)+RON*sqrt(gain);
             value = value*value;
-            value = value - gain*ron*ron + bias;
+            value = value - gain*RON*RON + bias;
         }
         data.image[IDout].array.F[ii] = value;
     }
@@ -2719,20 +2798,25 @@ long IMAGE_FORMAT_dequantize(const char *IDin_name, const char *IDout_name, doub
 
 
 
-long IMAGE_FORMAT_read_binary16(const char *fname, long xsize, long ysize, const char *IDname)
+imageID IMAGE_FORMAT_read_binary16(
+    const char *fname,
+    long xsize,
+    long ysize,
+    const char *IDname
+)
 {
     FILE *fp;
     char *buffer;
     unsigned long fileLen;
     long i, ii, jj;
-    long ID;
+    imageID ID = -1;
 
     //Open file
     if((fp = fopen(fname, "rb"))==NULL)
     {
-		printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
-		exit(0);
-	}
+        printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+        exit(0);
+    }
 
 
     //Get file length
@@ -2751,7 +2835,7 @@ long IMAGE_FORMAT_read_binary16(const char *fname, long xsize, long ysize, const
 
     //Read file contents into buffer
     if(fread(buffer, fileLen, 1, fp) < 1)
-		printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+        printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
     fclose(fp);
 
     ID = create_2Dimage_ID(IDname, xsize, ysize);
@@ -2760,7 +2844,7 @@ long IMAGE_FORMAT_read_binary16(const char *fname, long xsize, long ysize, const
     for(jj=0; jj<ysize; jj++)
         for(ii=0; ii<xsize; ii++)
         {
-			long v1;
+            long v1;
 
             if(i<fileLen+1)
                 v1 = (long) (((unsigned const char *)buffer)[i]) +  (long) (256*((unsigned const char *)buffer)[i+1]);
@@ -2770,26 +2854,31 @@ long IMAGE_FORMAT_read_binary16(const char *fname, long xsize, long ysize, const
 
     free(buffer);
 
-    return(0);
+    return ID;
 }
 
 
 
 
-long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)
+imageID IMAGE_FORMAT_read_binary32f(
+    const char *fname,
+    long        xsize,
+    long        ysize,
+    const char *IDname
+)
 {
     FILE *fp;
     float *buffer;
     unsigned long fileLen;
     long i, ii, jj;
-    long ID;
+    imageID ID;
     long v1;
 
     //Open file
-    if((fp = fopen(fname, "rb"))==NULL){
-		printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
-		return (0);
-	}
+    if((fp = fopen(fname, "rb"))==NULL) {
+        printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+        return (0);
+    }
 
     //Get file length
     fseek(fp, 0, SEEK_END);
@@ -2806,8 +2895,8 @@ long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, cons
     }
 
     //Read file contents into buffer
-    if(fread(buffer, fileLen, 1, fp) < 1) 
-		printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+    if(fread(buffer, fileLen, 1, fp) < 1)
+        printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
     fclose(fp);
 
     ID = create_2Dimage_ID(IDname, xsize, ysize);
@@ -2823,16 +2912,19 @@ long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, cons
     free(buffer);
 
 
-    return(0);
+    return ID;
 }
 
 
 
 
 
-long IMAGE_FORMAT_FITS_to_ushortintbin_lock( const char *IDname, const char *fname )
+imageID IMAGE_FORMAT_FITS_to_ushortintbin_lock(
+    const char *IDname,
+    const char *fname
+)
 {
-    long ID;
+    imageID ID;
     long xsize, ysize;
     long ii;
     int fd;
@@ -2872,21 +2964,24 @@ long IMAGE_FORMAT_FITS_to_ushortintbin_lock( const char *IDname, const char *fna
 
     free(valarray);
 
-    return(0);
+    return ID;
 }
 
 
 
 
 
-long IMAGE_FORMAT_FITS_to_floatbin_lock(  const char *IDname, const char *fname )
+imageID IMAGE_FORMAT_FITS_to_floatbin_lock(
+    const char *IDname,
+    const char *fname
+)
 {
-    long ID;
+    imageID ID = -1;
     long xsize, ysize;
     long ii;
     int fd;
     float *valarray;
-    
+
 
     ID = image_ID(IDname);
     xsize = data.image[ID].md[0].size[0];
@@ -2908,13 +3003,13 @@ long IMAGE_FORMAT_FITS_to_floatbin_lock(  const char *IDname, const char *fname 
     }
 
     if( (fd = open(fname, O_RDWR | O_CREAT, S_IRUSR|S_IWUSR)) == -1)
-		printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+        printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
     flock(fd, LOCK_EX);
     if( fd < 0 )
         printf( "Error opening file: %s\n", strerror( errno ) );
 
-    if(write(fd, valarray, sizeof(float)*xsize*ysize) < 1) 
-		printERROR(__FILE__,__func__,__LINE__, "write() returns <1 value");
+    if(write(fd, valarray, sizeof(float)*xsize*ysize) < 1)
+        printERROR(__FILE__,__func__,__LINE__, "write() returns <1 value");
     //  for(ii=0;ii<xsize*ysize;ii++)
     //  printf("[%ld %f] ", ii, valarray[ii]);
 
@@ -2924,7 +3019,7 @@ long IMAGE_FORMAT_FITS_to_floatbin_lock(  const char *IDname, const char *fname 
 
     free(valarray);
 
-    return(0);
+    return ID;
 }
 
 
