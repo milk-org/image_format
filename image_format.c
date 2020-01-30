@@ -1169,7 +1169,9 @@ long CR2toFITS_strfilter(
     }
 
     fclose(fp);
-    system("rm flist.tmp");
+    if(system("rm flist.tmp") != 0) {
+        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+    }
 
     printf("%ld files converted\n",cnt);
 
