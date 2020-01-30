@@ -931,16 +931,57 @@ imageID read_PGMimage(
         long maxval;
         long ii, jj;
         double val;
-        
-        fscanf(fp,"%s",line1);
-        
+
+        {
+            int fscanfcnt = fscanf(fp, "%s", line1);
+            if(fscanfcnt == EOF) {
+                if(ferror(fp)) {
+                    perror("fscanf");
+                } else {
+                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                }
+                exit(EXIT_FAILURE);
+            } else if(fscanfcnt != 1) {
+                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 1 expected\n", fscanfcnt);
+                exit(EXIT_FAILURE);
+            }
+        }
+
+
         if(strcmp(line1,"P5")!=0)
             fprintf(stderr,"ERROR: File is not PGM image\n");
         else
         {
-            fscanf(fp,"%ld %ld", &xsize, &ysize);
+            int fscanfcnt = fscanf(fp,"%ld %ld", &xsize, &ysize);
+            if(fscanfcnt == EOF) {
+                if(ferror(fp)) {
+                    perror("fscanf");
+                } else {
+                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                }
+                exit(EXIT_FAILURE);
+            } else if(fscanfcnt != 2) {
+                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 2 expected\n", fscanfcnt);
+                exit(EXIT_FAILURE);
+            }
+
             printf("PGM image size: %ld x %ld\n",xsize,ysize);
-            fscanf(fp,"%ld",&maxval);
+
+
+            fscanfcnt = fscanf(fp, "%ld", &maxval);
+            if(fscanfcnt == EOF) {
+                if(ferror(fp)) {
+                    perror("fscanf");
+                } else {
+                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                }
+                exit(EXIT_FAILURE);
+            } else if(fscanfcnt != 1) {
+                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 1 expected\n", fscanfcnt);
+                exit(EXIT_FAILURE);
+            }
+
+
             if(maxval!=65535)
                 fprintf(stderr,"Not 16-bit image. Cannot read\n");
             else
@@ -2375,7 +2416,8 @@ errno_t CR2tomov()
     {		
         if((fp = fopen("imgstats.txt","r"))==NULL)
 			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
-        while(fscanf(fp,"%05ld %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",&cnt,&vp01r,&vp05r,&vp10r,&vp20r,&vp50r,&vp80r,&vp90r,&vp95r,&vp99r,&vp995r,&vp998r,&vp999r,&vp01g,&vp05g,&vp10g,&vp20g,&vp50g,&vp80g,&vp90g,&vp95g,&vp99g,&vp995g,&vp998g,&vp999g,&vp01b,&vp05b,&vp10b,&vp20b,&vp50b,&vp80b,&vp90b,&vp95b,&vp99b,&vp995b,&vp998b,&vp999b)==37)
+        while(fscanf(fp, "%05ld %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+        &cnt,&vp01r,&vp05r,&vp10r,&vp20r,&vp50r,&vp80r,&vp90r,&vp95r,&vp99r,&vp995r,&vp998r,&vp999r,&vp01g,&vp05g,&vp10g,&vp20g,&vp50g,&vp80g,&vp90g,&vp95g,&vp99g,&vp995g,&vp998g,&vp999g,&vp01b,&vp05b,&vp10b,&vp20b,&vp50b,&vp80b,&vp90b,&vp95b,&vp99b,&vp995b,&vp998b,&vp999b)==37)
         {
             vp01 = ( vp01r + vp01g + vp01b ) / 3.0;
             vp05 = ( vp05r + vp05g + vp05b ) / 3.0;
