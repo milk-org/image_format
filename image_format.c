@@ -718,7 +718,7 @@ long getImageInfo(
     for(i=1; i<=numberOfChars; i++)
     {
         if(fread(ptrC, sizeof(char), 1, inputFile) < 1)
-            printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+            PRINT_ERROR("fread() returns <1 value");
 
         /* calculate value based on adding bytes */
         value = (long)(value + (*ptrC)*(pow(256, (i-1))));
@@ -873,17 +873,17 @@ errno_t read_BMPimage(
 
             /*----READ FIRST BYTE TO GET BLUE VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
-                printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+                PRINT_ERROR("fread() returns <1 value");
             BlueValue = *pChar;
 
             /*-----READ NEXT BYTE TO GET GREEN VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
-                printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+                PRINT_ERROR("fread() returns <1 value");
             GreenValue = *pChar;
 
             /*-----READ NEXT BYTE TO GET RED VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
-                printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+                PRINT_ERROR("fread() returns <1 value");
             RedValue = *pChar;
 
             /*---------WRITE TO FILES ---------*/
@@ -1019,7 +1019,6 @@ imageID CR2toFITS(
     const char *fnameFITS
 )
 {
-    char command[200];
     FILE *fp;
 
     float iso;
@@ -1030,61 +1029,51 @@ imageID CR2toFITS(
     long ii;
 
 
-    sprintf(command,"dcraw -t 0 -D -4 -c %s > _tmppgm.pgm",fnameCR2);
-    if(system(command) != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+	EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
 
 
     ID = read_PGMimage("_tmppgm.pgm", "tmpfits1");
     if(system("rm _tmppgm.pgm") != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        PRINT_ERROR("system() returns non-zero value");
 
     if(CR2toFITS_NORM==1)
     {
-        sprintf(command,"dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt",fnameCR2);
-        if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt", fnameCR2);        
         
         if((fp = fopen("iso_tmp.txt","r"))==NULL)
-		printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+			PRINT_ERROR("Cannot open file");
         if(fscanf(fp,"%f\n",&iso) != 1)
-			printERROR(__FILE__,__func__,__LINE__, "fscanf returns value != 1");
+			PRINT_ERROR("fscanf returns value != 1");
         fclose(fp);
         
         if(system("rm iso_tmp.txt") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+            PRINT_ERROR("system() returns non-zero value");
         
         printf("iso = %f\n",iso);
 
-        sprintf(command,"dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt",fnameCR2);
+		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt", fnameCR2);        
 
-        if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
-
-        if((fp = fopen("shutter_tmp.txt","r"))==NULL)
-			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+        if((fp = fopen("shutter_tmp.txt", "r"))==NULL)
+			PRINT_ERROR("Cannot open file");
         
         if(fscanf(fp,"%f\n", &shutter) != 1)
-			printERROR(__FILE__,__func__,__LINE__, "fscanf returns value != 1");
+			PRINT_ERROR("fscanf returns value != 1");
         fclose(fp);
 
         if(system("rm shutter_tmp.txt") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+            PRINT_ERROR("system() returns non-zero value");
         printf("shutter = %f\n",shutter);
 
-        sprintf(command,"dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt",fnameCR2);
-
-        if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt", fnameCR2);
 
         if((fp = fopen("aperture_tmp.txt","r"))==NULL)
-			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+			PRINT_ERROR("Cannot open file");
         if(fscanf(fp,"f/%f\n",&aperture) != 1)
-			printERROR(__FILE__,__func__,__LINE__, "fscanf returns value != 1");
+			PRINT_ERROR("fscanf returns value != 1");
         fclose(fp);
 
         if(system("rm aperture_tmp.txt") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+            PRINT_ERROR("system() returns non-zero value");
 
         printf("aperture = %f\n",aperture);
 
@@ -1117,17 +1106,13 @@ imageID loadCR2(
     const char *IDname
 )
 {
-    char command[200];
     imageID ID;
 
-
-    sprintf(command,"dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
-    if(system(command) != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+	EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);    
 
     ID = read_PGMimage("_tmppgm.pgm", IDname);
     if(system("rm _tmppgm.pgm") != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        PRINT_ERROR("system() returns non-zero value");
 
     return ID;
 }
@@ -1142,20 +1127,17 @@ long CR2toFITS_strfilter(
 )
 {
     long cnt = 0;
-    char command[200];
-    char fname[200];
-    char fname1[200];
+    char fname[STRINGMAXLEN_FULLFILENAME];
+    char fname1[STRINGMAXLEN_FULLFILENAME];
     FILE *fp;
 
-    sprintf(command,"ls %s.CR2 > flist.tmp\n",strfilter);
-    if(system(command) != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+	EXECUTE_SYSTEM_COMMAND("ls %s.CR2 > flist.tmp\n", strfilter);    
 
     fp = fopen("flist.tmp","r");
-    while(fgets(fname,200,fp)!=NULL)
+    while(fgets(fname, STRINGMAXLEN_FULLFILENAME, fp)!=NULL)
     {
         fname[strlen(fname)-1] = '\0';
-        strncpy(fname1,fname,strlen(fname)-4);
+        strncpy(fname1, fname, strlen(fname)-4 );
         fname1[strlen(fname)-4] = '.';
         fname1[strlen(fname)-3] = 'f';
         fname1[strlen(fname)-2] = 'i';
@@ -1164,13 +1146,13 @@ long CR2toFITS_strfilter(
         fname1[strlen(fname)+1] = '\0';
 
         CR2toFITS(fname,fname1);
-        printf("File %s  -> file %s\n",fname,fname1);
+        printf("File %s  -> file %s\n", fname, fname1);
         cnt++;
     }
 
     fclose(fp);
     if(system("rm flist.tmp") != 0) {
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        PRINT_ERROR("system() returns non-zero value");
     }
 
     printf("%ld files converted\n",cnt);
@@ -1914,13 +1896,8 @@ errno_t loadCR2toFITSRGB(
     const char *fnameFITSb
 )
 {
-    char command[200];
+	EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
 
-
-    sprintf(command,"dcraw -t 0 -D -4 -c %s > _tmppgm.pgm",fnameCR2);
-    if(system(command) != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
-    
     read_PGMimage("_tmppgm.pgm", "tmpfits1");
     //  r = system("rm _tmppgm.pgm");
 
@@ -1928,66 +1905,61 @@ errno_t loadCR2toFITSRGB(
 
     if(CR2toFITS_NORM==1)
     {
-	    FILE *fp;
-		float iso;
-		float shutter;
-		float aperture;
-		//imageID ID;
-		//long xsize,ysize;
-    
-        sprintf(command,"dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt",fnameCR2);
-        if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
-            
-        if((fp = fopen("iso_tmp.txt","r"))==NULL)
-			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
-        if(fscanf(fp,"%f\n",&iso) != 1)
-			printERROR(__FILE__,__func__,__LINE__, "fscanf returns value != 1");
-        fclose(fp);
+        FILE *fp;
+        float iso;
+        float shutter;
+        float aperture;
+        //imageID ID;
+        //long xsize,ysize;
+
+		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt", fnameCR2);
         
+        if((fp = fopen("iso_tmp.txt","r"))==NULL)
+            PRINT_ERROR("Cannot open file");
+        if(fscanf(fp,"%f\n",&iso) != 1)
+            PRINT_ERROR("fscanf returns value != 1");
+        fclose(fp);
+
         if(system("rm iso_tmp.txt") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+            PRINT_ERROR("system() returns non-zero value");
         printf("iso = %f\n",iso);
 
-        sprintf(command,"dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt",fnameCR2);
-		if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt", fnameCR2);
         
         if((fp = fopen("shutter_tmp.txt","r"))==NULL)
-			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
-        
-        if(fscanf(fp,"%f\n",&shutter) != 1)
-			printERROR(__FILE__,__func__,__LINE__, "fscanf returns value != 1");
-        fclose(fp);
-        
-        if(system("rm shutter_tmp.txt") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
-        printf("shutter = %f\n",shutter);
+            PRINT_ERROR("Cannot open file");
 
-        sprintf(command,"dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt",fnameCR2);
-        if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
-        
-        if((fp = fopen("aperture_tmp.txt","r"))==NULL)
-			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
-        if(fscanf(fp,"f/%f\n",&aperture) != 1)
-			printERROR(__FILE__,__func__,__LINE__, "fscanf returns value != 1");
+        if(fscanf(fp,"%f\n",&shutter) != 1)
+            PRINT_ERROR("fscanf returns value != 1");
         fclose(fp);
+
+        if(system("rm shutter_tmp.txt") != 0)
+            PRINT_ERROR("system() returns non-zero value");
+        printf("shutter = %f\n",shutter);
+		
+		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt", fnameCR2);
         
+
+        if((fp = fopen("aperture_tmp.txt","r"))==NULL)
+            PRINT_ERROR("Cannot open file");
+        if(fscanf(fp,"f/%f\n",&aperture) != 1)
+            PRINT_ERROR("fscanf returns value != 1");
+        fclose(fp);
+
         if(system("rm aperture_tmp.txt") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+            PRINT_ERROR("system() returns non-zero value");
         printf("aperture = %f\n",aperture);
 
         //ID = image_ID("tmpfits1");
-//        xsize = data.image[ID].md[0].size[0];
-//        ysize = data.image[ID].md[0].size[1];
+        //        xsize = data.image[ID].md[0].size[0];
+        //        ysize = data.image[ID].md[0].size[1];
 
         FLUXFACTOR = aperture*aperture/(shutter*iso);
     }
     else
         FLUXFACTOR = 1.0;
 
-    printf("FLUXFACTOR = %g\n" ,FLUXFACTOR);
+    printf("FLUXFACTOR = %g\n",FLUXFACTOR);
 
     if(variable_ID("RGBfullres")==-1)
         convert_rawbayerFITStorgbFITS_simple("tmpfits1", fnameFITSr, fnameFITSg, fnameFITSb, 1);
@@ -2009,29 +1981,28 @@ errno_t loadCR2toFITSRGB(
 
 errno_t CR2tomov()
 {
-    char configfile[200];
-    long ID,IDr,IDg,IDb;
+    char configfile[STRINGMAXLEN_FILENAME];
+    imageID ID, IDr, IDg, IDb;
     long ii,i;
     long cnt = 0;
     long cntmax;
-    char command[200];
-    char fname[200];
-    char fnamer[200];
-    char fnameg[200];
-    char fnameb[200];
-    char fnamestat[200];
-    char fnameoutr[200];
-    char fnameoutg[200];
-    char fnameoutb[200];
-    char fnamejpg[200];
+    char fname[STRINGMAXLEN_FULLFILENAME];
+    char fnamer[STRINGMAXLEN_FULLFILENAME];
+    char fnameg[STRINGMAXLEN_FULLFILENAME];
+    char fnameb[STRINGMAXLEN_FULLFILENAME];
+    char fnamestat[STRINGMAXLEN_FULLFILENAME];
+    char fnameoutr[STRINGMAXLEN_FULLFILENAME];
+    char fnameoutg[STRINGMAXLEN_FULLFILENAME];
+    char fnameoutb[STRINGMAXLEN_FULLFILENAME];
+    char fnamejpg[STRINGMAXLEN_FULLFILENAME];
     FILE *fp;
     FILE *fp1;
 
     long xsize,ysize;
 
-    long IDrtot;
-    long IDgtot;
-    long IDbtot;
+    imageID IDrtot;
+    imageID IDgtot;
+    imageID IDbtot;
 
     //double tot;
 
@@ -2112,9 +2083,21 @@ errno_t CR2tomov()
 
     int MKim;
 
-    
 
-    sprintf(configfile,"cr2tojpegconf.txt");
+
+
+    {   // code block write image name
+        int slen = snprintf(configfile, STRINGMAXLEN_FILENAME, "cr2tojpegconf.txt");
+        if(slen<1) {
+            PRINT_ERROR("snprintf wrote <1 char");
+            abort(); // can't handle this error any other way
+        }
+        if(slen >= STRINGMAXLEN_FILENAME) {
+            PRINT_ERROR("snprintf string truncation");
+            abort(); // can't handle this error any other way
+        }
+    } // end code block
+
 
     CR2toFITSrgb = read_config_parameter_int(configfile,"CR2TOFITSRGB");
     CR2TOFITSRGB_FORCE = read_config_parameter_int(configfile,"CR2TOFITSRGB_FORCE");
@@ -2195,19 +2178,17 @@ errno_t CR2tomov()
         load_fits("badpix.fits", "badpix", 1);
         load_fits("flat.fits", "flat", 1);
 
-        sprintf(command,"ls ./CR2/*.CR2 > flist.tmp\n");
-        if(system(command) != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+		EXECUTE_SYSTEM_COMMAND("ls ./CR2/*.CR2 > flist.tmp");
 
         if((fp = fopen("flist.tmp","r"))==NULL)
-			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+            PRINT_ERROR("Cannot open file");
         SKIPcnt = 0;
         while((fgets(fname,200,fp)!=NULL)&&(cnt<maxnbFITSfiles))
         {
-            sprintf(fnamestat,"./FITS/imgstats.%05ld.txt",cnt);
-            sprintf(fnameoutr,"./FITS/imr%05ld.fits",cnt);
-            sprintf(fnameoutg,"./FITS/img%05ld.fits",cnt);
-            sprintf(fnameoutb,"./FITS/imb%05ld.fits",cnt);
+            WRITE_FULLFILENAME(fnamestat, "./FITS/imgstats.%05ld.txt", cnt);
+            WRITE_FULLFILENAME(fnameoutr, "./FITS/imr%05ld.fits", cnt);
+            WRITE_FULLFILENAME(fnameoutg, "./FITS/img%05ld.fits", cnt);
+            WRITE_FULLFILENAME(fnameoutb, "./FITS/imb%05ld.fits", cnt);
 
             MKim = 0;
             if((file_exists(fnameoutr)==1)&&(file_exists(fnameoutg)==1)&&(file_exists(fnameoutb)==1)&&(CR2TOFITSRGB_FORCE==0))
@@ -2262,11 +2243,11 @@ errno_t CR2tomov()
                     save_fl_fits("imgtot","!imgtot.fits");
                     save_fl_fits("imbtot","!imbtot.fits");
 
-                    sprintf(fnameoutr,"!./FITS/imr%05ld.fits",cnt);
+                    WRITE_FULLFILENAME(fnameoutr,"!./FITS/imr%05ld.fits",cnt);
                     save_fl_fits("imr",fnameoutr);
-                    sprintf(fnameoutg,"!./FITS/img%05ld.fits",cnt);
+                    WRITE_FULLFILENAME(fnameoutg,"!./FITS/img%05ld.fits",cnt);
                     save_fl_fits("img",fnameoutg);
-                    sprintf(fnameoutb,"!./FITS/imb%05ld.fits",cnt);
+                    WRITE_FULLFILENAME(fnameoutb,"!./FITS/imb%05ld.fits",cnt);
                     save_fl_fits("imb",fnameoutb);
                 }
             }
@@ -2279,9 +2260,9 @@ errno_t CR2tomov()
                 printf("[%ld] working on file %s (statistics)\n",cnt,fname);
                 if(MKim == 0)
                 {
-                    sprintf(fnameoutr,"./FITS/imr%05ld.fits",cnt);
-                    sprintf(fnameoutg,"./FITS/img%05ld.fits",cnt);
-                    sprintf(fnameoutb,"./FITS/imb%05ld.fits",cnt);
+                    WRITE_FULLFILENAME(fnameoutr,"./FITS/imr%05ld.fits",cnt);
+                    WRITE_FULLFILENAME(fnameoutg,"./FITS/img%05ld.fits",cnt);
+                    WRITE_FULLFILENAME(fnameoutb,"./FITS/imb%05ld.fits",cnt);
                     load_fits(fnameoutr, "imr", 1);
                     load_fits(fnameoutg, "img", 1);
                     load_fits(fnameoutb, "imb", 1);
@@ -2397,16 +2378,16 @@ errno_t CR2tomov()
         }
         fclose(fp);
         if(system("rm flist.tmp") != 0)
-            printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+            PRINT_ERROR("system() returns non-zero value");
 
         printf("%ld images processed\n",cnt);
     }
 
     if(system("rm imgstats.txt") != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        PRINT_ERROR("system() returns non-zero value");
 
     if(system("cat ./FITS/imgstats.*.txt > imgstats.txt") != 0)
-        printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+        PRINT_ERROR("system() returns non-zero value");
 
 
 
@@ -2417,7 +2398,7 @@ errno_t CR2tomov()
     if(MAXLEVEL_AUTO == 1)
     {		
         if((fp = fopen("imgstats.txt","r"))==NULL)
-			printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+			PRINT_ERROR("Cannot open file");
         while(fscanf(fp, "%05ld %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
         &cnt,&vp01r,&vp05r,&vp10r,&vp20r,&vp50r,&vp80r,&vp90r,&vp95r,&vp99r,&vp995r,&vp998r,&vp999r,&vp01g,&vp05g,&vp10g,&vp20g,&vp50g,&vp80g,&vp90g,&vp95g,&vp99g,&vp995g,&vp998g,&vp999g,&vp01b,&vp05b,&vp10b,&vp20b,&vp50b,&vp80b,&vp90b,&vp95b,&vp99b,&vp995b,&vp998b,&vp999b)==37)
         {
@@ -2547,44 +2528,44 @@ errno_t CR2tomov()
 
         for(i=0; i<maxnbFITSfiles; i++)
         {
-            sprintf(fnamejpg,"./JPEG/im%05ld.jpg",i);
+            WRITE_FULLFILENAME(fnamejpg,"./JPEG/im%05ld.jpg",i);
             if(file_exists(fnamejpg)==1)
             {
                 printf("Files %s exists, no need to recreate\n",fnamejpg);
             }
             else
             {
-                sprintf(fnamer,"./FITS/imr%05ld.fits",i);
+                WRITE_FULLFILENAME(fnamer,"./FITS/imr%05ld.fits",i);
                 if(file_exists(fnamer)==1)
                 {
                     if(SKIPcnt_FITStoJPEG==0)
                     {
                         printf("file %s exists\n",fnamer);
 
-                        sprintf(fnamer,"./FITS/imr%05ld.f.fits",i);
+                        WRITE_FULLFILENAME(fnamer,"./FITS/imr%05ld.f.fits",i);
                         if(file_exists(fnamer)==1)
                             IDr = load_fits(fnamer, "imr", 1);
                         else
                         {
-                            sprintf(fnamer,"./FITS/imr%05ld.fits",i);
+                            WRITE_FULLFILENAME(fnamer,"./FITS/imr%05ld.fits",i);
                             IDr = load_fits(fnamer, "imr", 1);
                         }
 
-                        sprintf(fnameg,"./FITS/img%05ld.f.fits",i);
+                        WRITE_FULLFILENAME(fnameg,"./FITS/img%05ld.f.fits",i);
                         if(file_exists(fnameg)==1)
                             IDg = load_fits(fnameg, "img", 1);
                         else
                         {
-                            sprintf(fnameg,"./FITS/img%05ld.fits",i);
+                            WRITE_FULLFILENAME(fnameg,"./FITS/img%05ld.fits",i);
                             IDg = load_fits(fnameg, "img", 1);
                         }
 
-                        sprintf(fnameb,"./FITS/imb%05ld.f.fits",i);
+                        WRITE_FULLFILENAME(fnameb,"./FITS/imb%05ld.f.fits",i);
                         if(file_exists(fnameb)==1)
                             IDb = load_fits(fnameb, "imb", 1);
                         else
                         {
-                            sprintf(fnameb,"./FITS/imb%05ld.fits",i);
+                            WRITE_FULLFILENAME(fnameb,"./FITS/imb%05ld.fits",i);
                             IDb = load_fits(fnameb, "imb", 1);
                         }
 
@@ -2737,12 +2718,10 @@ errno_t CR2tomov()
                         delete_image_ID("imr");
                         delete_image_ID("img");
                         delete_image_ID("imb");
-                        //		  sprintf(fnamejpg,"./JPEG/im%05ld.jpg",i);
-                        sprintf(command,"bmptoppm imrgb.bmp | ppmtojpeg --quality 95 > _tmpjpeg.jpg; mv _tmpjpeg.jpg %s",fnamejpg);
-                        if(system(command) != 0)
-							printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
-                        if(system("rm imrgb.bmp") != 0)
-							printERROR(__FILE__,__func__,__LINE__, "system() returns non-zero value");
+                        //		  WRITE_FULLFILENAME(fnamejpg,"./JPEG/im%05ld.jpg",i);
+                        
+                        EXECUTE_SYSTEM_COMMAND("bmptoppm imrgb.bmp | ppmtojpeg --quality 95 > _tmpjpeg.jpg; mv _tmpjpeg.jpg %s", fnamejpg);
+                        EXECUTE_SYSTEM_COMMAND("rm imrgb.bmp");
                     }
                     SKIPcnt_FITStoJPEG++;
                     if(SKIPcnt_FITStoJPEG>SKIP_FITStoJPEG-1)
@@ -2859,7 +2838,7 @@ imageID IMAGE_FORMAT_read_binary16(
     //Open file
     if((fp = fopen(fname, "rb"))==NULL)
     {
-        printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+        PRINT_ERROR("Cannot open file");
         exit(0);
     }
 
@@ -2880,7 +2859,7 @@ imageID IMAGE_FORMAT_read_binary16(
 
     //Read file contents into buffer
     if(fread(buffer, fileLen, 1, fp) < 1)
-        printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+        PRINT_ERROR("fread() returns <1 value");
     fclose(fp);
 
     ID = create_2Dimage_ID(IDname, xsize, ysize);
@@ -2921,7 +2900,7 @@ imageID IMAGE_FORMAT_read_binary32f(
 
     //Open file
     if((fp = fopen(fname, "rb"))==NULL) {
-        printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+        PRINT_ERROR("Cannot open file");
         return (0);
     }
 
@@ -2941,7 +2920,7 @@ imageID IMAGE_FORMAT_read_binary32f(
 
     //Read file contents into buffer
     if(fread(buffer, fileLen, 1, fp) < 1)
-        printERROR(__FILE__,__func__,__LINE__, "fread() returns <1 value");
+        PRINT_ERROR("fread() returns <1 value");
     fclose(fp);
 
     ID = create_2Dimage_ID(IDname, xsize, ysize);
@@ -3002,7 +2981,7 @@ imageID IMAGE_FORMAT_FITS_to_ushortintbin_lock(
         printf( "Error opening file \"%s\": %s\n", fname, strerror( errno ) );
     }
     if(write(fd, valarray, sizeof(unsigned short int)*xsize*ysize) < 1) 
-		printERROR(__FILE__,__func__,__LINE__, "write() returns <1 value");
+		PRINT_ERROR("write() returns <1 value");
     flock(fd, LOCK_UN);
     close(fd);
 
@@ -3048,13 +3027,13 @@ imageID IMAGE_FORMAT_FITS_to_floatbin_lock(
     }
 
     if( (fd = open(fname, O_RDWR | O_CREAT, S_IRUSR|S_IWUSR)) == -1)
-        printERROR(__FILE__, __func__, __LINE__, "Cannot open file");
+        PRINT_ERROR("Cannot open file");
     flock(fd, LOCK_EX);
     if( fd < 0 )
         printf( "Error opening file: %s\n", strerror( errno ) );
 
     if(write(fd, valarray, sizeof(float)*xsize*ysize) < 1)
-        printERROR(__FILE__,__func__,__LINE__, "write() returns <1 value");
+        PRINT_ERROR("write() returns <1 value");
     //  for(ii=0;ii<xsize*ysize;ii++)
     //  printf("[%ld %f] ", ii, valarray[ii]);
 
