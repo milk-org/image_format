@@ -7,6 +7,30 @@
  */
 
 
+/* ================================================================== */
+/* ================================================================== */
+/*            MODULE INFO                                             */
+/* ================================================================== */
+/* ================================================================== */
+
+
+// module default short name
+// all CLI calls to this module functions will be <shortname>.<funcname>
+// if set to "", then calls use <funcname>
+#define MODULE_SHORTNAME_DEFAULT ""
+
+// Module short description
+#define MODULE_DESCRIPTION       "Conversion between image format, I/O"
+
+// Application to which module belongs
+#define MODULE_APPLICATION       "milk"
+
+
+
+
+
+
+
 
 /* =============================================================================================== */
 /* =============================================================================================== */
@@ -101,7 +125,7 @@ typedef struct {
 
 //extern DATA data;
 
-static int INITSTATUS_image_format = 0;
+//static int INITSTATUS_image_format = 0;
 
 
 static int CR2toFITS_NORM = 0; // 1 if FITS should be normalized to ISO = 1, exposure = 1 sec, and F/1.0
@@ -122,11 +146,34 @@ typedef struct {int rows; int cols; unsigned char* data;} sImage;
 
 
 
+/* ================================================================== */
+/* ================================================================== */
+/*            INITIALIZE LIBRARY                                      */
+/* ================================================================== */
+/* ================================================================== */
+
+// Module initialization macro in CLIcore.h
+// macro argument defines module name for bindings
+//
+INIT_MODULE_LIB(image_format)
+
+
+
+
+
+
+
 /* =============================================================================================== */
 /* =============================================================================================== */
 /*                           FUNCTIONS TIED TO COMMAND LINE INTERFACE (CLI)                        */
 /* =============================================================================================== */
 /* =============================================================================================== */
+
+
+
+
+
+
 /** @name CLI bindings */
 
 
@@ -252,20 +299,10 @@ errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 /* =============================================================================================== */
 
 
-void __attribute__ ((constructor)) libinit_image_format()
-{
-	if ( INITSTATUS_image_format == 0 )
-	{
-		init_image_format();
-		RegisterModule(__FILE__, "milk", "Conversion between image format, I/O");
-		INITSTATUS_image_format = 1;
-	}
-}
-
 
 /** @name Module initialization */
 
-errno_t init_image_format()
+static errno_t init_module_CLI()
 {
 
   strcpy(data.cmd[data.NBcmd].key,"im2ascii");
@@ -347,6 +384,16 @@ errno_t init_image_format()
   return RETURN_SUCCESS;
 
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

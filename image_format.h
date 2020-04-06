@@ -1,9 +1,8 @@
-#ifndef _IMAGEFORMATMODULE_H
-#define _IMAGEFORMATMODULE_H
+//#ifndef _IMAGEFORMATMODULE_H
+//#define _IMAGEFORMATMODULE_H
 
 
 void __attribute__ ((constructor)) libinit_image_format();
-errno_t init_image_format();
 
 
 errno_t IMAGE_FORMAT_im_to_ASCII(
@@ -62,5 +61,5 @@ errno_t image_format_extract_RGGBchan(
     const char *IDoutB_name
 );
 
-#endif
+//#endif
 
