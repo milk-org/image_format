@@ -1,9 +1,9 @@
 /**
  * @file    image_format.c
  * @brief   Convert between image formats
- * 
+ *
  * read and write images other than FITS
- * 
+ *
  */
 
 
@@ -77,8 +77,8 @@
 
 #define BMP_BIG_ENDIAN 0
 
-/* Default data types.  Here, uint16 is an unsigned integer that has size 2 bytes (16 bits), 
-   and uint32 is datatype that has size 4 bytes (32 bits).  You may need to change these 
+/* Default data types.  Here, uint16 is an unsigned integer that has size 2 bytes (16 bits),
+   and uint32 is datatype that has size 4 bytes (32 bits).  You may need to change these
    depending on your compiler. */
 #define uint16 unsigned short
 #define uint32 unsigned int
@@ -89,27 +89,29 @@
 #define BMP_TRUE 1
 
 
-typedef struct {
-   uint16 bfType; 
-   uint32 bfSize; 
-   uint16 bfReserved1; 
-   uint16 bfReserved2; 
-   uint32 bfOffBits; 
-} BITMAPFILEHEADER; 
+typedef struct
+{
+    uint16 bfType;
+    uint32 bfSize;
+    uint16 bfReserved1;
+    uint16 bfReserved2;
+    uint32 bfOffBits;
+} BITMAPFILEHEADER;
 
-typedef struct { 
-   uint32 biSize;
-   uint32 biWidth; 
-   uint32 biHeight; 
-   uint16 biPlanes; 
-   uint16 biBitCount; 
-   uint32 biCompression; 
-   uint32 biSizeImage; 
-   uint32 biXPelsPerMeter; 
-   uint32 biYPelsPerMeter; 
-   uint32 biClrUsed; 
-   uint32 biClrImportant; 
-} BITMAPINFOHEADER; 
+typedef struct
+{
+    uint32 biSize;
+    uint32 biWidth;
+    uint32 biHeight;
+    uint16 biPlanes;
+    uint16 biBitCount;
+    uint32 biCompression;
+    uint32 biSizeImage;
+    uint32 biXPelsPerMeter;
+    uint32 biYPelsPerMeter;
+    uint32 biClrUsed;
+    uint32 biClrImportant;
+} BITMAPINFOHEADER;
 
 
 
@@ -128,14 +130,20 @@ typedef struct {
 //static int INITSTATUS_image_format = 0;
 
 
-static int CR2toFITS_NORM = 0; // 1 if FITS should be normalized to ISO = 1, exposure = 1 sec, and F/1.0
+static int CR2toFITS_NORM =
+    0; // 1 if FITS should be normalized to ISO = 1, exposure = 1 sec, and F/1.0
 static float FLUXFACTOR = 1.0;
 
-typedef struct {int rows; int cols; unsigned char* data;} sImage;
+typedef struct
+{
+    int rows;
+    int cols;
+    unsigned char *data;
+} sImage;
 
-/* This pragma is necessary so that the data in the structures is aligned to 2-byte 
+/* This pragma is necessary so that the data in the structures is aligned to 2-byte
    boundaries.  Some different compilers have a different syntax for this line.  For
-   example, if you're using cc on Solaris, the line should be #pragma pack(2).  
+   example, if you're using cc on Solaris, the line should be #pragma pack(2).
 */
 #pragma pack(2)
 
@@ -193,13 +201,18 @@ INIT_MODULE_LIB(image_format)
 
 errno_t image_writeBMP_auto_cli()
 {
-  if(CLI_checkarg(1,4)+CLI_checkarg(2,4)+CLI_checkarg(3,4)+CLI_checkarg(4,3)==0)
+    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 4) + CLI_checkarg(3,
+            4) + CLI_checkarg(4, 3) == 0)
     {
-      image_writeBMP_auto(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string);
-      return RETURN_SUCCESS;
+        image_writeBMP_auto(data.cmdargtoken[1].val.string,
+                            data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string,
+                            data.cmdargtoken[4].val.string);
+        return RETURN_SUCCESS;
     }
-  else
-    return RETURN_FAILURE;
+    else
+    {
+        return RETURN_FAILURE;
+    }
 }
 
 
@@ -207,83 +220,106 @@ errno_t image_writeBMP_auto_cli()
 
 errno_t IMAGE_FORMAT_im_to_ASCII_cli()
 {
-  if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
+    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 3) == 0)
     {
-      IMAGE_FORMAT_im_to_ASCII(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
-      return RETURN_SUCCESS;
+        IMAGE_FORMAT_im_to_ASCII(data.cmdargtoken[1].val.string,
+                                 data.cmdargtoken[2].val.string);
+        return RETURN_SUCCESS;
     }
-  else
-    return RETURN_FAILURE;
+    else
+    {
+        return RETURN_FAILURE;
+    }
 }
 
 
 errno_t CR2toFITS_cli()
 {
-  //  if(CLI_checkarg(1, 3)+CLI_checkarg(2, 3))
-  CR2toFITS(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
-  // else
-  // return(0);
-  
-  return RETURN_SUCCESS;
+    //  if(CLI_checkarg(1, 3)+CLI_checkarg(2, 3))
+    CR2toFITS(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
+    // else
+    // return(0);
+
+    return RETURN_SUCCESS;
 }
 
 
 errno_t IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli()
 {
-  if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
+    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 3) == 0)
     {
-      IMAGE_FORMAT_FITS_to_ushortintbin_lock(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
-      return RETURN_SUCCESS;
+        IMAGE_FORMAT_FITS_to_ushortintbin_lock(data.cmdargtoken[1].val.string,
+                                               data.cmdargtoken[2].val.string);
+        return RETURN_SUCCESS;
     }
-  else
-    return RETURN_FAILURE;
+    else
+    {
+        return RETURN_FAILURE;
+    }
 }
 
 
 errno_t IMAGE_FORMAT_FITS_to_floatbin_lock_cli()
 {
-  if(CLI_checkarg(1,4)+CLI_checkarg(2,3)==0)
+    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 3) == 0)
     {
-      IMAGE_FORMAT_FITS_to_floatbin_lock(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
-      return RETURN_SUCCESS;
+        IMAGE_FORMAT_FITS_to_floatbin_lock(data.cmdargtoken[1].val.string,
+                                           data.cmdargtoken[2].val.string);
+        return RETURN_SUCCESS;
     }
-  else
-    return RETURN_FAILURE;
+    else
+    {
+        return RETURN_FAILURE;
+    }
 }
 
 
 errno_t IMAGE_FORMAT_read_binary32f_cli()
 {
-  if(CLI_checkarg(1,3)+CLI_checkarg(2,2)+CLI_checkarg(3,2)+CLI_checkarg(4,3)==0)
+    if(CLI_checkarg(1, 3) + CLI_checkarg(2, 2) + CLI_checkarg(3,
+            2) + CLI_checkarg(4, 3) == 0)
     {
-      IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.numl, data.cmdargtoken[3].val.numl, data.cmdargtoken[4].val.string);
-      return RETURN_SUCCESS;
+        IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string,
+                                    data.cmdargtoken[2].val.numl, data.cmdargtoken[3].val.numl,
+                                    data.cmdargtoken[4].val.string);
+        return RETURN_SUCCESS;
     }
-  else
-    return RETURN_FAILURE;
+    else
+    {
+        return RETURN_FAILURE;
+    }
 }
 
 
 errno_t IMAGE_FORMAT_extract_RGGBchan_cli()
 {
-  if(CLI_checkarg(1,4)+CLI_checkarg(2,3)+CLI_checkarg(3,3)+CLI_checkarg(4,3)+CLI_checkarg(5,3)==0)
+    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 3) + CLI_checkarg(3,
+            3) + CLI_checkarg(4, 3) + CLI_checkarg(5, 3) == 0)
     {
-      image_format_extract_RGGBchan(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string, data.cmdargtoken[5].val.string);
-      return RETURN_SUCCESS;
+        image_format_extract_RGGBchan(data.cmdargtoken[1].val.string,
+                                      data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string,
+                                      data.cmdargtoken[4].val.string, data.cmdargtoken[5].val.string);
+        return RETURN_SUCCESS;
     }
-  else
-    return RETURN_FAILURE;
+    else
+    {
+        return RETURN_FAILURE;
+    }
 }
 
 errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 {
-  if(CLI_checkarg(1,4)+CLI_checkarg(2,3)+CLI_checkarg(3,3)+CLI_checkarg(4,3)==0)
+    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 3) + CLI_checkarg(3,
+            3) + CLI_checkarg(4, 3) == 0)
     {
-      loadCR2toFITSRGB(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string, data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string);
-      return RETURN_SUCCESS;
+        loadCR2toFITSRGB(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string,
+                         data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string);
+        return RETURN_SUCCESS;
     }
-  else
-    return RETURN_FAILURE;
+    else
+    {
+        return RETURN_FAILURE;
+    }
 }
 
 
@@ -305,83 +341,93 @@ errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 static errno_t init_module_CLI()
 {
 
-  strcpy(data.cmd[data.NBcmd].key,"im2ascii");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = IMAGE_FORMAT_im_to_ASCII_cli;
-  strcpy(data.cmd[data.NBcmd].info,"convert image file to ASCII");
-  strcpy(data.cmd[data.NBcmd].syntax,"<input image> <output ASCII file>");
-  strcpy(data.cmd[data.NBcmd].example,"im2ascii im im.txt");
-  strcpy(data.cmd[data.NBcmd].Ccall,"int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)");
-  data.NBcmd++;
-  
-  strcpy(data.cmd[data.NBcmd].key,"saveBMP");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = image_writeBMP_auto_cli;
-  strcpy(data.cmd[data.NBcmd].info,"write RGB image as BMP - auto scaling");
-  strcpy(data.cmd[data.NBcmd].syntax,"<red image> <green image> <blue image> <output BMP file name>");
-  strcpy(data.cmd[data.NBcmd].example,"saveBMP imr img imb im.bmp");
-  strcpy(data.cmd[data.NBcmd].Ccall,"int image_writeBMP_auto(const char *IDnameR, const char *IDnameG, const char *IDnameB, const char *outname)");
-  data.NBcmd++;
-  
-  strcpy(data.cmd[data.NBcmd].key,"cr2tofits");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = CR2toFITS_cli;
-  strcpy(data.cmd[data.NBcmd].info,"convert cr2 file to fits");
-  strcpy(data.cmd[data.NBcmd].syntax,"<input CR2 file> <output FITS file>");
-  strcpy(data.cmd[data.NBcmd].example,"cr2tofits im01.CR2 im01.fits");
-  strcpy(data.cmd[data.NBcmd].Ccall,"int CR2toFITS(const char *fnameCR2, const char *fnameFITS)");
-  data.NBcmd++;
- 
-  strcpy(data.cmd[data.NBcmd].key,"writeushortintlock");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli;
-  strcpy(data.cmd[data.NBcmd].info,"write unsigned short int with file locking");
-  strcpy(data.cmd[data.NBcmd].syntax,"str1 is image, str2 is binary file");
-  strcpy(data.cmd[data.NBcmd].example,"writeushortintlock im im.bin");
-  strcpy(data.cmd[data.NBcmd].Ccall,"long IMAGE_FORMAT_FITS_to_ushortintbin_lock( const char *IDname, const char *fname)");
-  data.NBcmd++;
+    strcpy(data.cmd[data.NBcmd].key, "im2ascii");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_im_to_ASCII_cli;
+    strcpy(data.cmd[data.NBcmd].info, "convert image file to ASCII");
+    strcpy(data.cmd[data.NBcmd].syntax, "<input image> <output ASCII file>");
+    strcpy(data.cmd[data.NBcmd].example, "im2ascii im im.txt");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)");
+    data.NBcmd++;
 
-  strcpy(data.cmd[data.NBcmd].key,"writefloatlock");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = IMAGE_FORMAT_FITS_to_floatbin_lock_cli;
-  strcpy(data.cmd[data.NBcmd].info,"write float with file locking");
-  strcpy(data.cmd[data.NBcmd].syntax,"str1 is image, str2 is binary file");
-  strcpy(data.cmd[data.NBcmd].example,"writefloatlock im im.bin");
-  strcpy(data.cmd[data.NBcmd].Ccall,"long IMAGE_FORMAT_FITS_to_floatbin_lock( const char *IDname, const char *fname)");
-  data.NBcmd++;
+    strcpy(data.cmd[data.NBcmd].key, "saveBMP");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = image_writeBMP_auto_cli;
+    strcpy(data.cmd[data.NBcmd].info, "write RGB image as BMP - auto scaling");
+    strcpy(data.cmd[data.NBcmd].syntax,
+           "<red image> <green image> <blue image> <output BMP file name>");
+    strcpy(data.cmd[data.NBcmd].example, "saveBMP imr img imb im.bmp");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "int image_writeBMP_auto(const char *IDnameR, const char *IDnameG, const char *IDnameB, const char *outname)");
+    data.NBcmd++;
 
-  strcpy(data.cmd[data.NBcmd].key,"readb32fim");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = IMAGE_FORMAT_read_binary32f_cli;
-  strcpy(data.cmd[data.NBcmd].info,"read 32-bit float RAW image");
-  strcpy(data.cmd[data.NBcmd].syntax,"<bin file> <xsize> <ysize> <output image>");
-  strcpy(data.cmd[data.NBcmd].example,"readb32fim im.bin xsize ysize im");
-  strcpy(data.cmd[data.NBcmd].Ccall,"long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)");
-  data.NBcmd++;
+    strcpy(data.cmd[data.NBcmd].key, "cr2tofits");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = CR2toFITS_cli;
+    strcpy(data.cmd[data.NBcmd].info, "convert cr2 file to fits");
+    strcpy(data.cmd[data.NBcmd].syntax, "<input CR2 file> <output FITS file>");
+    strcpy(data.cmd[data.NBcmd].example, "cr2tofits im01.CR2 im01.fits");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "int CR2toFITS(const char *fnameCR2, const char *fnameFITS)");
+    data.NBcmd++;
 
-  strcpy(data.cmd[data.NBcmd].key,"extractRGGBchan");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = IMAGE_FORMAT_extract_RGGBchan_cli;
-  strcpy(data.cmd[data.NBcmd].info,"extract RGGB channels from color image");
-  strcpy(data.cmd[data.NBcmd].syntax,"<input image> <imR> <imG1> <imG2> <imB>");
-  strcpy(data.cmd[data.NBcmd].example,"extractRGGBchan im imR imG1 imG2 imB");
-  strcpy(data.cmd[data.NBcmd].Ccall,"int image_format_extract_RGGBchan(const char *ID_name, const char *IDoutR_name, const char *IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)");
-  data.NBcmd++;
+    strcpy(data.cmd[data.NBcmd].key, "writeushortintlock");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli;
+    strcpy(data.cmd[data.NBcmd].info, "write unsigned short int with file locking");
+    strcpy(data.cmd[data.NBcmd].syntax, "str1 is image, str2 is binary file");
+    strcpy(data.cmd[data.NBcmd].example, "writeushortintlock im im.bin");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "long IMAGE_FORMAT_FITS_to_ushortintbin_lock( const char *IDname, const char *fname)");
+    data.NBcmd++;
 
-  strcpy(data.cmd[data.NBcmd].key,"loadcr2torgb");
-  strcpy(data.cmd[data.NBcmd].module,__FILE__);
-  data.cmd[data.NBcmd].fp = IMAGE_FORMAT_loadCR2toFITSRGB_cli;
-  strcpy(data.cmd[data.NBcmd].info,"load CR2 file into R G B images");
-  strcpy(data.cmd[data.NBcmd].syntax,"<input image> <imR> <imG> <imB>");
-  strcpy(data.cmd[data.NBcmd].example,"loadcr2torgb im imR imG imB");
-  strcpy(data.cmd[data.NBcmd].Ccall,"loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *fnameFITSg, const char *fnameFITSb)");
-  data.NBcmd++;
+    strcpy(data.cmd[data.NBcmd].key, "writefloatlock");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_FITS_to_floatbin_lock_cli;
+    strcpy(data.cmd[data.NBcmd].info, "write float with file locking");
+    strcpy(data.cmd[data.NBcmd].syntax, "str1 is image, str2 is binary file");
+    strcpy(data.cmd[data.NBcmd].example, "writefloatlock im im.bin");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "long IMAGE_FORMAT_FITS_to_floatbin_lock( const char *IDname, const char *fname)");
+    data.NBcmd++;
+
+    strcpy(data.cmd[data.NBcmd].key, "readb32fim");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_read_binary32f_cli;
+    strcpy(data.cmd[data.NBcmd].info, "read 32-bit float RAW image");
+    strcpy(data.cmd[data.NBcmd].syntax,
+           "<bin file> <xsize> <ysize> <output image>");
+    strcpy(data.cmd[data.NBcmd].example, "readb32fim im.bin xsize ysize im");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)");
+    data.NBcmd++;
+
+    strcpy(data.cmd[data.NBcmd].key, "extractRGGBchan");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_extract_RGGBchan_cli;
+    strcpy(data.cmd[data.NBcmd].info, "extract RGGB channels from color image");
+    strcpy(data.cmd[data.NBcmd].syntax, "<input image> <imR> <imG1> <imG2> <imB>");
+    strcpy(data.cmd[data.NBcmd].example, "extractRGGBchan im imR imG1 imG2 imB");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "int image_format_extract_RGGBchan(const char *ID_name, const char *IDoutR_name, const char *IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)");
+    data.NBcmd++;
+
+    strcpy(data.cmd[data.NBcmd].key, "loadcr2torgb");
+    strcpy(data.cmd[data.NBcmd].module, __FILE__);
+    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_loadCR2toFITSRGB_cli;
+    strcpy(data.cmd[data.NBcmd].info, "load CR2 file into R G B images");
+    strcpy(data.cmd[data.NBcmd].syntax, "<input image> <imR> <imG> <imB>");
+    strcpy(data.cmd[data.NBcmd].example, "loadcr2torgb im imR imG imB");
+    strcpy(data.cmd[data.NBcmd].Ccall,
+           "loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *fnameFITSg, const char *fnameFITSb)");
+    data.NBcmd++;
 
 
 
- // add atexit functions here
+// add atexit functions here
 
-  return RETURN_SUCCESS;
+    return RETURN_SUCCESS;
 
 }
 
@@ -423,9 +469,9 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
 
     ID = image_ID(IDname);
     naxis = data.image[ID].md[0].naxis;
-    coord = (long*) malloc(sizeof(long)*naxis);
+    coord = (long *) malloc(sizeof(long) * naxis);
     npix = 1;
-    for(k=0; k<naxis; k++)
+    for(k = 0; k < naxis; k++)
     {
         npix *= data.image[ID].md[0].size[k];
         coord[k] = 0;
@@ -435,59 +481,64 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
 
     fpout = fopen(foutname, "w");
 
-    for(ii=0; ii<npix; ii++)
+    for(ii = 0; ii < npix; ii++)
     {
         int kOK;
 
-        for(k=0; k<naxis; k++)
+        for(k = 0; k < naxis; k++)
+        {
             fprintf(fpout, "%4ld ", coord[k]);
-        switch ( data.image[ID].md[0].datatype ) {
-        case _DATATYPE_UINT8:
-            fprintf(fpout, " %5u\n", data.image[ID].array.UI8[ii]);
-            break;
-        case _DATATYPE_UINT16:
-            fprintf(fpout, " %5u\n", data.image[ID].array.UI16[ii]);
-            break;
-        case _DATATYPE_UINT32:
-            fprintf(fpout, " %u\n", data.image[ID].array.UI32[ii]);
-            break;
-        case _DATATYPE_UINT64:
-            fprintf(fpout, " %lu\n", data.image[ID].array.UI64[ii]);
-            break;
+        }
+        switch(data.image[ID].md[0].datatype)
+        {
+            case _DATATYPE_UINT8:
+                fprintf(fpout, " %5u\n", data.image[ID].array.UI8[ii]);
+                break;
+            case _DATATYPE_UINT16:
+                fprintf(fpout, " %5u\n", data.image[ID].array.UI16[ii]);
+                break;
+            case _DATATYPE_UINT32:
+                fprintf(fpout, " %u\n", data.image[ID].array.UI32[ii]);
+                break;
+            case _DATATYPE_UINT64:
+                fprintf(fpout, " %lu\n", data.image[ID].array.UI64[ii]);
+                break;
 
-        case _DATATYPE_INT8:
-            fprintf(fpout, " %5d\n", data.image[ID].array.SI8[ii]);
-            break;
-        case _DATATYPE_INT16:
-            fprintf(fpout, " %5d\n", data.image[ID].array.SI16[ii]);
-            break;
-        case _DATATYPE_INT32:
-            fprintf(fpout, " %5d\n", data.image[ID].array.SI32[ii]);
-            break;
-        case _DATATYPE_INT64:
-            fprintf(fpout, " %5ld\n", data.image[ID].array.SI64[ii]);
-            break;
+            case _DATATYPE_INT8:
+                fprintf(fpout, " %5d\n", data.image[ID].array.SI8[ii]);
+                break;
+            case _DATATYPE_INT16:
+                fprintf(fpout, " %5d\n", data.image[ID].array.SI16[ii]);
+                break;
+            case _DATATYPE_INT32:
+                fprintf(fpout, " %5d\n", data.image[ID].array.SI32[ii]);
+                break;
+            case _DATATYPE_INT64:
+                fprintf(fpout, " %5ld\n", data.image[ID].array.SI64[ii]);
+                break;
 
-        case _DATATYPE_FLOAT:
-            fprintf(fpout, " %f\n", data.image[ID].array.F[ii]);
-            break;
-        case _DATATYPE_DOUBLE:
-            fprintf(fpout, " %lf\n", data.image[ID].array.D[ii]);
-            break;
+            case _DATATYPE_FLOAT:
+                fprintf(fpout, " %f\n", data.image[ID].array.F[ii]);
+                break;
+            case _DATATYPE_DOUBLE:
+                fprintf(fpout, " %lf\n", data.image[ID].array.D[ii]);
+                break;
         }
         coord[0]++;
 
         k = 0;
         kOK = 0;
-        while((kOK==0)&&(k<naxis))
+        while((kOK == 0) && (k < naxis))
         {
-            if(coord[k]==data.image[ID].md[0].size[k])
+            if(coord[k] == data.image[ID].md[0].size[k])
             {
                 coord[k] = 0;
-                coord[k+1]++;
+                coord[k + 1]++;
             }
             else
+            {
                 kOK = 1;
+            }
             k++;
         }
     }
@@ -504,10 +555,14 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
 /* This function is for byte swapping on big endian systems */
 uint16 setUint16(uint16 x)
 {
-    if (BMP_BIG_ENDIAN)
+    if(BMP_BIG_ENDIAN)
+    {
         return (x & 0x00FF) << 8 | (x & 0xFF00) >> 8;
+    }
     else
+    {
         return x;
+    }
 }
 
 
@@ -516,10 +571,15 @@ uint16 setUint16(uint16 x)
 /* This function is for byte swapping on big endian systems */
 uint32 setUint32(uint32 x)
 {
-    if (BMP_BIG_ENDIAN)
-        return (x & 0x000000FF) << 24 | (x & 0x0000FF00) << 8 | (x & 0x00FF0000) >> 8 | (x & 0xFF000000) >> 24;
+    if(BMP_BIG_ENDIAN)
+    {
+        return (x & 0x000000FF) << 24 | (x & 0x0000FF00) << 8 |
+               (x & 0x00FF0000) >> 8 | (x & 0xFF000000) >> 24;
+    }
     else
+    {
         return x;
+    }
 }
 
 
@@ -578,7 +638,8 @@ static uint32 write24BitBmpFile(
     bmpFileHeader.bfSize = setUint32(0);      /* This can be 0 for BI_RGB bitmaps */
     bmpFileHeader.bfReserved1 = setUint16(0);
     bmpFileHeader.bfReserved2 = setUint16(0);
-    bmpFileHeader.bfOffBits = setUint32(sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER));
+    bmpFileHeader.bfOffBits = setUint32(sizeof(BITMAPFILEHEADER) + sizeof(
+                                            BITMAPINFOHEADER));
 
     /* Fill the bitmap info structure */
     bmpInfoHeader.biSize = setUint32(sizeof(BITMAPINFOHEADER));
@@ -587,7 +648,8 @@ static uint32 write24BitBmpFile(
     bmpInfoHeader.biPlanes = setUint16(1);
     bmpInfoHeader.biBitCount = setUint16(24);            /* 24 - bit bitmap */
     bmpInfoHeader.biCompression = setUint32(BI_RGB);
-    bmpInfoHeader.biSizeImage = setUint32(bytesize);     /* includes padding for 4 byte alignment */
+    bmpInfoHeader.biSizeImage = setUint32(
+                                    bytesize);     /* includes padding for 4 byte alignment */
     bmpInfoHeader.biXPelsPerMeter = setUint32(0);
     bmpInfoHeader.biYPelsPerMeter = setUint32(0);
     bmpInfoHeader.biClrUsed = setUint32(0);
@@ -595,20 +657,25 @@ static uint32 write24BitBmpFile(
 
 
     /* Open file */
-    if ((filep = fopen(filename, "wb")) == NULL) {
+    if((filep = fopen(filename, "wb")) == NULL)
+    {
         printf("Error opening file %s\n", filename);
         return BMP_FALSE;
     }
 
     /* Write bmp file header */
-    if (fwrite(&bmpFileHeader, 1, sizeof(BITMAPFILEHEADER), filep) < sizeof(BITMAPFILEHEADER)) {
+    if(fwrite(&bmpFileHeader, 1, sizeof(BITMAPFILEHEADER),
+              filep) < sizeof(BITMAPFILEHEADER))
+    {
         printf("Error writing bitmap file header\n");
         fclose(filep);
         return BMP_FALSE;
     }
 
     /* Write bmp info header */
-    if (fwrite(&bmpInfoHeader, 1, sizeof(BITMAPINFOHEADER), filep) < sizeof(BITMAPINFOHEADER)) {
+    if(fwrite(&bmpInfoHeader, 1, sizeof(BITMAPINFOHEADER),
+              filep) < sizeof(BITMAPINFOHEADER))
+    {
         printf("Error writing bitmap info header\n");
         fclose(filep);
         return BMP_FALSE;
@@ -617,7 +684,8 @@ static uint32 write24BitBmpFile(
 
     /* Allocate memory for some temporary storage */
     paddedImage = (unsigned char *)calloc(sizeof(unsigned char), bytesize);
-    if (paddedImage == NULL) {
+    if(paddedImage == NULL)
+    {
         printf("Error allocating memory \n");
         fclose(filep);
         return BMP_FALSE;
@@ -629,25 +697,28 @@ static uint32 write24BitBmpFile(
     file is a multiple of 4.  Finally, it swaps (r, g, b) for (b, g, r).  This is another
     quirk of the .bmp file format. */
 
-    for (row = 0; row < height; row++) {
-		unsigned char *paddedImagePtr;
-		
-		
+    for(row = 0; row < height; row++)
+    {
+        unsigned char *paddedImagePtr;
+
+
         imagePtr = image + (height - 1 - row) * width * 3;
         paddedImagePtr = paddedImage + row * (width * 3 + extrabytes);
-        for (column = 0; column < width; column++) {
+        for(column = 0; column < width; column++)
+        {
             *paddedImagePtr = *(imagePtr + 2);
             *(paddedImagePtr + 1) = *(imagePtr + 1);
             *(paddedImagePtr + 2) = *imagePtr;
             imagePtr += 3;
             paddedImagePtr += 3;
         }
-        
-        
+
+
     }
 
     /* Write bmp data */
-    if (fwrite(paddedImage, 1, bytesize, filep) < bytesize) {
+    if(fwrite(paddedImage, 1, bytesize, filep) < bytesize)
+    {
         printf("Error writing bitmap data\n");
         free(paddedImage);
         fclose(filep);
@@ -657,7 +728,7 @@ static uint32 write24BitBmpFile(
     /* Close file */
     fclose(filep);
     free(paddedImage);
-    
+
     return BMP_TRUE;
 }
 
@@ -672,37 +743,42 @@ errno_t image_writeBMP_auto(
     const char *outname
 )
 {
-    imageID IDR,IDG,IDB;
+    imageID IDR, IDG, IDB;
     uint32 width;
     uint32 height;
     unsigned char *array;
-    uint32 ii,jj;
-    double minr,ming,minb,maxr,maxg,maxb;
+    uint32 ii, jj;
+    double minr, ming, minb, maxr, maxg, maxb;
 
 
-    minr=img_min(IDnameR);
-    ming=img_min(IDnameG);
-    minb=img_min(IDnameB);
+    minr = img_min(IDnameR);
+    ming = img_min(IDnameG);
+    minb = img_min(IDnameB);
 
-    maxr=img_max(IDnameR);
-    maxg=img_max(IDnameG);
-    maxb=img_max(IDnameB);
+    maxr = img_max(IDnameR);
+    maxg = img_max(IDnameG);
+    maxb = img_max(IDnameB);
 
-    IDR=image_ID(IDnameR);
-    IDG=image_ID(IDnameG);
-    IDB=image_ID(IDnameB);
+    IDR = image_ID(IDnameR);
+    IDG = image_ID(IDnameG);
+    IDB = image_ID(IDnameB);
     width = (uint32) data.image[IDR].md[0].size[0];
     height = (uint32) data.image[IDR].md[0].size[1];
-    array = (unsigned char*) malloc(sizeof(unsigned char)*width*height*3);
+    array = (unsigned char *) malloc(sizeof(unsigned char) * width * height * 3);
 
-    for(ii=0; ii<width; ii++)
-        for(jj=0; jj<height; jj++)
+    for(ii = 0; ii < width; ii++)
+        for(jj = 0; jj < height; jj++)
         {
-            array[(jj*width+ii)*3] = (unsigned char) ((data.image[IDR].array.F[(height-jj-1)*width+ii]-minr)*(255.0/(maxr-minr)));
-            array[(jj*width+ii)*3+1] = (unsigned char) ((data.image[IDG].array.F[(height-jj-1)*width+ii]-ming)*(255.0/(maxg-ming)));
-            array[(jj*width+ii)*3+2] = (unsigned char) ((data.image[IDB].array.F[(height-jj-1)*width+ii]-minb)*(255.0/(maxb-minb)));
+            array[(jj * width + ii) * 3] = (unsigned char)((data.image[IDR].array.F[(height
+                                           - jj - 1) * width + ii] - minr) * (255.0 / (maxr - minr)));
+            array[(jj * width + ii) * 3 + 1] = (unsigned char)((
+                                                   data.image[IDG].array.F[(height - jj - 1) * width + ii] - ming) * (255.0 /
+                                                           (maxg - ming)));
+            array[(jj * width + ii) * 3 + 2] = (unsigned char)((
+                                                   data.image[IDB].array.F[(height - jj - 1) * width + ii] - minb) * (255.0 /
+                                                           (maxb - minb)));
         }
-    write24BitBmpFile(outname,width,height,array);
+    write24BitBmpFile(outname, width, height, array);
     free(array);
 
     return RETURN_SUCCESS;
@@ -716,27 +792,30 @@ static errno_t image_writeBMP(
     const char *outname
 )
 {
-    imageID IDR,IDG,IDB;
+    imageID IDR, IDG, IDB;
     uint32 width;
     uint32 height;
     unsigned char *array;
-    uint32 ii,jj;
+    uint32 ii, jj;
 
-    IDR=image_ID(IDnameR);
-    IDG=image_ID(IDnameG);
-    IDB=image_ID(IDnameB);
+    IDR = image_ID(IDnameR);
+    IDG = image_ID(IDnameG);
+    IDB = image_ID(IDnameB);
     width = (uint32) data.image[IDR].md[0].size[0];
     height = (uint32) data.image[IDR].md[0].size[1];
-    array = (unsigned char*) malloc(sizeof(unsigned char)*width*height*3);
+    array = (unsigned char *) malloc(sizeof(unsigned char) * width * height * 3);
 
-    for(ii=0; ii<width; ii++)
-        for(jj=0; jj<height; jj++)
+    for(ii = 0; ii < width; ii++)
+        for(jj = 0; jj < height; jj++)
         {
-            array[(jj*width+ii)*3] = (unsigned char) (data.image[IDR].array.F[(height-jj-1)*width+ii]);
-            array[(jj*width+ii)*3+1] = (unsigned char) (data.image[IDG].array.F[(height-jj-1)*width+ii]);
-            array[(jj*width+ii)*3+2] = (unsigned char) (data.image[IDB].array.F[(height-jj-1)*width+ii]);
+            array[(jj * width + ii) * 3] = (unsigned char)(data.image[IDR].array.F[(height -
+                                           jj - 1) * width + ii]);
+            array[(jj * width + ii) * 3 + 1] = (unsigned char)(
+                                                   data.image[IDG].array.F[(height - jj - 1) * width + ii]);
+            array[(jj * width + ii) * 3 + 2] = (unsigned char)(
+                                                   data.image[IDB].array.F[(height - jj - 1) * width + ii]);
         }
-    write24BitBmpFile(outname,width,height,array);
+    write24BitBmpFile(outname, width, height, array);
     free(array);
 
     return RETURN_SUCCESS;
@@ -747,13 +826,13 @@ static errno_t image_writeBMP(
 
 
 long getImageInfo(
-    FILE* inputFile,
+    FILE *inputFile,
     long  offset,
     int   numberOfChars
 )
 {
     unsigned char			*ptrC;
-    long				value=0L;
+    long				value = 0L;
     int				i;
     unsigned char			dummy;
 
@@ -762,13 +841,15 @@ long getImageInfo(
 
     fseek(inputFile, offset, SEEK_SET);
 
-    for(i=1; i<=numberOfChars; i++)
+    for(i = 1; i <= numberOfChars; i++)
     {
         if(fread(ptrC, sizeof(char), 1, inputFile) < 1)
+        {
             PRINT_ERROR("fread() returns <1 value");
+        }
 
         /* calculate value based on adding bytes */
-        value = (long)(value + (*ptrC)*(pow(256, (i-1))));
+        value = (long)(value + (*ptrC) * (pow(256, (i - 1))));
     }
 
     return(value);
@@ -791,12 +872,12 @@ imageID read_ASCIIimage(
     long ID;
     FILE *fp;
 
-    ID = create_2Dimage_ID(ID_name,xsize,ysize);
+    ID = create_2Dimage_ID(ID_name, xsize, ysize);
 
-    fp = fopen(filename,"r");
-    if(fp==NULL)
+    fp = fopen(filename, "r");
+    if(fp == NULL)
     {
-        fprintf(stderr,"ERROR: cannot open file \"%s\"\n",filename);
+        fprintf(stderr, "ERROR: cannot open file \"%s\"\n", filename);
     }
     else
     {
@@ -804,9 +885,11 @@ imageID read_ASCIIimage(
         float value;
 
 
-        while((fscanf(fp,"%ld %ld %f\n", &iipix, &jjpix, &value)) == 3)
-            if((iipix>-1)&&(iipix<xsize)&&(jjpix>-1)&&(jjpix<ysize))
-                data.image[ID].array.F[jjpix*xsize+iipix] = value;
+        while((fscanf(fp, "%ld %ld %f\n", &iipix, &jjpix, &value)) == 3)
+            if((iipix > -1) && (iipix < xsize) && (jjpix > -1) && (jjpix < ysize))
+            {
+                data.image[ID].array.F[jjpix * xsize + iipix] = value;
+            }
         fclose(fp);
     }
 
@@ -828,26 +911,28 @@ imageID read_ASCIIimage1(
     imageID ID;
     FILE *fp;
 
-    ID = create_2Dimage_ID(ID_name,xsize,ysize);
+    ID = create_2Dimage_ID(ID_name, xsize, ysize);
 
-    fp = fopen(filename,"r");
-    if(fp==NULL)
+    fp = fopen(filename, "r");
+    if(fp == NULL)
     {
-        fprintf(stderr,"ERROR: cannot open file \"%s\"\n",filename);
+        fprintf(stderr, "ERROR: cannot open file \"%s\"\n", filename);
     }
     else
     {
         long ii, jj;
         double value;
 
-        for(ii=0; ii<xsize; ii++)
-            for(jj=0; jj<ysize; jj++)
+        for(ii = 0; ii < xsize; ii++)
+            for(jj = 0; jj < ysize; jj++)
             {
-                if(fscanf(fp,"%lf", &value)==1)
-                    data.image[ID].array.F[jj*xsize+ii] = value;
+                if(fscanf(fp, "%lf", &value) == 1)
+                {
+                    data.image[ID].array.F[jj * xsize + ii] = value;
+                }
                 else
                 {
-                    printERROR(__FILE__,__func__,__LINE__,"read error");
+                    printERROR(__FILE__, __func__, __LINE__, "read error");
                     exit(0);
                 }
             }
@@ -874,8 +959,8 @@ errno_t read_BMPimage(
     long				fileSize;
     int				nColors;
     int				r, c;
-    unsigned int BlueValue,RedValue,GreenValue;
-    long IDR,IDG,IDB;
+    unsigned int BlueValue, RedValue, GreenValue;
+    long IDR, IDG, IDB;
 
 
 
@@ -892,7 +977,7 @@ errno_t read_BMPimage(
     fseek(bmpInput, 0L, SEEK_END);
 
     /*-----GET BMP INFO-----*/
-    originalImage.cols = (int)getImageInfo(bmpInput, 18, 4)+1;
+    originalImage.cols = (int)getImageInfo(bmpInput, 18, 4) + 1;
     originalImage.rows = (int)getImageInfo(bmpInput, 22, 4);
     fileSize = getImageInfo(bmpInput, 2, 4);
     nColors = getImageInfo(bmpInput, 46, 4);
@@ -905,40 +990,49 @@ errno_t read_BMPimage(
     printf("No. colors: %d\n", nColors);
 
 
-    IDR = create_2Dimage_ID(IDname_R,(long) originalImage.cols,(long) originalImage.rows);
-    IDG = create_2Dimage_ID(IDname_G,(long) originalImage.cols,(long) originalImage.rows);
-    IDB = create_2Dimage_ID(IDname_B,(long) originalImage.cols,(long) originalImage.rows);
+    IDR = create_2Dimage_ID(IDname_R, (long) originalImage.cols,
+                            (long) originalImage.rows);
+    IDG = create_2Dimage_ID(IDname_G, (long) originalImage.cols,
+                            (long) originalImage.rows);
+    IDB = create_2Dimage_ID(IDname_B, (long) originalImage.cols,
+                            (long) originalImage.rows);
 
     /*----FOR 24-BIT BMP, THERE IS NO COLOR TABLE-----*/
     fseek(bmpInput, 54, SEEK_SET);
 
     /*-----------READ RASTER DATA-----------*/
-    for(r=0; r<=originalImage.rows-1; r++)
+    for(r = 0; r <= originalImage.rows - 1; r++)
     {
-        for(c=0; c<=originalImage.cols-1; c++)
+        for(c = 0; c <= originalImage.cols - 1; c++)
         {
 
             /*----READ FIRST BYTE TO GET BLUE VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
+            {
                 PRINT_ERROR("fread() returns <1 value");
+            }
             BlueValue = *pChar;
 
             /*-----READ NEXT BYTE TO GET GREEN VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
+            {
                 PRINT_ERROR("fread() returns <1 value");
+            }
             GreenValue = *pChar;
 
             /*-----READ NEXT BYTE TO GET RED VALUE-----*/
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
+            {
                 PRINT_ERROR("fread() returns <1 value");
+            }
             RedValue = *pChar;
 
             /*---------WRITE TO FILES ---------*/
             /*fprintf(rasterOutput, "(%d %d) = \tRed \t%d", r, c, RedValue);
             fprintf(rasterOutput, "\tGreen \t%d \tBlue \t%d\n", GreenValue, BlueValue);*/
-            data.image[IDR].array.F[r*originalImage.cols+c] = 1.0*RedValue;
-            data.image[IDG].array.F[r*originalImage.cols+c] = 1.0*GreenValue;
-            data.image[IDB].array.F[r*originalImage.cols+c] = 1.0*BlueValue;
+            data.image[IDR].array.F[r * originalImage.cols + c] = 1.0 * RedValue;
+            data.image[IDG].array.F[r * originalImage.cols + c] = 1.0 * GreenValue;
+            data.image[IDB].array.F[r * originalImage.cols + c] = 1.0 * BlueValue;
         }
     }
 
@@ -966,9 +1060,9 @@ imageID read_PGMimage(
     FILE *fp;
     imageID ID;
 
-    if((fp=fopen(fname, "r"))==NULL)
+    if((fp = fopen(fname, "r")) == NULL)
     {
-        fprintf(stderr,"ERROR: cannot open file \"%s\"\n",fname);
+        fprintf(stderr, "ERROR: cannot open file \"%s\"\n", fname);
         ID = -1;
     }
     else
@@ -981,67 +1075,98 @@ imageID read_PGMimage(
 
         {
             int fscanfcnt = fscanf(fp, "%s", line1);
-            if(fscanfcnt == EOF) {
-                if(ferror(fp)) {
+            if(fscanfcnt == EOF)
+            {
+                if(ferror(fp))
+                {
                     perror("fscanf");
-                } else {
-                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                }
+                else
+                {
+                    fprintf(stderr,
+                            "Error: fscanf reached end of file, no matching characters, no matching failure\n");
                 }
                 exit(EXIT_FAILURE);
-            } else if(fscanfcnt != 1) {
-                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 1 expected\n", fscanfcnt);
+            }
+            else if(fscanfcnt != 1)
+            {
+                fprintf(stderr,
+                        "Error: fscanf successfully matched and assigned %i input items, 1 expected\n",
+                        fscanfcnt);
                 exit(EXIT_FAILURE);
             }
         }
 
 
-        if(strcmp(line1,"P5")!=0)
-            fprintf(stderr,"ERROR: File is not PGM image\n");
+        if(strcmp(line1, "P5") != 0)
+        {
+            fprintf(stderr, "ERROR: File is not PGM image\n");
+        }
         else
         {
-            int fscanfcnt = fscanf(fp,"%ld %ld", &xsize, &ysize);
-            if(fscanfcnt == EOF) {
-                if(ferror(fp)) {
+            int fscanfcnt = fscanf(fp, "%ld %ld", &xsize, &ysize);
+            if(fscanfcnt == EOF)
+            {
+                if(ferror(fp))
+                {
                     perror("fscanf");
-                } else {
-                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                }
+                else
+                {
+                    fprintf(stderr,
+                            "Error: fscanf reached end of file, no matching characters, no matching failure\n");
                 }
                 exit(EXIT_FAILURE);
-            } else if(fscanfcnt != 2) {
-                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 2 expected\n", fscanfcnt);
+            }
+            else if(fscanfcnt != 2)
+            {
+                fprintf(stderr,
+                        "Error: fscanf successfully matched and assigned %i input items, 2 expected\n",
+                        fscanfcnt);
                 exit(EXIT_FAILURE);
             }
 
-            printf("PGM image size: %ld x %ld\n",xsize,ysize);
+            printf("PGM image size: %ld x %ld\n", xsize, ysize);
 
 
             fscanfcnt = fscanf(fp, "%ld", &maxval);
-            if(fscanfcnt == EOF) {
-                if(ferror(fp)) {
+            if(fscanfcnt == EOF)
+            {
+                if(ferror(fp))
+                {
                     perror("fscanf");
-                } else {
-                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                }
+                else
+                {
+                    fprintf(stderr,
+                            "Error: fscanf reached end of file, no matching characters, no matching failure\n");
                 }
                 exit(EXIT_FAILURE);
-            } else if(fscanfcnt != 1) {
-                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 1 expected\n", fscanfcnt);
+            }
+            else if(fscanfcnt != 1)
+            {
+                fprintf(stderr,
+                        "Error: fscanf successfully matched and assigned %i input items, 1 expected\n",
+                        fscanfcnt);
                 exit(EXIT_FAILURE);
             }
 
 
-            if(maxval!=65535)
-                fprintf(stderr,"Not 16-bit image. Cannot read\n");
+            if(maxval != 65535)
+            {
+                fprintf(stderr, "Not 16-bit image. Cannot read\n");
+            }
             else
             {
                 printf("Reading PGM image\n");
                 ID = create_2Dimage_ID(ID_name, xsize, ysize);
                 fgetc(fp);
-                for(jj=0; jj<ysize; jj++)
+                for(jj = 0; jj < ysize; jj++)
                 {
-                    for(ii=0; ii<xsize; ii++)
+                    for(ii = 0; ii < xsize; ii++)
                     {
-                        val = 256.0*((int) fgetc(fp)) + 1.0*((int) fgetc(fp));
-                        data.image[ID].array.F[(ysize-jj-1)*xsize+ii] = val;
+                        val = 256.0 * ((int) fgetc(fp)) + 1.0 * ((int) fgetc(fp));
+                        data.image[ID].array.F[(ysize - jj - 1)*xsize + ii] = val;
                     }
                 }
             }
@@ -1072,64 +1197,89 @@ imageID CR2toFITS(
     float shutter;
     float aperture;
     imageID ID;
-    long xsize,ysize;
+    long xsize, ysize;
     long ii;
 
 
-	EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
+    EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
 
 
     ID = read_PGMimage("_tmppgm.pgm", "tmpfits1");
     if(system("rm _tmppgm.pgm") != 0)
-        PRINT_ERROR("system() returns non-zero value");
-
-    if(CR2toFITS_NORM==1)
     {
-        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt", fnameCR2);        
-        
-        if((fp = fopen("iso_tmp.txt","r"))==NULL)
-			PRINT_ERROR("Cannot open file");
-        if(fscanf(fp,"%f\n",&iso) != 1)
-			PRINT_ERROR("fscanf returns value != 1");
+        PRINT_ERROR("system() returns non-zero value");
+    }
+
+    if(CR2toFITS_NORM == 1)
+    {
+        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt",
+                               fnameCR2);
+
+        if((fp = fopen("iso_tmp.txt", "r")) == NULL)
+        {
+            PRINT_ERROR("Cannot open file");
+        }
+        if(fscanf(fp, "%f\n", &iso) != 1)
+        {
+            PRINT_ERROR("fscanf returns value != 1");
+        }
         fclose(fp);
-        
+
         if(system("rm iso_tmp.txt") != 0)
+        {
             PRINT_ERROR("system() returns non-zero value");
-        
-        printf("iso = %f\n",iso);
+        }
 
-		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt", fnameCR2);        
+        printf("iso = %f\n", iso);
 
-        if((fp = fopen("shutter_tmp.txt", "r"))==NULL)
-			PRINT_ERROR("Cannot open file");
-        
-        if(fscanf(fp,"%f\n", &shutter) != 1)
-			PRINT_ERROR("fscanf returns value != 1");
+        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt",
+                               fnameCR2);
+
+        if((fp = fopen("shutter_tmp.txt", "r")) == NULL)
+        {
+            PRINT_ERROR("Cannot open file");
+        }
+
+        if(fscanf(fp, "%f\n", &shutter) != 1)
+        {
+            PRINT_ERROR("fscanf returns value != 1");
+        }
         fclose(fp);
 
         if(system("rm shutter_tmp.txt") != 0)
+        {
             PRINT_ERROR("system() returns non-zero value");
-        printf("shutter = %f\n",shutter);
+        }
+        printf("shutter = %f\n", shutter);
 
-		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt", fnameCR2);
+        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt",
+                               fnameCR2);
 
-        if((fp = fopen("aperture_tmp.txt","r"))==NULL)
-			PRINT_ERROR("Cannot open file");
-        if(fscanf(fp,"f/%f\n",&aperture) != 1)
-			PRINT_ERROR("fscanf returns value != 1");
+        if((fp = fopen("aperture_tmp.txt", "r")) == NULL)
+        {
+            PRINT_ERROR("Cannot open file");
+        }
+        if(fscanf(fp, "f/%f\n", &aperture) != 1)
+        {
+            PRINT_ERROR("fscanf returns value != 1");
+        }
         fclose(fp);
 
         if(system("rm aperture_tmp.txt") != 0)
+        {
             PRINT_ERROR("system() returns non-zero value");
+        }
 
-        printf("aperture = %f\n",aperture);
+        printf("aperture = %f\n", aperture);
 
         ID = image_ID("tmpfits1");
         xsize = data.image[ID].md[0].size[0];
         ysize = data.image[ID].md[0].size[1];
 
-        for(ii=0; ii<xsize*ysize; ii++)
-            data.image[ID].array.F[ii] /= (shutter*aperture*aperture*iso);
+        for(ii = 0; ii < xsize * ysize; ii++)
+        {
+            data.image[ID].array.F[ii] /= (shutter * aperture * aperture * iso);
+        }
     }
 
     save_fl_fits("tmpfits1", fnameFITS);
@@ -1155,11 +1305,13 @@ imageID loadCR2(
 {
     imageID ID;
 
-	EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);    
+    EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
 
     ID = read_PGMimage("_tmppgm.pgm", IDname);
     if(system("rm _tmppgm.pgm") != 0)
+    {
         PRINT_ERROR("system() returns non-zero value");
+    }
 
     return ID;
 }
@@ -1178,31 +1330,32 @@ long CR2toFITS_strfilter(
     char fname1[STRINGMAXLEN_FULLFILENAME];
     FILE *fp;
 
-	EXECUTE_SYSTEM_COMMAND("ls %s.CR2 > flist.tmp\n", strfilter);    
+    EXECUTE_SYSTEM_COMMAND("ls %s.CR2 > flist.tmp\n", strfilter);
 
-    fp = fopen("flist.tmp","r");
-    while(fgets(fname, STRINGMAXLEN_FULLFILENAME, fp)!=NULL)
+    fp = fopen("flist.tmp", "r");
+    while(fgets(fname, STRINGMAXLEN_FULLFILENAME, fp) != NULL)
     {
-        fname[strlen(fname)-1] = '\0';
-        strncpy(fname1, fname, strlen(fname)-4 );
-        fname1[strlen(fname)-4] = '.';
-        fname1[strlen(fname)-3] = 'f';
-        fname1[strlen(fname)-2] = 'i';
-        fname1[strlen(fname)-1] = 't';
+        fname[strlen(fname) - 1] = '\0';
+        strncpy(fname1, fname, strlen(fname) - 4);
+        fname1[strlen(fname) - 4] = '.';
+        fname1[strlen(fname) - 3] = 'f';
+        fname1[strlen(fname) - 2] = 'i';
+        fname1[strlen(fname) - 1] = 't';
         fname1[strlen(fname)] = 's';
-        fname1[strlen(fname)+1] = '\0';
+        fname1[strlen(fname) + 1] = '\0';
 
-        CR2toFITS(fname,fname1);
+        CR2toFITS(fname, fname1);
         printf("File %s  -> file %s\n", fname, fname1);
         cnt++;
     }
 
     fclose(fp);
-    if(system("rm flist.tmp") != 0) {
+    if(system("rm flist.tmp") != 0)
+    {
         PRINT_ERROR("system() returns non-zero value");
     }
 
-    printf("%ld files converted\n",cnt);
+    printf("%ld files converted\n", cnt);
 
     return(cnt);
 }
@@ -1238,21 +1391,25 @@ errno_t image_format_extract_RGGBchan(
     printf("size = %ld %ld\n", Xsize, Ysize);
 
 
-    if((Xsize == 4770)&&(Ysize == 3178))
+    if((Xsize == 4770) && (Ysize == 3178))
+    {
         RGBmode = 1;
-    if((Xsize == 5202)&&(Ysize == 3465))
+    }
+    if((Xsize == 5202) && (Ysize == 3465))
+    {
         RGBmode = 2;
+    }
 
 
 
     if(RGBmode == 0)
     {
-        printERROR(__FILE__,__func__,__LINE__,"Unknown RGB image mode\n");
+        printERROR(__FILE__, __func__, __LINE__, "Unknown RGB image mode\n");
         exit(0);
     }
 
-    xsize2 = Xsize/2;
-    ysize2 = Ysize/2;
+    xsize2 = Xsize / 2;
+    ysize2 = Ysize / 2;
 
     printf("Creating color channel images, %ld x %ld\n", xsize2, ysize2);
     fflush(stdout);
@@ -1266,7 +1423,7 @@ errno_t image_format_extract_RGGBchan(
     printf("STEP 2\n");
     fflush(stdout);
 
-    if(RGBmode==1) // GBRG
+    if(RGBmode == 1) // GBRG
     {
         ID00 = IDg1;
         ID10 = IDb;
@@ -1274,7 +1431,7 @@ errno_t image_format_extract_RGGBchan(
         ID11 = IDg2;
     }
 
-    if(RGBmode==2)
+    if(RGBmode == 2)
     {
         ID00 = IDr;
         ID10 = IDg1;
@@ -1283,15 +1440,19 @@ errno_t image_format_extract_RGGBchan(
     }
 
 
-    for(ii=0; ii<xsize2; ii++)
-        for(jj=0; jj<ysize2; jj++)
+    for(ii = 0; ii < xsize2; ii++)
+        for(jj = 0; jj < ysize2; jj++)
         {
-            ii1 = 2*ii;
-            jj1 = 2*jj;
-            data.image[ID01].array.F[jj*xsize2+ii] = data.image[ID].array.F[(jj1+1)*Xsize+ii1];
-            data.image[ID00].array.F[jj*xsize2+ii] = data.image[ID].array.F[jj1*Xsize+ii1];
-            data.image[ID11].array.F[jj*xsize2+ii] = data.image[ID].array.F[(jj1+1)*Xsize+(ii1+1)];
-            data.image[ID10].array.F[jj*xsize2+ii] = data.image[ID].array.F[jj1*Xsize+(ii1+1)];
+            ii1 = 2 * ii;
+            jj1 = 2 * jj;
+            data.image[ID01].array.F[jj * xsize2 + ii] = data.image[ID].array.F[(jj1 + 1) *
+                    Xsize + ii1];
+            data.image[ID00].array.F[jj * xsize2 + ii] = data.image[ID].array.F[jj1 * Xsize
+                    + ii1];
+            data.image[ID11].array.F[jj * xsize2 + ii] = data.image[ID].array.F[(jj1 + 1) *
+                    Xsize + (ii1 + 1)];
+            data.image[ID10].array.F[jj * xsize2 + ii] = data.image[ID].array.F[jj1 * Xsize
+                    + (ii1 + 1)];
         }
 
     return RETURN_SUCCESS;
@@ -1311,7 +1472,7 @@ imageID image_format_reconstruct_from_RGGBchan(
     imageID ID;
     imageID IDr, IDg1, IDg2, IDb;
     long xsize1, ysize1, xsize2, ysize2;
-    long ii1,jj1;
+    long ii1, jj1;
     int RGBmode = 0;
     imageID ID00, ID01, ID10, ID11;
 
@@ -1323,21 +1484,25 @@ imageID image_format_reconstruct_from_RGGBchan(
     xsize1 = data.image[IDr].md[0].size[0];
     ysize1 = data.image[IDr].md[0].size[1];
 
-    xsize2 = 2*xsize1;
-    ysize2 = 2*ysize1;
+    xsize2 = 2 * xsize1;
+    ysize2 = 2 * ysize1;
 
-    if((xsize2 == 4770)&&(ysize2 == 3178))
+    if((xsize2 == 4770) && (ysize2 == 3178))
+    {
         RGBmode = 1;
-    if((xsize2 == 5202)&&(ysize2 == 3465))
+    }
+    if((xsize2 == 5202) && (ysize2 == 3465))
+    {
         RGBmode = 2;
+    }
 
     if(RGBmode == 0)
     {
-        printERROR(__FILE__,__func__,__LINE__,"Unknown RGB image mode\n");
+        printERROR(__FILE__, __func__, __LINE__, "Unknown RGB image mode\n");
         exit(0);
     }
 
-    if(RGBmode==1) // GBRG
+    if(RGBmode == 1) // GBRG
     {
         ID00 = IDg1;
         ID10 = IDb;
@@ -1345,7 +1510,7 @@ imageID image_format_reconstruct_from_RGGBchan(
         ID11 = IDg2;
     }
 
-    if(RGBmode==2)
+    if(RGBmode == 2)
     {
         ID00 = IDr;
         ID10 = IDg1;
@@ -1353,15 +1518,19 @@ imageID image_format_reconstruct_from_RGGBchan(
         ID11 = IDb;
     }
 
-    ID = create_2Dimage_ID(IDout_name,xsize2,ysize2);
+    ID = create_2Dimage_ID(IDout_name, xsize2, ysize2);
 
-    for(ii1=0; ii1<xsize1; ii1++)
-        for(jj1=0; jj1<ysize1; jj1++)
+    for(ii1 = 0; ii1 < xsize1; ii1++)
+        for(jj1 = 0; jj1 < ysize1; jj1++)
         {
-            data.image[ID].array.F[(2*jj1+1)*xsize2+2*ii1] = data.image[ID01].array.F[jj1*xsize1+ii1];
-            data.image[ID].array.F[2*jj1*xsize2+2*ii1] = data.image[ID00].array.F[jj1*xsize1+ii1];
-            data.image[ID].array.F[(2*jj1+1)*xsize2+(2*ii1+1)] = data.image[ID11].array.F[jj1*xsize1+ii1];
-            data.image[ID].array.F[2*jj1*xsize2+(2*ii1+1)] = data.image[ID10].array.F[jj1*xsize1+ii1];
+            data.image[ID].array.F[(2 * jj1 + 1)*xsize2 + 2 * ii1] =
+                data.image[ID01].array.F[jj1 * xsize1 + ii1];
+            data.image[ID].array.F[2 * jj1 * xsize2 + 2 * ii1] =
+                data.image[ID00].array.F[jj1 * xsize1 + ii1];
+            data.image[ID].array.F[(2 * jj1 + 1)*xsize2 + (2 * ii1 + 1)] =
+                data.image[ID11].array.F[jj1 * xsize1 + ii1];
+            data.image[ID].array.F[2 * jj1 * xsize2 + (2 * ii1 + 1)] =
+                data.image[ID10].array.F[jj1 * xsize1 + ii1];
         }
 
     return(ID);
@@ -1385,14 +1554,14 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 )
 {
     imageID ID;
-    long Xsize,Ysize;
-    imageID IDr,IDg,IDb,IDrc,IDgc,IDbc,IDbp;
+    long Xsize, Ysize;
+    imageID IDr, IDg, IDb, IDrc, IDgc, IDbc, IDbp;
     imageID IDbadpix;
     imageID IDflat;
     imageID IDdark;
     imageID IDbias;
-    long ii,jj,ii1,jj1,ii2,jj2,iistart,iiend,jjstart,jjend,dii,djj;
-    double v1,v2,v,vc,tmp1;
+    long ii, jj, ii1, jj1, ii2, jj2, iistart, iiend, jjstart, jjend, dii, djj;
+    double v1, v2, v, vc, tmp1;
     long cnt;
     double coeff;
     imageID ID00, ID01, ID10, ID11;
@@ -1402,8 +1571,10 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
     int FastMode = 0;
 
-    if(variable_ID("_RGBfast")!=-1)
+    if(variable_ID("_RGBfast") != -1)
+    {
         FastMode = 1;
+    }
 
     ID = image_ID(ID_name);
     Xsize = data.image[ID].md[0].size[0];
@@ -1413,18 +1584,26 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
 
 
-    if((Xsize == 4290)&&(Ysize == 2856))
+    if((Xsize == 4290) && (Ysize == 2856))
+    {
         RGBmode = 1;
-    if((Xsize == 4770)&&(Ysize == 3178))
+    }
+    if((Xsize == 4770) && (Ysize == 3178))
+    {
         RGBmode = 1;
-    if((Xsize == 5202)&&(Ysize == 3465))
+    }
+    if((Xsize == 5202) && (Ysize == 3465))
+    {
         RGBmode = 2;
-    if((Xsize == 5208)&&(Ysize == 3476))
+    }
+    if((Xsize == 5208) && (Ysize == 3476))
+    {
         RGBmode = 1;
+    }
 
     if(RGBmode == 0)
     {
-        printERROR(__FILE__,__func__,__LINE__,"WARNING: Unknown RGB image mode\n");
+        printERROR(__FILE__, __func__, __LINE__, "WARNING: Unknown RGB image mode\n");
         exit(0);
     }
 
@@ -1433,33 +1612,39 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
     printf("RGBmode   = %d\n", RGBmode);
     //exit(0);
 
-    if(FastMode==0)
+    if(FastMode == 0)
     {
         // bias
         IDbias = image_ID("bias");
         if(IDbias == -1)
         {
-            IDbias = create_2Dimage_ID("bias",Xsize,Ysize);
-            for(ii=0; ii<Xsize*Ysize; ii++)
+            IDbias = create_2Dimage_ID("bias", Xsize, Ysize);
+            for(ii = 0; ii < Xsize * Ysize; ii++)
+            {
                 data.image[IDbias].array.F[ii] = 0.0;
+            }
         }
 
         // dark
         IDdark = image_ID("dark");
         if(IDdark == -1)
         {
-            IDdark = create_2Dimage_ID("dark",Xsize,Ysize);
-            for(ii=0; ii<Xsize*Ysize; ii++)
+            IDdark = create_2Dimage_ID("dark", Xsize, Ysize);
+            for(ii = 0; ii < Xsize * Ysize; ii++)
+            {
                 data.image[IDdark].array.F[ii] = 0.0;
+            }
         }
 
         // bad pixel map
         IDbadpix = image_ID("badpix");
         if(IDbadpix == -1)
         {
-            IDbadpix = create_2Dimage_ID("badpix",Xsize,Ysize);
-            for(ii=0; ii<Xsize*Ysize; ii++)
+            IDbadpix = create_2Dimage_ID("badpix", Xsize, Ysize);
+            for(ii = 0; ii < Xsize * Ysize; ii++)
+            {
                 data.image[IDbadpix].array.F[ii] = 0.0;
+            }
         }
 
         copy_image_ID("badpix", "badpix1", 0);
@@ -1469,9 +1654,11 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
         IDflat = image_ID("flat");
         if(IDflat == -1)
         {
-            IDflat = create_2Dimage_ID("flat",Xsize,Ysize);
-            for(ii=0; ii<Xsize*Ysize; ii++)
+            IDflat = create_2Dimage_ID("flat", Xsize, Ysize);
+            for(ii = 0; ii < Xsize * Ysize; ii++)
+            {
                 data.image[IDflat].array.F[ii] = 1.0;
+            }
             //      arith_image_cstadd_inplace("flat",1.0);
         }
 
@@ -1479,446 +1666,516 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
 
         // remove bias
-        if(IDbias!=-1)
+        if(IDbias != -1)
         {
-            for(ii=0; ii<Xsize; ii++)
-                for(jj=0; jj<Ysize; jj++)
-                    data.image[ID].array.F[jj*Xsize+ii] -= data.image[IDbias].array.F[jj*Xsize+ii];
+            for(ii = 0; ii < Xsize; ii++)
+                for(jj = 0; jj < Ysize; jj++)
+                {
+                    data.image[ID].array.F[jj * Xsize + ii] -= data.image[IDbias].array.F[jj * Xsize
+                            + ii];
+                }
         }
         // remove dark
-        if(IDdark!=-1)
+        if(IDdark != -1)
         {
-            for(ii=0; ii<Xsize; ii++)
-                for(jj=0; jj<Ysize; jj++)
-                    data.image[ID].array.F[jj*Xsize+ii] -= data.image[IDdark].array.F[jj*Xsize+ii];
+            for(ii = 0; ii < Xsize; ii++)
+                for(jj = 0; jj < Ysize; jj++)
+                {
+                    data.image[ID].array.F[jj * Xsize + ii] -= data.image[IDdark].array.F[jj * Xsize
+                            + ii];
+                }
         }
 
 
 
         // remove obvious isolated hot pixels
         cnt = 0;
-        for(ii=0; ii<Xsize; ii++)
-            for(jj=0; jj<Ysize; jj++)
+        for(ii = 0; ii < Xsize; ii++)
+            for(jj = 0; jj < Ysize; jj++)
             {
-                v1 = data.image[ID].array.F[jj*Xsize+ii];
-                iistart = ii-2;
-                iiend = ii+2;
-                if(iistart<0)
-                    iistart = 0;
-                if(iiend>Xsize-1)
-                    iiend = Xsize-1;
-                jjstart = jj-2;
-                jjend = jj+2;
-                if(jjstart<0)
-                    jjstart = 0;
-                if(jjend>Ysize-1)
-                    jjend = Ysize-1;
-                v2 = 0.0;
-                for(ii1=iistart; ii1<iiend; ii1++)
-                    for(jj1=jjstart; jj1<jjend; jj1++)
-                        if((ii1!=ii)||(jj1!=jj))
-                        {
-                            tmp1 = data.image[ID].array.F[jj1*Xsize+ii1];
-                            if(tmp1>v2)
-                                v2 = tmp1;
-                        }
-                if(v1>4.0*v2+500.0)
+                v1 = data.image[ID].array.F[jj * Xsize + ii];
+                iistart = ii - 2;
+                iiend = ii + 2;
+                if(iistart < 0)
                 {
-                    data.image[ID].array.F[jj*Xsize+ii] = v2;
+                    iistart = 0;
+                }
+                if(iiend > Xsize - 1)
+                {
+                    iiend = Xsize - 1;
+                }
+                jjstart = jj - 2;
+                jjend = jj + 2;
+                if(jjstart < 0)
+                {
+                    jjstart = 0;
+                }
+                if(jjend > Ysize - 1)
+                {
+                    jjend = Ysize - 1;
+                }
+                v2 = 0.0;
+                for(ii1 = iistart; ii1 < iiend; ii1++)
+                    for(jj1 = jjstart; jj1 < jjend; jj1++)
+                        if((ii1 != ii) || (jj1 != jj))
+                        {
+                            tmp1 = data.image[ID].array.F[jj1 * Xsize + ii1];
+                            if(tmp1 > v2)
+                            {
+                                v2 = tmp1;
+                            }
+                        }
+                if(v1 > 4.0 * v2 + 500.0)
+                {
+                    data.image[ID].array.F[jj * Xsize + ii] = v2;
                     //		data.image[IDbp].array.F[jj*Xsize+ii] = 1.0;
                     cnt ++;
                 }
             }
-        printf("%ld hot pixels removed\n",cnt);
+        printf("%ld hot pixels removed\n", cnt);
 
 
-        for(ii=0; ii<Xsize; ii++)
-            for(jj=0; jj<Ysize; jj++)
-                data.image[ID].array.F[jj*Xsize+ii] *= FLUXFACTOR;
+        for(ii = 0; ii < Xsize; ii++)
+            for(jj = 0; jj < Ysize; jj++)
+            {
+                data.image[ID].array.F[jj * Xsize + ii] *= FLUXFACTOR;
+            }
     }
 
 
 
-    switch ( SamplFactor ) {
+    switch(SamplFactor)
+    {
 
-    case 0 :
+        case 0 :
 
-        if(image_ID(ID_name_r)!=-1)
-            delete_image_ID(ID_name_r);
-        IDr = create_2Dimage_ID(ID_name_r,Xsize,Ysize);
-        IDrc = create_2Dimage_ID("imrc",Xsize,Ysize);
+            if(image_ID(ID_name_r) != -1)
+            {
+                delete_image_ID(ID_name_r);
+            }
+            IDr = create_2Dimage_ID(ID_name_r, Xsize, Ysize);
+            IDrc = create_2Dimage_ID("imrc", Xsize, Ysize);
 
-        if(image_ID(ID_name_g)!=-1)
-            delete_image_ID(ID_name_g);
-        IDg = create_2Dimage_ID(ID_name_g,Xsize,Ysize);
-        IDgc = create_2Dimage_ID("imgc",Xsize,Ysize);
+            if(image_ID(ID_name_g) != -1)
+            {
+                delete_image_ID(ID_name_g);
+            }
+            IDg = create_2Dimage_ID(ID_name_g, Xsize, Ysize);
+            IDgc = create_2Dimage_ID("imgc", Xsize, Ysize);
 
-        if(image_ID(ID_name_b)!=-1)
-            delete_image_ID(ID_name_b);
-        IDb = create_2Dimage_ID(ID_name_b,Xsize,Ysize);
-        IDbc = create_2Dimage_ID("imbc",Xsize,Ysize);
+            if(image_ID(ID_name_b) != -1)
+            {
+                delete_image_ID(ID_name_b);
+            }
+            IDb = create_2Dimage_ID(ID_name_b, Xsize, Ysize);
+            IDbc = create_2Dimage_ID("imbc", Xsize, Ysize);
 
-        if(RGBmode==1) // GBRG
-        {
-            ID00 = IDg;
-            ID00c = IDgc;
+            if(RGBmode == 1) // GBRG
+            {
+                ID00 = IDg;
+                ID00c = IDgc;
 
-            ID10 = IDb;
-            ID10c = IDbc;
+                ID10 = IDb;
+                ID10c = IDbc;
 
-            ID01 = IDr;
-            ID01c = IDrc;
+                ID01 = IDr;
+                ID01c = IDrc;
 
-            ID11 = IDg;
-            ID11c = IDgc;
-        }
+                ID11 = IDg;
+                ID11c = IDgc;
+            }
 
-        if(RGBmode==2)
-        {
-            ID00 = IDr;
-            ID00c = IDrc;
+            if(RGBmode == 2)
+            {
+                ID00 = IDr;
+                ID00c = IDrc;
 
-            ID10 = IDg;
-            ID10c = IDgc;
+                ID10 = IDg;
+                ID10c = IDgc;
 
-            ID01 = IDg;
-            ID01c = IDgc;
+                ID01 = IDg;
+                ID01c = IDgc;
 
-            ID11 = IDb;
-            ID11c = IDbc;
-        }
+                ID11 = IDb;
+                ID11c = IDbc;
+            }
 
-        if(FastMode==0)
-        {
-            for(ii1=0; ii1<Xsize/2; ii1++)
-                for(jj1=0; jj1<Ysize/2; jj1++)
+            if(FastMode == 0)
+            {
+                for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii;
+                        jj2 = jj + 1;
+                        data.image[ID01].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                        data.image[ID01c].array.F[jj2 * Xsize + ii2] = 1.0 -
+                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                        ii2 = ii + 1;
+                        jj2 = jj + 1;
+                        data.image[ID11].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                        data.image[ID11c].array.F[jj2 * Xsize + ii2] = 1.0 -
+                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                        ii2 = ii;
+                        jj2 = jj;
+                        data.image[ID00].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                        data.image[ID00c].array.F[jj2 * Xsize + ii2] = 1.0 -
+                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                        ii2 = ii + 1;
+                        jj2 = jj;
+                        data.image[ID10].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                        data.image[ID10c].array.F[jj2 * Xsize + ii2] = 1.0 -
+                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                    }
+
+                for(ii = 0; ii < Xsize; ii++)
+                    for(jj = 0; jj < Ysize; jj++)
+                    {
+                        if(data.image[IDrc].array.F[jj * Xsize + ii] < 0.5)
+                        {
+                            v = 0.0;
+                            vc = 0.0;
+                            for(dii = -2; dii < 3; dii++)
+                                for(djj = -2; djj < 3; djj++)
+                                {
+                                    ii1 = ii + dii;
+                                    jj1 = jj + djj;
+                                    if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                        if((dii != 0) || (djj != 0))
+                                        {
+                                            if(data.image[IDrc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                            {
+                                                coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                                vc += coeff;
+                                                v += data.image[IDr].array.F[jj1 * Xsize + ii1] * coeff;
+                                            }
+                                        }
+                                }
+                            data.image[IDr].array.F[jj * Xsize + ii] = v / vc;
+                        }
+
+                        if(data.image[IDgc].array.F[jj * Xsize + ii] < 0.5)
+                        {
+                            v = 0.0;
+                            vc = 0.0;
+                            for(dii = -2; dii < 3; dii++)
+                                for(djj = -2; djj < 3; djj++)
+                                {
+                                    ii1 = ii + dii;
+                                    jj1 = jj + djj;
+                                    if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                        if((dii != 0) || (djj != 0))
+                                        {
+                                            if(data.image[IDgc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                            {
+                                                coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                                vc += coeff;
+                                                v += data.image[IDg].array.F[jj1 * Xsize + ii1] * coeff;
+                                            }
+                                        }
+                                }
+                            data.image[IDg].array.F[jj * Xsize + ii] = v / vc;
+                        }
+
+                        if(data.image[IDbc].array.F[jj * Xsize + ii] < 0.5)
+                        {
+                            v = 0.0;
+                            vc = 0.0;
+                            for(dii = -2; dii < 3; dii++)
+                                for(djj = -2; djj < 3; djj++)
+                                {
+                                    ii1 = ii + dii;
+                                    jj1 = jj + djj;
+                                    if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                        if((dii != 0) || (djj != 0))
+                                        {
+                                            if(data.image[IDbc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                            {
+                                                coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                                vc += coeff;
+                                                v += data.image[IDb].array.F[jj1 * Xsize + ii1] * coeff;
+                                            }
+                                        }
+                                }
+                            data.image[IDb].array.F[jj * Xsize + ii] = v / vc;
+                        }
+                    }
+            }
+            else
+            {
+                if(RGBmode == 1) // GBRG
                 {
-                    ii = ii1*2;
-                    jj = jj1*2;
+                    // G
+                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+
+                            ii2 = ii;
+                            jj2 = jj;
+                            data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                    + ii2];
+                            ii2 = ii + 1;
+                            jj2 = jj + 1;
+                            data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                    + ii2];
+                        }
+                    // replace blue pixels
+                    for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
+                        for(jj1 = 1; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii + 1;
+                            jj2 = jj;
+                            data.image[IDg].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[jj2
+                                    * Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize +
+                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
+                                    data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
+                        }
+                    // replace red pixels
+                    for(ii1 = 1; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii;
+                            jj2 = jj + 1;
+                            data.image[IDg].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[jj2
+                                    * Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize +
+                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
+                                    data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
+                        }
+
+
+
+                    // R
+                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+                            ii2 = ii;
+                            jj2 = jj + 1;
+                            data.image[IDr].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                    + ii2];
+                        }
+                    // replace g1 pixels
+                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 1; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii;
+                            jj2 = jj;
+                            data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[(jj2
+                                    - 1) * Xsize + ii2] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
+                        }
+                    // replace g2 pixels
+                    for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii + 1;
+                            jj2 = jj + 1;
+                            data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[jj2 *
+                                    Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
+                        }
+                    // replace b pixels
+                    for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
+                        for(jj1 = 1; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii + 1;
+                            jj2 = jj;
+                            data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[(jj2
+                                    - 1) * Xsize + (ii2 - 1)] + data.image[ID].array.F[(jj2 - 1) * Xsize +
+                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize +
+                                                    (ii2 - 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
+                        }
+
+
+                    // B
+                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+                            ii2 = ii + 1;
+                            jj2 = jj;
+                            data.image[IDb].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                    + ii2];
+                        }
+
+                    // replace g2 pixels
+                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii + 1;
+                            jj2 = jj + 1;
+                            data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[(jj2
+                                    - 1) * Xsize + ii2] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
+                        }
+                    // replace g1 pixels
+                    for(ii1 = 1; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii;
+                            jj2 = jj;
+                            data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[jj2 *
+                                    Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
+                        }
+                    // replace r pixels
+                    for(ii1 = 1; ii1 < Xsize / 2; ii1++)
+                        for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
+                        {
+                            ii = ii1 * 2;
+                            jj = jj1 * 2;
+
+                            ii2 = ii;
+                            jj2 = jj + 1;
+                            data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[(jj2
+                                    - 1) * Xsize + (ii2 - 1)] + data.image[ID].array.F[(jj2 - 1) * Xsize +
+                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize +
+                                                    (ii2 - 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
+                        }
+
+                }
+            }
+
+
+
+            //  delete_image_ID("badpix1");
+
+            delete_image_ID("imrc");
+            delete_image_ID("imgc");
+            delete_image_ID("imbc");
+            //  delete_image_ID("imraw");
+            break;
+
+        case 1:
+            if(image_ID(ID_name_r) != -1)
+            {
+                delete_image_ID(ID_name_r);
+            }
+            IDr = create_2Dimage_ID(ID_name_r, Xsize / 2, Ysize / 2);
+            IDrc = create_2Dimage_ID("imrc", Xsize / 2, Ysize / 2);
+
+            if(image_ID(ID_name_g) != -1)
+            {
+                delete_image_ID(ID_name_g);
+            }
+            IDg = create_2Dimage_ID(ID_name_g, Xsize / 2, Ysize / 2);
+            IDgc = create_2Dimage_ID("imgc", Xsize / 2, Ysize / 2);
+
+            if(image_ID(ID_name_b) != -1)
+            {
+                delete_image_ID(ID_name_b);
+            }
+            IDb = create_2Dimage_ID(ID_name_b, Xsize / 2, Ysize / 2);
+            IDbc = create_2Dimage_ID("imbc", Xsize / 2, Ysize / 2);
+
+            if(RGBmode == 1) // GBRG
+            {
+                ID00 = IDg;
+                ID00c = IDgc;
+
+                ID10 = IDb;
+                ID10c = IDbc;
+
+                ID01 = IDr;
+                ID01c = IDrc;
+
+                ID11 = IDg;
+                ID11c = IDgc;
+            }
+
+            if(RGBmode == 2)
+            {
+                ID00 = IDr;
+                ID00c = IDrc;
+
+                ID10 = IDg;
+                ID10c = IDgc;
+
+                ID01 = IDg;
+                ID01c = IDgc;
+
+                ID11 = IDb;
+                ID11c = IDbc;
+            }
+
+            for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                {
+                    ii = ii1 * 2;
+                    jj = jj1 * 2;
 
                     ii2 = ii;
-                    jj2 = jj+1;
-                    data.image[ID01].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                    data.image[ID01c].array.F[jj2*Xsize+ii2] = 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
+                    jj2 = jj + 1;
+                    data.image[ID01].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID01c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                            data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
-                    ii2 = ii+1;
-                    jj2 = jj+1;
-                    data.image[ID11].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                    data.image[ID11c].array.F[jj2*Xsize+ii2] = 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
+                    ii2 = ii + 1;
+                    jj2 = jj + 1;
+                    data.image[ID11].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID11c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                            data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                     ii2 = ii;
                     jj2 = jj;
-                    data.image[ID00].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                    data.image[ID00c].array.F[jj2*Xsize+ii2] = 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
+                    data.image[ID00].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID00c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                            data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
-                    ii2 = ii+1;
+                    ii2 = ii + 1;
                     jj2 = jj;
-                    data.image[ID10].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                    data.image[ID10c].array.F[jj2*Xsize+ii2] = 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
+                    data.image[ID10].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID10c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                            data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                    data.image[IDr].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDrc].array.F[jj1 *
+                            Xsize / 2 + ii1] + eps;
+                    data.image[IDg].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDgc].array.F[jj1 *
+                            Xsize / 2 + ii1] + eps;
+                    data.image[IDb].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDbc].array.F[jj1 *
+                            Xsize / 2 + ii1] + eps;
                 }
 
-            for(ii=0; ii<Xsize; ii++)
-                for(jj=0; jj<Ysize; jj++)
-                {
-                    if(data.image[IDrc].array.F[jj*Xsize+ii]<0.5)
-                    {
-                        v = 0.0;
-                        vc = 0.0;
-                        for(dii=-2; dii<3; dii++)
-                            for(djj=-2; djj<3; djj++)
-                            {
-                                ii1 = ii+dii;
-                                jj1 = jj+djj;
-                                if((ii1>-1)&&(jj1>-1)&&(ii1<Xsize)&&(jj1<Ysize))
-                                    if((dii!=0)||(djj!=0))
-                                    {
-                                        if(data.image[IDrc].array.F[jj1*Xsize+ii1]>0.5)
-                                        {
-                                            coeff = exp(-5.0*(dii*dii+djj*djj));
-                                            vc += coeff;
-                                            v += data.image[IDr].array.F[jj1*Xsize+ii1]*coeff;
-                                        }
-                                    }
-                            }
-                        data.image[IDr].array.F[jj*Xsize+ii] = v/vc;
-                    }
+            delete_image_ID("imrc");
+            delete_image_ID("imgc");
+            delete_image_ID("imbc");
 
-                    if(data.image[IDgc].array.F[jj*Xsize+ii]<0.5)
-                    {
-                        v = 0.0;
-                        vc = 0.0;
-                        for(dii=-2; dii<3; dii++)
-                            for(djj=-2; djj<3; djj++)
-                            {
-                                ii1 = ii+dii;
-                                jj1 = jj+djj;
-                                if((ii1>-1)&&(jj1>-1)&&(ii1<Xsize)&&(jj1<Ysize))
-                                    if((dii!=0)||(djj!=0))
-                                    {
-                                        if(data.image[IDgc].array.F[jj1*Xsize+ii1]>0.5)
-                                        {
-                                            coeff = exp(-5.0*(dii*dii+djj*djj));
-                                            vc += coeff;
-                                            v += data.image[IDg].array.F[jj1*Xsize+ii1]*coeff;
-                                        }
-                                    }
-                            }
-                        data.image[IDg].array.F[jj*Xsize+ii] = v/vc;
-                    }
-
-                    if(data.image[IDbc].array.F[jj*Xsize+ii]<0.5)
-                    {
-                        v = 0.0;
-                        vc = 0.0;
-                        for(dii=-2; dii<3; dii++)
-                            for(djj=-2; djj<3; djj++)
-                            {
-                                ii1 = ii+dii;
-                                jj1 = jj+djj;
-                                if((ii1>-1)&&(jj1>-1)&&(ii1<Xsize)&&(jj1<Ysize))
-                                    if((dii!=0)||(djj!=0))
-                                    {
-                                        if(data.image[IDbc].array.F[jj1*Xsize+ii1]>0.5)
-                                        {
-                                            coeff = exp(-5.0*(dii*dii+djj*djj));
-                                            vc += coeff;
-                                            v += data.image[IDb].array.F[jj1*Xsize+ii1]*coeff;
-                                        }
-                                    }
-                            }
-                        data.image[IDb].array.F[jj*Xsize+ii] = v/vc;
-                    }
-                }
-        }
-        else
-        {
-            if(RGBmode==1) // GBRG
-            {
-                // G
-                for(ii1=0; ii1<Xsize/2; ii1++)
-                    for(jj1=0; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-
-                        ii2 = ii;
-                        jj2 = jj;
-                        data.image[IDg].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2];
-                        ii2 = ii+1;
-                        jj2 = jj+1;
-                        data.image[IDg].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2];
-                    }
-                // replace blue pixels
-                for(ii1=0; ii1<Xsize/2-1; ii1++)
-                    for(jj1=1; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii+1;
-                        jj2 = jj;
-                        data.image[IDg].array.F[jj2*Xsize+ii2] = 0.25*(data.image[ID].array.F[jj2*Xsize+(ii2-1)]+data.image[ID].array.F[jj2*Xsize+(ii2+1)]+data.image[ID].array.F[(jj2+1)*Xsize+ii2]+data.image[ID].array.F[(jj2-1)*Xsize+ii2]);
-                    }
-                // replace red pixels
-                for(ii1=1; ii1<Xsize/2; ii1++)
-                    for(jj1=0; jj1<Ysize/2-1; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii;
-                        jj2 = jj+1;
-                        data.image[IDg].array.F[jj2*Xsize+ii2] = 0.25*(data.image[ID].array.F[jj2*Xsize+(ii2-1)]+data.image[ID].array.F[jj2*Xsize+(ii2+1)]+data.image[ID].array.F[(jj2+1)*Xsize+ii2]+data.image[ID].array.F[(jj2-1)*Xsize+ii2]);
-                    }
-
-
-
-                // R
-                for(ii1=0; ii1<Xsize/2; ii1++)
-                    for(jj1=0; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-                        ii2 = ii;
-                        jj2 = jj+1;
-                        data.image[IDr].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2];
-                    }
-                // replace g1 pixels
-                for(ii1=0; ii1<Xsize/2; ii1++)
-                    for(jj1=1; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii;
-                        jj2 = jj;
-                        data.image[IDr].array.F[jj2*Xsize+ii2] = 0.5*(data.image[ID].array.F[(jj2-1)*Xsize+ii2] + data.image[ID].array.F[(jj2+1)*Xsize+ii2]);
-                    }
-                // replace g2 pixels
-                for(ii1=0; ii1<Xsize/2-1; ii1++)
-                    for(jj1=0; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii+1;
-                        jj2 = jj+1;
-                        data.image[IDr].array.F[jj2*Xsize+ii2] = 0.5*(data.image[ID].array.F[jj2*Xsize+(ii2-1)] + data.image[ID].array.F[jj2*Xsize+(ii2+1)]);
-                    }
-                // replace b pixels
-                for(ii1=0; ii1<Xsize/2-1; ii1++)
-                    for(jj1=1; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii+1;
-                        jj2 = jj;
-                        data.image[IDr].array.F[jj2*Xsize+ii2] = 0.25*(data.image[ID].array.F[(jj2-1)*Xsize+(ii2-1)] + data.image[ID].array.F[(jj2-1)*Xsize+(ii2+1)]+data.image[ID].array.F[(jj2+1)*Xsize+(ii2-1)] + data.image[ID].array.F[(jj2+1)*Xsize+(ii2+1)]);
-                    }
-
-
-                // B
-                for(ii1=0; ii1<Xsize/2; ii1++)
-                    for(jj1=0; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-                        ii2 = ii+1;
-                        jj2 = jj;
-                        data.image[IDb].array.F[jj2*Xsize+ii2] = data.image[ID].array.F[jj2*Xsize+ii2];
-                    }
-
-                // replace g2 pixels
-                for(ii1=0; ii1<Xsize/2; ii1++)
-                    for(jj1=0; jj1<Ysize/2-1; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii+1;
-                        jj2 = jj+1;
-                        data.image[IDb].array.F[jj2*Xsize+ii2] = 0.5*(data.image[ID].array.F[(jj2-1)*Xsize+ii2] + data.image[ID].array.F[(jj2+1)*Xsize+ii2]);
-                    }
-                // replace g1 pixels
-                for(ii1=1; ii1<Xsize/2; ii1++)
-                    for(jj1=0; jj1<Ysize/2; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii;
-                        jj2 = jj;
-                        data.image[IDb].array.F[jj2*Xsize+ii2] = 0.5*(data.image[ID].array.F[jj2*Xsize+(ii2-1)] + data.image[ID].array.F[jj2*Xsize+(ii2+1)]);
-                    }
-                // replace r pixels
-                for(ii1=1; ii1<Xsize/2; ii1++)
-                    for(jj1=0; jj1<Ysize/2-1; jj1++)
-                    {
-                        ii = ii1*2;
-                        jj = jj1*2;
-
-                        ii2 = ii;
-                        jj2 = jj+1;
-                        data.image[IDb].array.F[jj2*Xsize+ii2] = 0.25*(data.image[ID].array.F[(jj2-1)*Xsize+(ii2-1)] + data.image[ID].array.F[(jj2-1)*Xsize+(ii2+1)]+data.image[ID].array.F[(jj2+1)*Xsize+(ii2-1)] + data.image[ID].array.F[(jj2+1)*Xsize+(ii2+1)]);
-                    }
-
-            }
-        }
-
-
-
-        //  delete_image_ID("badpix1");
-
-        delete_image_ID("imrc");
-        delete_image_ID("imgc");
-        delete_image_ID("imbc");
-        //  delete_image_ID("imraw");
-        break;
-
-    case 1:
-        if(image_ID(ID_name_r)!=-1)
-            delete_image_ID(ID_name_r);
-        IDr = create_2Dimage_ID(ID_name_r,Xsize/2,Ysize/2);
-        IDrc = create_2Dimage_ID("imrc",Xsize/2,Ysize/2);
-
-        if(image_ID(ID_name_g)!=-1)
-            delete_image_ID(ID_name_g);
-        IDg = create_2Dimage_ID(ID_name_g,Xsize/2,Ysize/2);
-        IDgc = create_2Dimage_ID("imgc",Xsize/2,Ysize/2);
-
-        if(image_ID(ID_name_b)!=-1)
-            delete_image_ID(ID_name_b);
-        IDb = create_2Dimage_ID(ID_name_b,Xsize/2,Ysize/2);
-        IDbc = create_2Dimage_ID("imbc",Xsize/2,Ysize/2);
-
-        if(RGBmode==1) // GBRG
-        {
-            ID00 = IDg;
-            ID00c = IDgc;
-
-            ID10 = IDb;
-            ID10c = IDbc;
-
-            ID01 = IDr;
-            ID01c = IDrc;
-
-            ID11 = IDg;
-            ID11c = IDgc;
-        }
-
-        if(RGBmode==2)
-        {
-            ID00 = IDr;
-            ID00c = IDrc;
-
-            ID10 = IDg;
-            ID10c = IDgc;
-
-            ID01 = IDg;
-            ID01c = IDgc;
-
-            ID11 = IDb;
-            ID11c = IDbc;
-        }
-
-        for(ii1=0; ii1<Xsize/2; ii1++)
-            for(jj1=0; jj1<Ysize/2; jj1++)
-            {
-                ii = ii1*2;
-                jj = jj1*2;
-
-                ii2 = ii;
-                jj2 = jj+1;
-                data.image[ID01].array.F[jj1*Xsize/2+ii1] += data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                data.image[ID01c].array.F[jj1*Xsize/2+ii1] += 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
-
-                ii2 = ii+1;
-                jj2 = jj+1;
-                data.image[ID11].array.F[jj1*Xsize/2+ii1] += data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                data.image[ID11c].array.F[jj1*Xsize/2+ii1] += 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
-
-                ii2 = ii;
-                jj2 = jj;
-                data.image[ID00].array.F[jj1*Xsize/2+ii1] += data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                data.image[ID00c].array.F[jj1*Xsize/2+ii1] += 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
-
-                ii2 = ii+1;
-                jj2 = jj;
-                data.image[ID10].array.F[jj1*Xsize/2+ii1] += data.image[ID].array.F[jj2*Xsize+ii2]/data.image[IDflat].array.F[jj2*Xsize+ii2];
-                data.image[ID10c].array.F[jj1*Xsize/2+ii1] += 1.0-data.image[IDbp].array.F[jj2*Xsize+ii2];
-
-                data.image[IDr].array.F[jj1*Xsize/2+ii1] /= data.image[IDrc].array.F[jj1*Xsize/2+ii1]+eps;
-                data.image[IDg].array.F[jj1*Xsize/2+ii1] /= data.image[IDgc].array.F[jj1*Xsize/2+ii1]+eps;
-                data.image[IDb].array.F[jj1*Xsize/2+ii1] /= data.image[IDbc].array.F[jj1*Xsize/2+ii1]+eps;
-            }
-
-        delete_image_ID("imrc");
-        delete_image_ID("imgc");
-        delete_image_ID("imbc");
-
-        break;
+            break;
 
     }
 
@@ -1943,14 +2200,14 @@ errno_t loadCR2toFITSRGB(
     const char *fnameFITSb
 )
 {
-	EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
+    EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
 
     read_PGMimage("_tmppgm.pgm", "tmpfits1");
     //  r = system("rm _tmppgm.pgm");
 
 
 
-    if(CR2toFITS_NORM==1)
+    if(CR2toFITS_NORM == 1)
     {
         FILE *fp;
         float iso;
@@ -1959,59 +2216,88 @@ errno_t loadCR2toFITSRGB(
         //imageID ID;
         //long xsize,ysize;
 
-		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt", fnameCR2);
-        
-        if((fp = fopen("iso_tmp.txt","r"))==NULL)
+        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > iso_tmp.txt",
+                               fnameCR2);
+
+        if((fp = fopen("iso_tmp.txt", "r")) == NULL)
+        {
             PRINT_ERROR("Cannot open file");
-        if(fscanf(fp,"%f\n",&iso) != 1)
+        }
+        if(fscanf(fp, "%f\n", &iso) != 1)
+        {
             PRINT_ERROR("fscanf returns value != 1");
+        }
         fclose(fp);
 
         if(system("rm iso_tmp.txt") != 0)
+        {
             PRINT_ERROR("system() returns non-zero value");
-        printf("iso = %f\n",iso);
+        }
+        printf("iso = %f\n", iso);
 
-		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt", fnameCR2);
-        
-        if((fp = fopen("shutter_tmp.txt","r"))==NULL)
+        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Shutter\"| awk '{print $2}' > shutter_tmp.txt",
+                               fnameCR2);
+
+        if((fp = fopen("shutter_tmp.txt", "r")) == NULL)
+        {
             PRINT_ERROR("Cannot open file");
+        }
 
-        if(fscanf(fp,"%f\n",&shutter) != 1)
+        if(fscanf(fp, "%f\n", &shutter) != 1)
+        {
             PRINT_ERROR("fscanf returns value != 1");
+        }
         fclose(fp);
 
         if(system("rm shutter_tmp.txt") != 0)
+        {
             PRINT_ERROR("system() returns non-zero value");
-        printf("shutter = %f\n",shutter);
-		
-		EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt", fnameCR2);
-        
+        }
+        printf("shutter = %f\n", shutter);
 
-        if((fp = fopen("aperture_tmp.txt","r"))==NULL)
+        EXECUTE_SYSTEM_COMMAND("dcraw -i -v %s | grep \"Aperture\"| awk '{print $2}' > aperture_tmp.txt",
+                               fnameCR2);
+
+
+        if((fp = fopen("aperture_tmp.txt", "r")) == NULL)
+        {
             PRINT_ERROR("Cannot open file");
-        if(fscanf(fp,"f/%f\n",&aperture) != 1)
+        }
+        if(fscanf(fp, "f/%f\n", &aperture) != 1)
+        {
             PRINT_ERROR("fscanf returns value != 1");
+        }
         fclose(fp);
 
         if(system("rm aperture_tmp.txt") != 0)
+        {
             PRINT_ERROR("system() returns non-zero value");
-        printf("aperture = %f\n",aperture);
+        }
+        printf("aperture = %f\n", aperture);
 
         //ID = image_ID("tmpfits1");
         //        xsize = data.image[ID].md[0].size[0];
         //        ysize = data.image[ID].md[0].size[1];
 
-        FLUXFACTOR = aperture*aperture/(shutter*iso);
+        FLUXFACTOR = aperture * aperture / (shutter * iso);
     }
     else
+    {
         FLUXFACTOR = 1.0;
+    }
 
-    printf("FLUXFACTOR = %g\n",FLUXFACTOR);
+    printf("FLUXFACTOR = %g\n", FLUXFACTOR);
 
-    if(variable_ID("RGBfullres")==-1)
-        convert_rawbayerFITStorgbFITS_simple("tmpfits1", fnameFITSr, fnameFITSg, fnameFITSb, 1);
+    if(variable_ID("RGBfullres") == -1)
+    {
+        convert_rawbayerFITStorgbFITS_simple("tmpfits1", fnameFITSr, fnameFITSg,
+                                             fnameFITSb, 1);
+    }
     else
-        convert_rawbayerFITStorgbFITS_simple("tmpfits1", fnameFITSr, fnameFITSg, fnameFITSb, 0);
+    {
+        convert_rawbayerFITStorgbFITS_simple("tmpfits1", fnameFITSr, fnameFITSg,
+                                             fnameFITSb, 0);
+    }
 
     delete_image_ID("tmpfits1");
 
@@ -2030,7 +2316,7 @@ errno_t CR2tomov()
 {
     char configfile[STRINGMAXLEN_FILENAME];
     imageID ID, IDr, IDg, IDb;
-    long ii,i;
+    long ii, i;
     long cnt = 0;
     long cntmax;
     char fname[STRINGMAXLEN_FULLFILENAME];
@@ -2045,7 +2331,7 @@ errno_t CR2tomov()
     FILE *fp;
     FILE *fp1;
 
-    long xsize,ysize;
+    long xsize, ysize;
 
     imageID IDrtot;
     imageID IDgtot;
@@ -2094,7 +2380,7 @@ errno_t CR2tomov()
     double RGBM_BR;
     double RGBM_BG;
     double RGBM_BB;
-    double LUMR,LUMG,LUMB; // luminance vector
+    double LUMR, LUMG, LUMB; // luminance vector
     double COLORSAT;
 
     double ALPHA;
@@ -2102,14 +2388,18 @@ errno_t CR2tomov()
 
 
 
-    double vp01,vp05,vp10,vp20,vp50,vp80,vp90,vp95,vp99,vp995,vp998,vp999;
-    double vp01r,vp05r,vp10r,vp20r,vp50r,vp80r,vp90r,vp95r,vp99r,vp995r,vp998r,vp999r;
-    double vp01g,vp05g,vp10g,vp20g,vp50g,vp80g,vp90g,vp95g,vp99g,vp995g,vp998g,vp999g;
-    double vp01b,vp05b,vp10b,vp20b,vp50b,vp80b,vp90b,vp95b,vp99b,vp995b,vp998b,vp999b;
+    double vp01, vp05, vp10, vp20, vp50, vp80, vp90, vp95, vp99, vp995, vp998,
+           vp999;
+    double vp01r, vp05r, vp10r, vp20r, vp50r, vp80r, vp90r, vp95r, vp99r, vp995r,
+           vp998r, vp999r;
+    double vp01g, vp05g, vp10g, vp20g, vp50g, vp80g, vp90g, vp95g, vp99g, vp995g,
+           vp998g, vp999g;
+    double vp01b, vp05b, vp10b, vp20b, vp50b, vp80b, vp90b, vp95b, vp99b, vp995b,
+           vp998b, vp999b;
     double *maxlevel;
     double *maxlevel1;
     double *array;
-    double value,valuecnt;
+    double value, valuecnt;
     long boxsize;
     double sigma;
     long j;
@@ -2133,65 +2423,78 @@ errno_t CR2tomov()
 
 
 
-    {   // code block write image name
+    {
+        // code block write image name
         int slen = snprintf(configfile, STRINGMAXLEN_FILENAME, "cr2tojpegconf.txt");
-        if(slen<1) {
+        if(slen < 1)
+        {
             PRINT_ERROR("snprintf wrote <1 char");
             abort(); // can't handle this error any other way
         }
-        if(slen >= STRINGMAXLEN_FILENAME) {
+        if(slen >= STRINGMAXLEN_FILENAME)
+        {
             PRINT_ERROR("snprintf string truncation");
             abort(); // can't handle this error any other way
         }
     } // end code block
 
 
-    CR2toFITSrgb = read_config_parameter_int(configfile,"CR2TOFITSRGB");
-    CR2TOFITSRGB_FORCE = read_config_parameter_int(configfile,"CR2TOFITSRGB_FORCE");
-    maxnbFITSfiles = read_config_parameter_long(configfile,"CR2TOFITS_MAXNBFILE");
-    binfact = read_config_parameter_int(configfile,"CR2TOFITSBIN");
+    CR2toFITSrgb = read_config_parameter_int(configfile, "CR2TOFITSRGB");
+    CR2TOFITSRGB_FORCE = read_config_parameter_int(configfile,
+                         "CR2TOFITSRGB_FORCE");
+    maxnbFITSfiles = read_config_parameter_long(configfile, "CR2TOFITS_MAXNBFILE");
+    binfact = read_config_parameter_int(configfile, "CR2TOFITSBIN");
 
-    maxlevel = (double*) malloc(sizeof(double)*maxnbFITSfiles);
+    maxlevel = (double *) malloc(sizeof(double) * maxnbFITSfiles);
 
-    FITStoJPEG = read_config_parameter_int(configfile,"FITStoJPEG");
-    MINLEVEL = read_config_parameter_float(configfile,"MINLEVEL");
-    MAXLEVEL = read_config_parameter_float(configfile,"MAXLEVEL");
+    FITStoJPEG = read_config_parameter_int(configfile, "FITStoJPEG");
+    MINLEVEL = read_config_parameter_float(configfile, "MINLEVEL");
+    MAXLEVEL = read_config_parameter_float(configfile, "MAXLEVEL");
 
-    MAXLEVEL_AUTO = read_config_parameter_int(configfile,"MAXLEVEL_AUTO");
-    MAXLEVEL_AUTO_FLOOR = read_config_parameter_float(configfile,"MAXLEVEL_AUTO_FLOOR");
+    MAXLEVEL_AUTO = read_config_parameter_int(configfile, "MAXLEVEL_AUTO");
+    MAXLEVEL_AUTO_FLOOR = read_config_parameter_float(configfile,
+                          "MAXLEVEL_AUTO_FLOOR");
 
-    if(read_config_parameter_exists(configfile,"MAXLEVEL_AUTO_CEIL")==1)
-        MAXLEVEL_AUTO_CEIL = read_config_parameter_float(configfile,"MAXLEVEL_AUTO_CEIL");
+    if(read_config_parameter_exists(configfile, "MAXLEVEL_AUTO_CEIL") == 1)
+    {
+        MAXLEVEL_AUTO_CEIL = read_config_parameter_float(configfile,
+                             "MAXLEVEL_AUTO_CEIL");
+    }
     else
+    {
         MAXLEVEL_AUTO_CEIL = 100000.0;
+    }
 
-    MAX_PERC01_COEFF = read_config_parameter_float(configfile,"MAX_PERC01_COEFF");
-    MAX_PERC05_COEFF = read_config_parameter_float(configfile,"MAX_PERC05_COEFF");
-    MAX_PERC10_COEFF = read_config_parameter_float(configfile,"MAX_PERC10_COEFF");
-    MAX_PERC20_COEFF = read_config_parameter_float(configfile,"MAX_PERC20_COEFF");
-    MAX_PERC50_COEFF = read_config_parameter_float(configfile,"MAX_PERC50_COEFF");
-    MAX_PERC80_COEFF = read_config_parameter_float(configfile,"MAX_PERC80_COEFF");
-    MAX_PERC90_COEFF = read_config_parameter_float(configfile,"MAX_PERC90_COEFF");
-    MAX_PERC95_COEFF = read_config_parameter_float(configfile,"MAX_PERC95_COEFF");
-    MAX_PERC99_COEFF = read_config_parameter_float(configfile,"MAX_PERC99_COEFF");
-    MAX_PERC995_COEFF = read_config_parameter_float(configfile,"MAX_PERC995_COEFF");
-    MAX_PERC998_COEFF = read_config_parameter_float(configfile,"MAX_PERC998_COEFF");
-    MAX_PERC999_COEFF = read_config_parameter_float(configfile,"MAX_PERC999_COEFF");
+    MAX_PERC01_COEFF = read_config_parameter_float(configfile, "MAX_PERC01_COEFF");
+    MAX_PERC05_COEFF = read_config_parameter_float(configfile, "MAX_PERC05_COEFF");
+    MAX_PERC10_COEFF = read_config_parameter_float(configfile, "MAX_PERC10_COEFF");
+    MAX_PERC20_COEFF = read_config_parameter_float(configfile, "MAX_PERC20_COEFF");
+    MAX_PERC50_COEFF = read_config_parameter_float(configfile, "MAX_PERC50_COEFF");
+    MAX_PERC80_COEFF = read_config_parameter_float(configfile, "MAX_PERC80_COEFF");
+    MAX_PERC90_COEFF = read_config_parameter_float(configfile, "MAX_PERC90_COEFF");
+    MAX_PERC95_COEFF = read_config_parameter_float(configfile, "MAX_PERC95_COEFF");
+    MAX_PERC99_COEFF = read_config_parameter_float(configfile, "MAX_PERC99_COEFF");
+    MAX_PERC995_COEFF = read_config_parameter_float(configfile,
+                        "MAX_PERC995_COEFF");
+    MAX_PERC998_COEFF = read_config_parameter_float(configfile,
+                        "MAX_PERC998_COEFF");
+    MAX_PERC999_COEFF = read_config_parameter_float(configfile,
+                        "MAX_PERC999_COEFF");
 
 
-    RGBM_RR = read_config_parameter_float(configfile,"RGBM_RR");
-    RGBM_RG = read_config_parameter_float(configfile,"RGBM_RG");
-    RGBM_RB = read_config_parameter_float(configfile,"RGBM_RB");
-    RGBM_GR = read_config_parameter_float(configfile,"RGBM_GR");
-    RGBM_GG = read_config_parameter_float(configfile,"RGBM_GG");
-    RGBM_GB = read_config_parameter_float(configfile,"RGBM_GB");
-    RGBM_BR = read_config_parameter_float(configfile,"RGBM_BR");
-    RGBM_BG = read_config_parameter_float(configfile,"RGBM_BG");
-    RGBM_BB = read_config_parameter_float(configfile,"RGBM_BB");
-    LUMR = read_config_parameter_float(configfile,"LUMR");
-    LUMG = read_config_parameter_float(configfile,"LUMG");
-    LUMB = read_config_parameter_float(configfile,"LUMB");
-    COLORSAT = read_config_parameter_float(configfile,"COLORSAT");
+    RGBM_RR = read_config_parameter_float(configfile, "RGBM_RR");
+    RGBM_RG = read_config_parameter_float(configfile, "RGBM_RG");
+    RGBM_RB = read_config_parameter_float(configfile, "RGBM_RB");
+    RGBM_GR = read_config_parameter_float(configfile, "RGBM_GR");
+    RGBM_GG = read_config_parameter_float(configfile, "RGBM_GG");
+    RGBM_GB = read_config_parameter_float(configfile, "RGBM_GB");
+    RGBM_BR = read_config_parameter_float(configfile, "RGBM_BR");
+    RGBM_BG = read_config_parameter_float(configfile, "RGBM_BG");
+    RGBM_BB = read_config_parameter_float(configfile, "RGBM_BB");
+    LUMR = read_config_parameter_float(configfile, "LUMR");
+    LUMG = read_config_parameter_float(configfile, "LUMG");
+    LUMB = read_config_parameter_float(configfile, "LUMB");
+    COLORSAT = read_config_parameter_float(configfile, "COLORSAT");
 
 
     //NLCONV = 0;
@@ -2205,32 +2508,36 @@ errno_t CR2tomov()
         NLCONV_SIGMA = read_config_parameter_float(configfile,"NLCONV_SIGMA");
     }*/
 
-    ALPHA = read_config_parameter_float(configfile,"ALPHA");
+    ALPHA = read_config_parameter_float(configfile, "ALPHA");
 
 
 
     SKIP = 0;
 
     ID = variable_ID("SKIP");
-    if(ID!=1)
-        SKIP = (long) (data.variable[ID].value.f + 0.1);
-    printf("SKIP = %ld\n",SKIP);
+    if(ID != 1)
+    {
+        SKIP = (long)(data.variable[ID].value.f + 0.1);
+    }
+    printf("SKIP = %ld\n", SKIP);
 
 
 
-    if(CR2toFITSrgb==1)
+    if(CR2toFITSrgb == 1)
     {
         load_fits("bias.fits", "bias", 1);
         load_fits("dark.fits", "dark", 1);
         load_fits("badpix.fits", "badpix", 1);
         load_fits("flat.fits", "flat", 1);
 
-		EXECUTE_SYSTEM_COMMAND("ls ./CR2/*.CR2 > flist.tmp");
+        EXECUTE_SYSTEM_COMMAND("ls ./CR2/*.CR2 > flist.tmp");
 
-        if((fp = fopen("flist.tmp","r"))==NULL)
+        if((fp = fopen("flist.tmp", "r")) == NULL)
+        {
             PRINT_ERROR("Cannot open file");
+        }
         SKIPcnt = 0;
-        while((fgets(fname,200,fp)!=NULL)&&(cnt<maxnbFITSfiles))
+        while((fgets(fname, 200, fp) != NULL) && (cnt < maxnbFITSfiles))
         {
             WRITE_FULLFILENAME(fnamestat, "./FITS/imgstats.%05ld.txt", cnt);
             WRITE_FULLFILENAME(fnameoutr, "./FITS/imr%05ld.fits", cnt);
@@ -2238,16 +2545,20 @@ errno_t CR2tomov()
             WRITE_FULLFILENAME(fnameoutb, "./FITS/imb%05ld.fits", cnt);
 
             MKim = 0;
-            if((file_exists(fnameoutr)==1)&&(file_exists(fnameoutg)==1)&&(file_exists(fnameoutb)==1)&&(CR2TOFITSRGB_FORCE==0))
-                printf("Files %s %s %s exist, no need to recreate\n",fnameoutr,fnameoutg,fnameoutb);
+            if((file_exists(fnameoutr) == 1) && (file_exists(fnameoutg) == 1)
+                    && (file_exists(fnameoutb) == 1) && (CR2TOFITSRGB_FORCE == 0))
+            {
+                printf("Files %s %s %s exist, no need to recreate\n", fnameoutr, fnameoutg,
+                       fnameoutb);
+            }
             else
             {
-                if(SKIPcnt==0)
+                if(SKIPcnt == 0)
                 {
                     MKim = 1;
-                    printf("[%ld] working on file %s\n",cnt,fname);
-                    fname[strlen(fname)-1] = '\0';
-                    loadCR2toFITSRGB(fname,"imr","img","imb");
+                    printf("[%ld] working on file %s\n", cnt, fname);
+                    fname[strlen(fname) - 1] = '\0';
+                    loadCR2toFITSRGB(fname, "imr", "img", "imb");
                     /*		  if(binfact!=1)
                       {
                         basic_contract("imr","imrc",binfact,binfact);
@@ -2265,57 +2576,57 @@ errno_t CR2tomov()
                     ysize = data.image[ID].md[0].size[1];
 
                     IDrtot = image_ID("imrtot");
-                    if(IDrtot==-1)
+                    if(IDrtot == -1)
                     {
-                        IDrtot = create_2Dimage_ID("imrtot",xsize,ysize);
-                        IDgtot = create_2Dimage_ID("imgtot",xsize,ysize);
-                        IDbtot = create_2Dimage_ID("imbtot",xsize,ysize);
+                        IDrtot = create_2Dimage_ID("imrtot", xsize, ysize);
+                        IDgtot = create_2Dimage_ID("imgtot", xsize, ysize);
+                        IDbtot = create_2Dimage_ID("imbtot", xsize, ysize);
                     }
 
                     IDr = image_ID("imr");
                     IDg = image_ID("img");
                     IDb = image_ID("imb");
 
-                    for(ii=0; ii<xsize*ysize; ii++)
+                    for(ii = 0; ii < xsize * ysize; ii++)
                     {
-                        data.image[IDr].array.F[ii] /= binfact*binfact;
-                        data.image[IDg].array.F[ii] /= binfact*binfact;
-                        data.image[IDb].array.F[ii] /= binfact*binfact;
+                        data.image[IDr].array.F[ii] /= binfact * binfact;
+                        data.image[IDg].array.F[ii] /= binfact * binfact;
+                        data.image[IDb].array.F[ii] /= binfact * binfact;
 
                         data.image[IDrtot].array.F[ii] += data.image[IDr].array.F[ii];
                         data.image[IDgtot].array.F[ii] += data.image[IDg].array.F[ii];
                         data.image[IDbtot].array.F[ii] += data.image[IDb].array.F[ii];
                     }
-                    save_fl_fits("imrtot","!imrtot.fits");
-                    save_fl_fits("imgtot","!imgtot.fits");
-                    save_fl_fits("imbtot","!imbtot.fits");
+                    save_fl_fits("imrtot", "!imrtot.fits");
+                    save_fl_fits("imgtot", "!imgtot.fits");
+                    save_fl_fits("imbtot", "!imbtot.fits");
 
-                    WRITE_FULLFILENAME(fnameoutr,"!./FITS/imr%05ld.fits",cnt);
-                    save_fl_fits("imr",fnameoutr);
-                    WRITE_FULLFILENAME(fnameoutg,"!./FITS/img%05ld.fits",cnt);
-                    save_fl_fits("img",fnameoutg);
-                    WRITE_FULLFILENAME(fnameoutb,"!./FITS/imb%05ld.fits",cnt);
-                    save_fl_fits("imb",fnameoutb);
+                    WRITE_FULLFILENAME(fnameoutr, "!./FITS/imr%05ld.fits", cnt);
+                    save_fl_fits("imr", fnameoutr);
+                    WRITE_FULLFILENAME(fnameoutg, "!./FITS/img%05ld.fits", cnt);
+                    save_fl_fits("img", fnameoutg);
+                    WRITE_FULLFILENAME(fnameoutb, "!./FITS/imb%05ld.fits", cnt);
+                    save_fl_fits("imb", fnameoutb);
                 }
             }
 
 
 
 
-            if(((MKim == 1)||(file_exists(fnamestat)==0))&&(SKIPcnt==0))
+            if(((MKim == 1) || (file_exists(fnamestat) == 0)) && (SKIPcnt == 0))
             {
-                printf("[%ld] working on file %s (statistics)\n",cnt,fname);
+                printf("[%ld] working on file %s (statistics)\n", cnt, fname);
                 if(MKim == 0)
                 {
-                    WRITE_FULLFILENAME(fnameoutr,"./FITS/imr%05ld.fits",cnt);
-                    WRITE_FULLFILENAME(fnameoutg,"./FITS/img%05ld.fits",cnt);
-                    WRITE_FULLFILENAME(fnameoutb,"./FITS/imb%05ld.fits",cnt);
+                    WRITE_FULLFILENAME(fnameoutr, "./FITS/imr%05ld.fits", cnt);
+                    WRITE_FULLFILENAME(fnameoutg, "./FITS/img%05ld.fits", cnt);
+                    WRITE_FULLFILENAME(fnameoutb, "./FITS/imb%05ld.fits", cnt);
                     load_fits(fnameoutr, "imr", 1);
                     load_fits(fnameoutg, "img", 1);
                     load_fits(fnameoutb, "imb", 1);
                 }
 
-                info_image_stats("imr","");
+                info_image_stats("imr", "");
                 ID = variable_ID("vp01");
                 vp01r = data.variable[ID].value.f;
                 ID = variable_ID("vp05");
@@ -2342,7 +2653,7 @@ errno_t CR2tomov()
                 vp999r = data.variable[ID].value.f;
                 delete_image_ID("imr");
 
-                info_image_stats("img","");
+                info_image_stats("img", "");
                 ID = variable_ID("vp01");
                 vp01g = data.variable[ID].value.f;
                 ID = variable_ID("vp05");
@@ -2369,7 +2680,7 @@ errno_t CR2tomov()
                 vp999g = data.variable[ID].value.f;
                 delete_image_ID("img");
 
-                info_image_stats("imb","");
+                info_image_stats("imb", "");
                 ID = variable_ID("vp01");
                 vp01b = data.variable[ID].value.f;
                 ID = variable_ID("vp05");
@@ -2397,8 +2708,13 @@ errno_t CR2tomov()
                 delete_image_ID("imb");
 
 
-                fp1 = fopen(fnamestat,"w");
-                fprintf(fp1,"%05ld %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g\n",cnt,vp01r,vp05r,vp10r,vp20r,vp50r,vp80r,vp90r,vp95r,vp99r,vp995r,vp998r,vp999r,vp01g,vp05g,vp10g,vp20g,vp50g,vp80g,vp90g,vp95g,vp99g,vp995g,vp998g,vp999g,vp01b,vp05b,vp10b,vp20b,vp50b,vp80b,vp90b,vp95b,vp99b,vp995b,vp998b,vp999b);
+                fp1 = fopen(fnamestat, "w");
+                fprintf(fp1,
+                        "%05ld %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g\n",
+                        cnt, vp01r, vp05r, vp10r, vp20r, vp50r, vp80r, vp90r, vp95r, vp99r, vp995r,
+                        vp998r, vp999r, vp01g, vp05g, vp10g, vp20g, vp50g, vp80g, vp90g, vp95g, vp99g,
+                        vp995g, vp998g, vp999g, vp01b, vp05b, vp10b, vp20b, vp50b, vp80b, vp90b, vp95b,
+                        vp99b, vp995b, vp998b, vp999b);
                 fclose(fp1);
 
                 if(MKim == 0)
@@ -2418,23 +2734,31 @@ errno_t CR2tomov()
 
 
             SKIPcnt++;
-            if(SKIPcnt>SKIP-1)
+            if(SKIPcnt > SKIP - 1)
+            {
                 SKIPcnt = 0;
+            }
 
             cnt++;
         }
         fclose(fp);
         if(system("rm flist.tmp") != 0)
+        {
             PRINT_ERROR("system() returns non-zero value");
+        }
 
-        printf("%ld images processed\n",cnt);
+        printf("%ld images processed\n", cnt);
     }
 
     if(system("rm imgstats.txt") != 0)
+    {
         PRINT_ERROR("system() returns non-zero value");
+    }
 
     if(system("cat ./FITS/imgstats.*.txt > imgstats.txt") != 0)
+    {
         PRINT_ERROR("system() returns non-zero value");
+    }
 
 
 
@@ -2443,32 +2767,46 @@ errno_t CR2tomov()
 
 
     if(MAXLEVEL_AUTO == 1)
-    {		
-        if((fp = fopen("imgstats.txt","r"))==NULL)
-			PRINT_ERROR("Cannot open file");
-        while(fscanf(fp, "%05ld %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-        &cnt,&vp01r,&vp05r,&vp10r,&vp20r,&vp50r,&vp80r,&vp90r,&vp95r,&vp99r,&vp995r,&vp998r,&vp999r,&vp01g,&vp05g,&vp10g,&vp20g,&vp50g,&vp80g,&vp90g,&vp95g,&vp99g,&vp995g,&vp998g,&vp999g,&vp01b,&vp05b,&vp10b,&vp20b,&vp50b,&vp80b,&vp90b,&vp95b,&vp99b,&vp995b,&vp998b,&vp999b)==37)
+    {
+        if((fp = fopen("imgstats.txt", "r")) == NULL)
         {
-            vp01 = ( vp01r + vp01g + vp01b ) / 3.0;
-            vp05 = ( vp05r + vp05g + vp05b ) / 3.0;
-            vp10 = ( vp10r + vp10g + vp10b ) / 3.0;
-            vp20 = ( vp20r + vp20g + vp20b ) / 3.0;
-            vp50 = ( vp50r + vp50g + vp50b ) / 3.0;
-            vp80 = ( vp80r + vp80g + vp80b ) / 3.0;
-            vp90 = ( vp90r + vp90g + vp90b ) / 3.0;
-            vp95 = ( vp95r + vp95g + vp95b ) / 3.0;
-            vp99 = ( vp99r + vp99g + vp99b ) / 3.0;
-            vp995 = ( vp995r + vp995g + vp995b ) / 3.0;
-            vp998 = ( vp998r + vp998g + vp998b ) / 3.0;
-            vp999 = ( vp999r + vp999g + vp999b ) / 3.0;
+            PRINT_ERROR("Cannot open file");
+        }
+        while(fscanf(fp,
+                     "%05ld %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                     &cnt, &vp01r, &vp05r, &vp10r, &vp20r, &vp50r, &vp80r, &vp90r, &vp95r, &vp99r,
+                     &vp995r, &vp998r, &vp999r, &vp01g, &vp05g, &vp10g, &vp20g, &vp50g, &vp80g,
+                     &vp90g, &vp95g, &vp99g, &vp995g, &vp998g, &vp999g, &vp01b, &vp05b, &vp10b,
+                     &vp20b, &vp50b, &vp80b, &vp90b, &vp95b, &vp99b, &vp995b, &vp998b,
+                     &vp999b) == 37)
+        {
+            vp01 = (vp01r + vp01g + vp01b) / 3.0;
+            vp05 = (vp05r + vp05g + vp05b) / 3.0;
+            vp10 = (vp10r + vp10g + vp10b) / 3.0;
+            vp20 = (vp20r + vp20g + vp20b) / 3.0;
+            vp50 = (vp50r + vp50g + vp50b) / 3.0;
+            vp80 = (vp80r + vp80g + vp80b) / 3.0;
+            vp90 = (vp90r + vp90g + vp90b) / 3.0;
+            vp95 = (vp95r + vp95g + vp95b) / 3.0;
+            vp99 = (vp99r + vp99g + vp99b) / 3.0;
+            vp995 = (vp995r + vp995g + vp995b) / 3.0;
+            vp998 = (vp998r + vp998g + vp998b) / 3.0;
+            vp999 = (vp999r + vp999g + vp999b) / 3.0;
             if(cnt < maxnbFITSfiles)
             {
-                maxlevel[cnt] = vp01*MAX_PERC01_COEFF + vp05*MAX_PERC05_COEFF + vp10*MAX_PERC10_COEFF + vp20*MAX_PERC20_COEFF + vp50*MAX_PERC50_COEFF + vp80*MAX_PERC80_COEFF + vp90*MAX_PERC90_COEFF + vp95*MAX_PERC95_COEFF + vp99*MAX_PERC99_COEFF + vp995*MAX_PERC995_COEFF + vp998*MAX_PERC998_COEFF + vp999*MAX_PERC999_COEFF;
-                printf("[%ld %g]   ",cnt,maxlevel[cnt]);
-                maxlevel[cnt] = sqrt(maxlevel[cnt]*maxlevel[cnt]+MAXLEVEL_AUTO_FLOOR*MAXLEVEL_AUTO_FLOOR);
+                maxlevel[cnt] = vp01 * MAX_PERC01_COEFF + vp05 * MAX_PERC05_COEFF + vp10 *
+                                MAX_PERC10_COEFF + vp20 * MAX_PERC20_COEFF + vp50 * MAX_PERC50_COEFF + vp80 *
+                                MAX_PERC80_COEFF + vp90 * MAX_PERC90_COEFF + vp95 * MAX_PERC95_COEFF + vp99 *
+                                MAX_PERC99_COEFF + vp995 * MAX_PERC995_COEFF + vp998 * MAX_PERC998_COEFF + vp999
+                                * MAX_PERC999_COEFF;
+                printf("[%ld %g]   ", cnt, maxlevel[cnt]);
+                maxlevel[cnt] = sqrt(maxlevel[cnt] * maxlevel[cnt] + MAXLEVEL_AUTO_FLOOR *
+                                     MAXLEVEL_AUTO_FLOOR);
                 if(maxlevel[cnt] > MAXLEVEL_AUTO_CEIL)
+                {
                     maxlevel[cnt] = MAXLEVEL_AUTO_CEIL;
-                printf("%ld -> %g\n",cnt, maxlevel[cnt]);
+                }
+                printf("%ld -> %g\n", cnt, maxlevel[cnt]);
             }
         }
         fclose(fp);
@@ -2478,25 +2816,31 @@ errno_t CR2tomov()
             // smooth the maxlevel in time
             // scheme employed is running median/average
             cntmax = maxnbFITSfiles;
-            if(cntmax > cnt+1)
-                cntmax = cnt+1;
-
-            printf("cntmax = %ld\n",cntmax);
-            boxsize = 100;
-            if(boxsize>0.1*cntmax)
-                boxsize = (long) (0.1*cntmax);
-            sigma = 0.2*boxsize;
-
-            if(boxsize==0)
-                boxsize = 1;
-            printf("boxsize = %ld\n",boxsize);
-
-
-            array = (double*) malloc(sizeof(double)*(2*boxsize+1));
-            maxlevel1 = (double*) malloc(sizeof(double)*cntmax);
-            for(i=0; i<cntmax; i++)
+            if(cntmax > cnt + 1)
             {
-                jstart = i-boxsize;
+                cntmax = cnt + 1;
+            }
+
+            printf("cntmax = %ld\n", cntmax);
+            boxsize = 100;
+            if(boxsize > 0.1 * cntmax)
+            {
+                boxsize = (long)(0.1 * cntmax);
+            }
+            sigma = 0.2 * boxsize;
+
+            if(boxsize == 0)
+            {
+                boxsize = 1;
+            }
+            printf("boxsize = %ld\n", boxsize);
+
+
+            array = (double *) malloc(sizeof(double) * (2 * boxsize + 1));
+            maxlevel1 = (double *) malloc(sizeof(double) * cntmax);
+            for(i = 0; i < cntmax; i++)
+            {
+                jstart = i - boxsize;
                 //jend = i+boxsize+1;
                 /*	  jcent = 0;
 
@@ -2514,40 +2858,44 @@ errno_t CR2tomov()
                 }
                 */
 
-                for(j=0; j<2*boxsize+1; j++)
+                for(j = 0; j < 2 * boxsize + 1; j++)
                 {
-                    j1 = j+jstart;
-                    if(j1<0)
+                    j1 = j + jstart;
+                    if(j1 < 0)
+                    {
                         j1 = 0;
-                    if(j1>cntmax-1)
-                        j1 = cntmax-1;
+                    }
+                    if(j1 > cntmax - 1)
+                    {
+                        j1 = cntmax - 1;
+                    }
 
                     array[j] = maxlevel[j1];
                 }
 
-                quick_sort_double(array, 2*boxsize+1);
+                quick_sort_double(array, 2 * boxsize + 1);
 
                 value = 0.0;
                 valuecnt = 0.0;
-                for(ii=0; ii<2*boxsize+1; ii++)
+                for(ii = 0; ii < 2 * boxsize + 1; ii++)
                 {
-					double tmp1;
-					
-                    tmp1 = 1.0*(ii-boxsize);
-                    value += log10(array[ii])*exp(-tmp1*tmp1/sigma/sigma);
-                    valuecnt += exp(-tmp1*tmp1/sigma/sigma);
+                    double tmp1;
+
+                    tmp1 = 1.0 * (ii - boxsize);
+                    value += log10(array[ii]) * exp(-tmp1 * tmp1 / sigma / sigma);
+                    valuecnt += exp(-tmp1 * tmp1 / sigma / sigma);
                 }
 
-                maxlevel1[i] = pow(10.0,value/valuecnt);
+                maxlevel1[i] = pow(10.0, value / valuecnt);
 
             }
             free(array);
 
-            fp = fopen("maxlevel.log","w");
-            for(i=0; i<cntmax; i++)
+            fp = fopen("maxlevel.log", "w");
+            for(i = 0; i < cntmax; i++)
             {
-                printf("%ld MAXLEVEL : %g ---> %g\n",i,maxlevel[i],maxlevel1[i]);
-                fprintf(fp,"%ld %g %g\n",i,maxlevel[i],maxlevel1[i]);
+                printf("%ld MAXLEVEL : %g ---> %g\n", i, maxlevel[i], maxlevel1[i]);
+                fprintf(fp, "%ld %g %g\n", i, maxlevel[i], maxlevel1[i]);
                 maxlevel[i] = maxlevel1[i];
             }
             fclose(fp);
@@ -2566,53 +2914,61 @@ errno_t CR2tomov()
         SKIP_FITStoJPEG = 0;
 
         ID = variable_ID("SKIP_FITStoJPEG");
-        if(ID!=1)
-            SKIP_FITStoJPEG = (long) (data.variable[ID].value.f + 0.1);
-        printf("SKIP FITS to JPEG = %ld\n",SKIP_FITStoJPEG);
+        if(ID != 1)
+        {
+            SKIP_FITStoJPEG = (long)(data.variable[ID].value.f + 0.1);
+        }
+        printf("SKIP FITS to JPEG = %ld\n", SKIP_FITStoJPEG);
 
 
         SKIPcnt_FITStoJPEG = 0;
 
-        for(i=0; i<maxnbFITSfiles; i++)
+        for(i = 0; i < maxnbFITSfiles; i++)
         {
-            WRITE_FULLFILENAME(fnamejpg,"./JPEG/im%05ld.jpg",i);
-            if(file_exists(fnamejpg)==1)
+            WRITE_FULLFILENAME(fnamejpg, "./JPEG/im%05ld.jpg", i);
+            if(file_exists(fnamejpg) == 1)
             {
-                printf("Files %s exists, no need to recreate\n",fnamejpg);
+                printf("Files %s exists, no need to recreate\n", fnamejpg);
             }
             else
             {
-                WRITE_FULLFILENAME(fnamer,"./FITS/imr%05ld.fits",i);
-                if(file_exists(fnamer)==1)
+                WRITE_FULLFILENAME(fnamer, "./FITS/imr%05ld.fits", i);
+                if(file_exists(fnamer) == 1)
                 {
-                    if(SKIPcnt_FITStoJPEG==0)
+                    if(SKIPcnt_FITStoJPEG == 0)
                     {
-                        printf("file %s exists\n",fnamer);
+                        printf("file %s exists\n", fnamer);
 
-                        WRITE_FULLFILENAME(fnamer,"./FITS/imr%05ld.f.fits",i);
-                        if(file_exists(fnamer)==1)
+                        WRITE_FULLFILENAME(fnamer, "./FITS/imr%05ld.f.fits", i);
+                        if(file_exists(fnamer) == 1)
+                        {
                             IDr = load_fits(fnamer, "imr", 1);
+                        }
                         else
                         {
-                            WRITE_FULLFILENAME(fnamer,"./FITS/imr%05ld.fits",i);
+                            WRITE_FULLFILENAME(fnamer, "./FITS/imr%05ld.fits", i);
                             IDr = load_fits(fnamer, "imr", 1);
                         }
 
-                        WRITE_FULLFILENAME(fnameg,"./FITS/img%05ld.f.fits",i);
-                        if(file_exists(fnameg)==1)
+                        WRITE_FULLFILENAME(fnameg, "./FITS/img%05ld.f.fits", i);
+                        if(file_exists(fnameg) == 1)
+                        {
                             IDg = load_fits(fnameg, "img", 1);
+                        }
                         else
                         {
-                            WRITE_FULLFILENAME(fnameg,"./FITS/img%05ld.fits",i);
+                            WRITE_FULLFILENAME(fnameg, "./FITS/img%05ld.fits", i);
                             IDg = load_fits(fnameg, "img", 1);
                         }
 
-                        WRITE_FULLFILENAME(fnameb,"./FITS/imb%05ld.f.fits",i);
-                        if(file_exists(fnameb)==1)
+                        WRITE_FULLFILENAME(fnameb, "./FITS/imb%05ld.f.fits", i);
+                        if(file_exists(fnameb) == 1)
+                        {
                             IDb = load_fits(fnameb, "imb", 1);
+                        }
                         else
                         {
-                            WRITE_FULLFILENAME(fnameb,"./FITS/imb%05ld.fits",i);
+                            WRITE_FULLFILENAME(fnameb, "./FITS/imb%05ld.fits", i);
                             IDb = load_fits(fnameb, "imb", 1);
                         }
 
@@ -2621,32 +2977,37 @@ errno_t CR2tomov()
                         ysize = data.image[IDr].md[0].size[1];
 
                         if(MAXLEVEL_AUTO == 1)
-                            MAXLEVEL = maxlevel[i];
-
-
-                        for(ii=0; ii<xsize*ysize; ii++)
                         {
-							double r0, g0, b0;
-							double tmpr, tmpg, tmpb, tmpr1, tmpg1, tmpb1;
+                            MAXLEVEL = maxlevel[i];
+                        }
 
-							
-							
+
+                        for(ii = 0; ii < xsize * ysize; ii++)
+                        {
+                            double r0, g0, b0;
+                            double tmpr, tmpg, tmpb, tmpr1, tmpg1, tmpb1;
+
+
+
                             r0 = data.image[IDr].array.F[ii];
                             g0 = data.image[IDg].array.F[ii];
                             b0 = data.image[IDb].array.F[ii];
 
-                            r0 = (r0-MINLEVEL)/(MAXLEVEL-MINLEVEL);
-                            g0 = (g0-MINLEVEL)/(MAXLEVEL-MINLEVEL);
-                            b0 = (b0-MINLEVEL)/(MAXLEVEL-MINLEVEL);
+                            r0 = (r0 - MINLEVEL) / (MAXLEVEL - MINLEVEL);
+                            g0 = (g0 - MINLEVEL) / (MAXLEVEL - MINLEVEL);
+                            b0 = (b0 - MINLEVEL) / (MAXLEVEL - MINLEVEL);
 
-                            tmpr = r0*RGBM_RR + g0*RGBM_RG + b0*RGBM_RB;
-                            tmpg = r0*RGBM_GR + g0*RGBM_GG + b0*RGBM_GB;
-                            tmpb = r0*RGBM_BR + g0*RGBM_BG + b0*RGBM_BB;
+                            tmpr = r0 * RGBM_RR + g0 * RGBM_RG + b0 * RGBM_RB;
+                            tmpg = r0 * RGBM_GR + g0 * RGBM_GG + b0 * RGBM_GB;
+                            tmpb = r0 * RGBM_BR + g0 * RGBM_BG + b0 * RGBM_BB;
 
 
-                            tmpr1 = tmpr*((1.0-COLORSAT)*LUMR+COLORSAT) + tmpg*((1.0-COLORSAT)*LUMG) + tmpb*((1.0-COLORSAT)*LUMB);
-                            tmpg1 = tmpr*((1.0-COLORSAT)*LUMR) + tmpg*((1.0-COLORSAT)*LUMG+COLORSAT) + tmpb*((1.0-COLORSAT)*LUMB);
-                            tmpb1 = tmpr*((1.0-COLORSAT)*LUMR) + tmpg*((1.0-COLORSAT)*LUMG) + tmpb*((1.0-COLORSAT)*LUMB+COLORSAT);
+                            tmpr1 = tmpr * ((1.0 - COLORSAT) * LUMR + COLORSAT) + tmpg * ((
+                                        1.0 - COLORSAT) * LUMG) + tmpb * ((1.0 - COLORSAT) * LUMB);
+                            tmpg1 = tmpr * ((1.0 - COLORSAT) * LUMR) + tmpg * ((1.0 - COLORSAT) * LUMG +
+                                    COLORSAT) + tmpb * ((1.0 - COLORSAT) * LUMB);
+                            tmpb1 = tmpr * ((1.0 - COLORSAT) * LUMR) + tmpg * ((1.0 - COLORSAT) * LUMG) +
+                                    tmpb * ((1.0 - COLORSAT) * LUMB + COLORSAT);
 
 
                             data.image[IDr].array.F[ii] = tmpr1;
@@ -2655,20 +3016,26 @@ errno_t CR2tomov()
                         }
 
 
-                        for(ii=0; ii<xsize*ysize; ii++)
+                        for(ii = 0; ii < xsize * ysize; ii++)
                         {
-							double vr, vg, vb;
-							
+                            double vr, vg, vb;
+
                             vr = data.image[IDr].array.F[ii];
                             vg = data.image[IDg].array.F[ii];
                             vb = data.image[IDb].array.F[ii];
 
-                            if(vr<0.0)
+                            if(vr < 0.0)
+                            {
                                 vr = 0.0;
-                            if(vg<0.0)
+                            }
+                            if(vg < 0.0)
+                            {
                                 vg = 0.0;
-                            if(vb<0.0)
+                            }
+                            if(vb < 0.0)
+                            {
                                 vb = 0.0;
+                            }
                         }
 
                         // non-linear convolution
@@ -2727,33 +3094,45 @@ errno_t CR2tomov()
                           delete_image_ID("imb_c");
                           }*/
 
-                        for(ii=0; ii<xsize*ysize; ii++)
+                        for(ii = 0; ii < xsize * ysize; ii++)
                         {
-							double vr, vg, vb;
-							
+                            double vr, vg, vb;
+
                             vr = data.image[IDr].array.F[ii];
                             vg = data.image[IDg].array.F[ii];
                             vb = data.image[IDb].array.F[ii];
 
-                            if(vr<0.0)
+                            if(vr < 0.0)
+                            {
                                 vr = 0.0;
-                            if(vg<0.0)
+                            }
+                            if(vg < 0.0)
+                            {
                                 vg = 0.0;
-                            if(vb<0.0)
+                            }
+                            if(vb < 0.0)
+                            {
                                 vb = 0.0;
+                            }
 
-                            if(vr>1.0)
+                            if(vr > 1.0)
+                            {
                                 vr = 1.0;
+                            }
 
-                            if(vg>1.0)
+                            if(vg > 1.0)
+                            {
                                 vg = 1.0;
+                            }
 
-                            if(vb>1.0)
+                            if(vb > 1.0)
+                            {
                                 vb = 1.0;
+                            }
 
-                            vr = 255.0*pow(vr,ALPHA);
-                            vg = 255.0*pow(vg,ALPHA);
-                            vb = 255.0*pow(vb,ALPHA);
+                            vr = 255.0 * pow(vr, ALPHA);
+                            vg = 255.0 * pow(vg, ALPHA);
+                            vb = 255.0 * pow(vb, ALPHA);
 
                             data.image[IDr].array.F[ii] = vr;
                             data.image[IDg].array.F[ii] = vg;
@@ -2761,18 +3140,21 @@ errno_t CR2tomov()
                         }
 
 
-                        image_writeBMP("imr","img","imb","imrgb.bmp");
+                        image_writeBMP("imr", "img", "imb", "imrgb.bmp");
                         delete_image_ID("imr");
                         delete_image_ID("img");
                         delete_image_ID("imb");
                         //		  WRITE_FULLFILENAME(fnamejpg,"./JPEG/im%05ld.jpg",i);
-                        
-                        EXECUTE_SYSTEM_COMMAND("bmptoppm imrgb.bmp | ppmtojpeg --quality 95 > _tmpjpeg.jpg; mv _tmpjpeg.jpg %s", fnamejpg);
+
+                        EXECUTE_SYSTEM_COMMAND("bmptoppm imrgb.bmp | ppmtojpeg --quality 95 > _tmpjpeg.jpg; mv _tmpjpeg.jpg %s",
+                                               fnamejpg);
                         EXECUTE_SYSTEM_COMMAND("rm imrgb.bmp");
                     }
                     SKIPcnt_FITStoJPEG++;
-                    if(SKIPcnt_FITStoJPEG>SKIP_FITStoJPEG-1)
+                    if(SKIPcnt_FITStoJPEG > SKIP_FITStoJPEG - 1)
+                    {
                         SKIPcnt_FITStoJPEG = 0;
+                    }
                 }
             }
         }
@@ -2800,24 +3182,29 @@ imageID IMAGE_FORMAT_requantize(
 {
     imageID IDin, IDout;
     long ii;
-    long xsize,ysize;
+    long xsize, ysize;
 
     IDin = image_ID(IDin_name);
     xsize = data.image[IDin].md[0].size[0];
     ysize = data.image[IDin].md[0].size[1];
 
-    IDout = create_2Dimage_ID(IDout_name,xsize,ysize);
-    for(ii=0; ii<xsize*ysize; ii++)
+    IDout = create_2Dimage_ID(IDout_name, xsize, ysize);
+    for(ii = 0; ii < xsize * ysize; ii++)
     {
         double value;
 
         value = data.image[IDin].array.F[ii];
         value = value - bias;
         if(value < 0.0)
-            value = value/(alpha*RON);
+        {
+            value = value / (alpha * RON);
+        }
         else
-            value = 2.0/alpha*sqrt(gain)*(sqrt(gain*RON*RON+value)-sqrt(gain)*RON);
-        data.image[IDout].array.F[ii] = value+0.5;
+        {
+            value = 2.0 / alpha * sqrt(gain) * (sqrt(gain * RON * RON + value) - sqrt(
+                                                    gain) * RON);
+        }
+        data.image[IDout].array.F[ii] = value + 0.5;
     }
 
     return(IDout);
@@ -2840,25 +3227,27 @@ imageID IMAGE_FORMAT_dequantize(
 {
     imageID IDin, IDout;
     long ii;
-    long xsize,ysize;
+    long xsize, ysize;
 
     IDin = image_ID(IDin_name);
     xsize = data.image[IDin].md[0].size[0];
     ysize = data.image[IDin].md[0].size[1];
 
-    IDout = create_2Dimage_ID(IDout_name,xsize,ysize);
-    for(ii=0; ii<xsize*ysize; ii++)
+    IDout = create_2Dimage_ID(IDout_name, xsize, ysize);
+    for(ii = 0; ii < xsize * ysize; ii++)
     {
         double value;
 
         value = data.image[IDin].array.F[ii];
         if(value < 0.0)
-            value = value*alpha*RON + bias;
+        {
+            value = value * alpha * RON + bias;
+        }
         else
         {
-            value = alpha/2.0*value/sqrt(gain)+RON*sqrt(gain);
-            value = value*value;
-            value = value - gain*RON*RON + bias;
+            value = alpha / 2.0 * value / sqrt(gain) + RON * sqrt(gain);
+            value = value * value;
+            value = value - gain * RON * RON + bias;
         }
         data.image[IDout].array.F[ii] = value;
     }
@@ -2883,7 +3272,7 @@ imageID IMAGE_FORMAT_read_binary16(
     imageID ID = -1;
 
     //Open file
-    if((fp = fopen(fname, "rb"))==NULL)
+    if((fp = fopen(fname, "rb")) == NULL)
     {
         PRINT_ERROR("Cannot open file");
         exit(0);
@@ -2892,12 +3281,12 @@ imageID IMAGE_FORMAT_read_binary16(
 
     //Get file length
     fseek(fp, 0, SEEK_END);
-    fileLen=ftell(fp);
+    fileLen = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
     //Allocate memory
-    buffer=(char *)malloc(fileLen+1);
-    if (!buffer)
+    buffer = (char *)malloc(fileLen + 1);
+    if(!buffer)
     {
         fprintf(stderr, "Memory error!");
         fclose(fp);
@@ -2906,20 +3295,25 @@ imageID IMAGE_FORMAT_read_binary16(
 
     //Read file contents into buffer
     if(fread(buffer, fileLen, 1, fp) < 1)
+    {
         PRINT_ERROR("fread() returns <1 value");
+    }
     fclose(fp);
 
     ID = create_2Dimage_ID(IDname, xsize, ysize);
 
     unsigned long i = 0;
-    for(jj=0; jj<ysize; jj++)
-        for(ii=0; ii<xsize; ii++)
+    for(jj = 0; jj < ysize; jj++)
+        for(ii = 0; ii < xsize; ii++)
         {
             long v1;
 
-            if(i < fileLen+1)
-                v1 = (long) (((unsigned const char *)buffer)[i]) +  (long) (256*((unsigned const char *)buffer)[i+1]);
-            data.image[ID].array.F[jj*xsize+ii] = (float) v1;
+            if(i < fileLen + 1)
+            {
+                v1 = (long)(((unsigned const char *)buffer)[i]) + (long)(256 * ((
+                            unsigned const char *)buffer)[i + 1]);
+            }
+            data.image[ID].array.F[jj * xsize + ii] = (float) v1;
             i += 2;
         }
 
@@ -2943,22 +3337,23 @@ imageID IMAGE_FORMAT_read_binary32f(
     unsigned long fileLen;
     long i, ii, jj;
     imageID ID;
-   //long v1;
+    //long v1;
 
     //Open file
-    if((fp = fopen(fname, "rb"))==NULL) {
+    if((fp = fopen(fname, "rb")) == NULL)
+    {
         PRINT_ERROR("Cannot open file");
         return (0);
     }
 
     //Get file length
     fseek(fp, 0, SEEK_END);
-    fileLen=ftell(fp);
+    fileLen = ftell(fp);
     fseek(fp, 0, SEEK_SET);
 
     //Allocate memory
-    buffer = (float *)malloc(fileLen+1);
-    if (!buffer)
+    buffer = (float *)malloc(fileLen + 1);
+    if(!buffer)
     {
         fprintf(stderr, "Memory error!");
         fclose(fp);
@@ -2967,16 +3362,18 @@ imageID IMAGE_FORMAT_read_binary32f(
 
     //Read file contents into buffer
     if(fread(buffer, fileLen, 1, fp) < 1)
+    {
         PRINT_ERROR("fread() returns <1 value");
+    }
     fclose(fp);
 
     ID = create_2Dimage_ID(IDname, xsize, ysize);
 
     i = 0;
-    for(jj=0; jj<ysize; jj++)
-        for(ii=0; ii<xsize; ii++)
+    for(jj = 0; jj < ysize; jj++)
+        for(ii = 0; ii < xsize; ii++)
         {
-            data.image[ID].array.F[jj*xsize+ii] = buffer[i];
+            data.image[ID].array.F[jj * xsize + ii] = buffer[i];
             i++;
         }
 
@@ -3005,30 +3402,37 @@ imageID IMAGE_FORMAT_FITS_to_ushortintbin_lock(
     xsize = data.image[ID].md[0].size[0];
     ysize = data.image[ID].md[0].size[1];
 
-    valarray = (unsigned short int*) malloc(sizeof(unsigned short int)*xsize*ysize);
+    valarray = (unsigned short int *) malloc(sizeof(unsigned short int) * xsize *
+               ysize);
 
     if(data.image[ID].md[0].datatype == _DATATYPE_FLOAT)
     {
         printf("float -> unsigned short int array\n");
-        for(ii=0; ii<xsize*ysize; ii++)
+        for(ii = 0; ii < xsize * ysize; ii++)
+        {
             valarray[ii] = (unsigned short int) data.image[ID].array.F[ii];
+        }
     }
     if(data.image[ID].md[0].datatype == _DATATYPE_DOUBLE)
     {
         printf("double -> unsigned short int array\n");
-        for(ii=0; ii<xsize*ysize; ii++)
+        for(ii = 0; ii < xsize * ysize; ii++)
+        {
             valarray[ii] = (unsigned short int) data.image[ID].array.D[ii];
+        }
     }
 
-    fd = open(fname, O_RDWR | O_CREAT, S_IRUSR|S_IWUSR);
+    fd = open(fname, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
     flock(fd, LOCK_EX);
-    if( fd < 0 )
+    if(fd < 0)
     {
-        perror( "Error opening file" );
-        printf( "Error opening file \"%s\": %s\n", fname, strerror( errno ) );
+        perror("Error opening file");
+        printf("Error opening file \"%s\": %s\n", fname, strerror(errno));
     }
-    if(write(fd, valarray, sizeof(unsigned short int)*xsize*ysize) < 1) 
-		PRINT_ERROR("write() returns <1 value");
+    if(write(fd, valarray, sizeof(unsigned short int)*xsize * ysize) < 1)
+    {
+        PRINT_ERROR("write() returns <1 value");
+    }
     flock(fd, LOCK_UN);
     close(fd);
 
@@ -3058,29 +3462,39 @@ imageID IMAGE_FORMAT_FITS_to_floatbin_lock(
     xsize = data.image[ID].md[0].size[0];
     ysize = data.image[ID].md[0].size[1];
 
-    valarray = (float*) malloc(sizeof(float)*xsize*ysize);
+    valarray = (float *) malloc(sizeof(float) * xsize * ysize);
 
     if(data.image[ID].md[0].datatype == _DATATYPE_FLOAT)
     {
         printf("WRITING float array\n");
-        for(ii=0; ii<xsize*ysize; ii++)
+        for(ii = 0; ii < xsize * ysize; ii++)
+        {
             valarray[ii] = data.image[ID].array.F[ii];
+        }
     }
     if(data.image[ID].md[0].datatype == _DATATYPE_DOUBLE)
     {
         printf("WRITING double array\n");
-        for(ii=0; ii<xsize*ysize; ii++)
+        for(ii = 0; ii < xsize * ysize; ii++)
+        {
             valarray[ii] = (float) data.image[ID].array.D[ii];
+        }
     }
 
-    if( (fd = open(fname, O_RDWR | O_CREAT, S_IRUSR|S_IWUSR)) == -1)
+    if((fd = open(fname, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR)) == -1)
+    {
         PRINT_ERROR("Cannot open file");
+    }
     flock(fd, LOCK_EX);
-    if( fd < 0 )
-        printf( "Error opening file: %s\n", strerror( errno ) );
+    if(fd < 0)
+    {
+        printf("Error opening file: %s\n", strerror(errno));
+    }
 
-    if(write(fd, valarray, sizeof(float)*xsize*ysize) < 1)
+    if(write(fd, valarray, sizeof(float)*xsize * ysize) < 1)
+    {
         PRINT_ERROR("write() returns <1 value");
+    }
     //  for(ii=0;ii<xsize*ysize;ii++)
     //  printf("[%ld %f] ", ii, valarray[ii]);
 

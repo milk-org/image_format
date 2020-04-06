@@ -2,7 +2,7 @@
 //#define _IMAGEFORMATMODULE_H
 
 
-void __attribute__ ((constructor)) libinit_image_format();
+void __attribute__((constructor)) libinit_image_format();
 
 
 errno_t IMAGE_FORMAT_im_to_ASCII(
