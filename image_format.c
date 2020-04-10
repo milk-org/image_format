@@ -59,7 +59,7 @@
 
 //#include <modules/image_basic/image_basic.h>
 #include "info/info.h"
-#include "fft/fft.h"
+//#include "fft/fft.h"
 //#include <modules/image_filter/image_filter.h>
 #include "image_gen/image_gen.h"
 
@@ -932,7 +932,7 @@ imageID read_ASCIIimage1(
                 }
                 else
                 {
-                    printERROR(__FILE__, __func__, __LINE__, "read error");
+                    PRINT_ERROR("read error");
                     exit(0);
                 }
             }
@@ -1404,7 +1404,7 @@ errno_t image_format_extract_RGGBchan(
 
     if(RGBmode == 0)
     {
-        printERROR(__FILE__, __func__, __LINE__, "Unknown RGB image mode\n");
+        PRINT_ERROR("Unknown RGB image mode\n");
         exit(0);
     }
 
@@ -1498,7 +1498,7 @@ imageID image_format_reconstruct_from_RGGBchan(
 
     if(RGBmode == 0)
     {
-        printERROR(__FILE__, __func__, __LINE__, "Unknown RGB image mode\n");
+        PRINT_ERROR("Unknown RGB image mode\n");
         exit(0);
     }
 
@@ -1603,7 +1603,7 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
     if(RGBmode == 0)
     {
-        printERROR(__FILE__, __func__, __LINE__, "WARNING: Unknown RGB image mode\n");
+        PRINT_ERROR("Unknown RGB image mode\n");
         exit(0);
     }
 
