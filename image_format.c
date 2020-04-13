@@ -17,7 +17,7 @@
 // module default short name
 // all CLI calls to this module functions will be <shortname>.<funcname>
 // if set to "", then calls use <funcname>
-#define MODULE_SHORTNAME_DEFAULT ""
+#define MODULE_SHORTNAME_DEFAULT "imgformat"
 
 // Module short description
 #define MODULE_DESCRIPTION       "Conversion between image format, I/O"
@@ -47,7 +47,6 @@
 #include <sys/file.h>
 
 #include "CommandLineInterface/CLIcore.h"
-#include "00CORE/00CORE.h"
 #include "COREMOD_memory/COREMOD_memory.h"
 #include "COREMOD_arith/COREMOD_arith.h"
 #include "COREMOD_tools/COREMOD_tools.h"
