@@ -750,13 +750,13 @@ errno_t image_writeBMP_auto(
     double minr, ming, minb, maxr, maxg, maxb;
 
 
-    minr = img_min(IDnameR);
-    ming = img_min(IDnameG);
-    minb = img_min(IDnameB);
+    minr = arith_image_min(IDnameR);
+    ming = arith_image_min(IDnameG);
+    minb = arith_image_min(IDnameB);
 
-    maxr = img_max(IDnameR);
-    maxg = img_max(IDnameG);
-    maxb = img_max(IDnameB);
+    maxr = arith_image_max(IDnameR);
+    maxg = arith_image_max(IDnameG);
+    maxb = arith_image_max(IDnameB);
 
     IDR = image_ID(IDnameR);
     IDG = image_ID(IDnameG);
