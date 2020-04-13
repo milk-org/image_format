@@ -1,9 +1,29 @@
-project(lib_image_format_project)
+# library name
+set(LIBNAME "milkimageformat")
+
+
+set(SOURCEFILES
+	image_format.c)
+
+set(INCLUDEFILES
+	image_format.h)
+
+
+# DEFAULT SETTINGS 
+# Do not change unless needed
+# =====================================================================
+
+project(lib_${LIBNAME}_project)
 
 include_directories ("${PROJECT_SOURCE_DIR}/src")
 include_directories ("${PROJECT_SOURCE_DIR}/..")
-add_library(image_format SHARED image_format.c)
 
-install(TARGETS image_format DESTINATION lib)
-install(FILES image_format.h DESTINATION include)
+
+# Library can be compiled from multiple source files
+# Convention: the main souce file is named <libname>.c
+# 
+add_library(${LIBNAME} SHARED ${SOURCEFILES})
+
+install(TARGETS ${LIBNAME} DESTINATION lib)
+install(FILES ${INCLUDEFILES} DESTINATION include)
 
