@@ -1,12 +1,13 @@
 # library name
 set(LIBNAME "milkimageformat")
+set(SRCNAME "image_format")
 
 
 set(SOURCEFILES
-	image_format.c)
+	${SRCNAME}.c)
 
 set(INCLUDEFILES
-	image_format.h)
+	${SRCNAME}.h)
 
 
 # DEFAULT SETTINGS 
@@ -25,5 +26,16 @@ include_directories ("${PROJECT_SOURCE_DIR}/..")
 add_library(${LIBNAME} SHARED ${SOURCEFILES})
 
 install(TARGETS ${LIBNAME} DESTINATION lib)
-install(FILES ${INCLUDEFILES} DESTINATION include)
+install(FILES ${INCLUDEFILES} DESTINATION include/${SRCNAME})
 
+
+# PKGCONFIG
+# =====================================================================
+set(INSTALL_PKGCONFIG_DIR "lib/pkgconfig"
+    CACHE PATH "Installation directory for pkgconfig (.pc) files")
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${LIBNAME}.pc.in
+               ${CMAKE_CURRENT_BINARY_DIR}/${LIBNAME}.pc @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${LIBNAME}.pc
+        DESTINATION "${INSTALL_PKGCONFIG_DIR}")
