@@ -339,89 +339,77 @@ errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 
 static errno_t init_module_CLI()
 {
+    RegisterCLIcommand(
+        "im2ascii",
+        __FILE__,
+        IMAGE_FORMAT_im_to_ASCII_cli,
+        "convert image file to ASCII",
+        "<input image> <output ASCII file>",
+        "im2ascii im im.txt",
+        "int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)");
 
-    strcpy(data.cmd[data.NBcmd].key, "im2ascii");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_im_to_ASCII_cli;
-    strcpy(data.cmd[data.NBcmd].info, "convert image file to ASCII");
-    strcpy(data.cmd[data.NBcmd].syntax, "<input image> <output ASCII file>");
-    strcpy(data.cmd[data.NBcmd].example, "im2ascii im im.txt");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)");
-    data.NBcmd++;
+    RegisterCLIcommand(
+        "saveBMP",
+        __FILE__,
+        image_writeBMP_auto_cli,
+        "write RGB image as BMP - auto scaling",
+        "<red image> <green image> <blue image> <output BMP file name>",
+        "saveBMP imr img imb im.bmp",
+        "int image_writeBMP_auto(const char *IDnameR, const char *IDnameG, const char *IDnameB, const char *outname)");
 
-    strcpy(data.cmd[data.NBcmd].key, "saveBMP");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = image_writeBMP_auto_cli;
-    strcpy(data.cmd[data.NBcmd].info, "write RGB image as BMP - auto scaling");
-    strcpy(data.cmd[data.NBcmd].syntax,
-           "<red image> <green image> <blue image> <output BMP file name>");
-    strcpy(data.cmd[data.NBcmd].example, "saveBMP imr img imb im.bmp");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "int image_writeBMP_auto(const char *IDnameR, const char *IDnameG, const char *IDnameB, const char *outname)");
-    data.NBcmd++;
+    RegisterCLIcommand(
+        "cr2tofits",
+        __FILE__,
+        CR2toFITS_cli,
+        "convert cr2 file to fits",
+        "<input CR2 file> <output FITS file>",
+        "cr2tofits im01.CR2 im01.fits",
+        "int CR2toFITS(const char *fnameCR2, const char *fnameFITS)");
 
-    strcpy(data.cmd[data.NBcmd].key, "cr2tofits");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = CR2toFITS_cli;
-    strcpy(data.cmd[data.NBcmd].info, "convert cr2 file to fits");
-    strcpy(data.cmd[data.NBcmd].syntax, "<input CR2 file> <output FITS file>");
-    strcpy(data.cmd[data.NBcmd].example, "cr2tofits im01.CR2 im01.fits");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "int CR2toFITS(const char *fnameCR2, const char *fnameFITS)");
-    data.NBcmd++;
+    RegisterCLIcommand(
+        "writeushortintlock",
+        __FILE__,
+        IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli,
+        "write unsigned short int with file locking",
+        "str1 is image, str2 is binary file",
+        "writeushortintlock im im.bin",
+        "long IMAGE_FORMAT_FITS_to_ushortintbin_lock( const char *IDname, const char *fname)");
 
-    strcpy(data.cmd[data.NBcmd].key, "writeushortintlock");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_FITS_to_ushortintbin_lock_cli;
-    strcpy(data.cmd[data.NBcmd].info, "write unsigned short int with file locking");
-    strcpy(data.cmd[data.NBcmd].syntax, "str1 is image, str2 is binary file");
-    strcpy(data.cmd[data.NBcmd].example, "writeushortintlock im im.bin");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "long IMAGE_FORMAT_FITS_to_ushortintbin_lock( const char *IDname, const char *fname)");
-    data.NBcmd++;
+    RegisterCLIcommand(
+        "writefloatlock",
+        __FILE__,
+        IMAGE_FORMAT_FITS_to_floatbin_lock_cli,
+        "write float with file locking",
+        "str1 is image, str2 is binary file",
+        "writefloatlock im im.bin",
+        "long IMAGE_FORMAT_FITS_to_floatbin_lock( const char *IDname, const char *fname)");
 
-    strcpy(data.cmd[data.NBcmd].key, "writefloatlock");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_FITS_to_floatbin_lock_cli;
-    strcpy(data.cmd[data.NBcmd].info, "write float with file locking");
-    strcpy(data.cmd[data.NBcmd].syntax, "str1 is image, str2 is binary file");
-    strcpy(data.cmd[data.NBcmd].example, "writefloatlock im im.bin");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "long IMAGE_FORMAT_FITS_to_floatbin_lock( const char *IDname, const char *fname)");
-    data.NBcmd++;
+    RegisterCLIcommand(
+        "readb32fim",
+        __FILE__,
+        IMAGE_FORMAT_read_binary32f_cli,
+        "read 32-bit float RAW image",
+        "<bin file> <xsize> <ysize> <output image>",
+        "readb32fim im.bin xsize ysize im",
+        "long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)");
 
-    strcpy(data.cmd[data.NBcmd].key, "readb32fim");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_read_binary32f_cli;
-    strcpy(data.cmd[data.NBcmd].info, "read 32-bit float RAW image");
-    strcpy(data.cmd[data.NBcmd].syntax,
-           "<bin file> <xsize> <ysize> <output image>");
-    strcpy(data.cmd[data.NBcmd].example, "readb32fim im.bin xsize ysize im");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)");
-    data.NBcmd++;
+    RegisterCLIcommand(
+        "extractRGGBchan",
+        __FILE__,
+        IMAGE_FORMAT_extract_RGGBchan_cli,
+        "extract RGGB channels from color image",
+        "<input image> <imR> <imG1> <imG2> <imB>",
+        "extractRGGBchan im imR imG1 imG2 imB",
+        "int image_format_extract_RGGBchan(const char *ID_name, const char *IDoutR_name, const char *IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)");
 
-    strcpy(data.cmd[data.NBcmd].key, "extractRGGBchan");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_extract_RGGBchan_cli;
-    strcpy(data.cmd[data.NBcmd].info, "extract RGGB channels from color image");
-    strcpy(data.cmd[data.NBcmd].syntax, "<input image> <imR> <imG1> <imG2> <imB>");
-    strcpy(data.cmd[data.NBcmd].example, "extractRGGBchan im imR imG1 imG2 imB");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "int image_format_extract_RGGBchan(const char *ID_name, const char *IDoutR_name, const char *IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)");
-    data.NBcmd++;
-
-    strcpy(data.cmd[data.NBcmd].key, "loadcr2torgb");
-    strcpy(data.cmd[data.NBcmd].module, __FILE__);
-    data.cmd[data.NBcmd].fp = IMAGE_FORMAT_loadCR2toFITSRGB_cli;
-    strcpy(data.cmd[data.NBcmd].info, "load CR2 file into R G B images");
-    strcpy(data.cmd[data.NBcmd].syntax, "<input image> <imR> <imG> <imB>");
-    strcpy(data.cmd[data.NBcmd].example, "loadcr2torgb im imR imG imB");
-    strcpy(data.cmd[data.NBcmd].Ccall,
-           "loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *fnameFITSg, const char *fnameFITSb)");
-    data.NBcmd++;
-
+    RegisterCLIcommand(
+        "loadcr2torgb",
+        __FILE__,
+        IMAGE_FORMAT_loadCR2toFITSRGB_cli,
+        "load CR2 file into R G B images",
+        "<input image> <imR> <imG> <imB>",
+        "loadcr2torgb im imR imG imB",
+        "loadCR2toFITSRGB(const char *fnameCR2, const char *fnameFITSr, const char *fnameFITSg, const char *fnameFITSb)");
 
 
 // add atexit functions here
@@ -1317,6 +1305,7 @@ imageID loadCR2(
 
 
 
+
 // load all images matching strfilter + .CR2
 // return number of images converted
 // FITS image name = CR2 image name with .CR2 -> .fits
@@ -1334,14 +1323,21 @@ long CR2toFITS_strfilter(
     fp = fopen("flist.tmp", "r");
     while(fgets(fname, STRINGMAXLEN_FULLFILENAME, fp) != NULL)
     {
-        fname[strlen(fname) - 1] = '\0';
-        strncpy(fname1, fname, strlen(fname) - 4);
-        fname1[strlen(fname) - 4] = '.';
-        fname1[strlen(fname) - 3] = 'f';
-        fname1[strlen(fname) - 2] = 'i';
-        fname1[strlen(fname) - 1] = 't';
-        fname1[strlen(fname)] = 's';
-        fname1[strlen(fname) + 1] = '\0';
+		int slen = strlen(fname);
+		if(slen > STRINGMAXLEN_FULLFILENAME-1) {
+			slen = STRINGMAXLEN_FULLFILENAME-1;
+		}
+		
+        fname[slen - 1] = '\0';
+        
+        strncpy(fname1, fname, slen - 4);
+        
+        fname1[slen - 4] = '.';
+        fname1[slen - 3] = 'f';
+        fname1[slen - 2] = 'i';
+        fname1[slen - 1] = 't';
+        fname1[slen] = 's';
+        fname1[slen + 1] = '\0';
 
         CR2toFITS(fname, fname1);
         printf("File %s  -> file %s\n", fname, fname1);
@@ -1349,10 +1345,8 @@ long CR2toFITS_strfilter(
     }
 
     fclose(fp);
-    if(system("rm flist.tmp") != 0)
-    {
-        PRINT_ERROR("system() returns non-zero value");
-    }
+
+    EXECUTE_SYSTEM_COMMAND("rm flist.tmp");
 
     printf("%ld files converted\n", cnt);
 
