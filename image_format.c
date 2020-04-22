@@ -22,9 +22,6 @@
 // Module short description
 #define MODULE_DESCRIPTION       "Conversion between image format, I/O"
 
-// Application to which module belongs
-#define MODULE_APPLICATION       "milk"
-
 
 
 
