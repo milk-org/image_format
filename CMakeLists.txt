@@ -4,10 +4,16 @@ set(SRCNAME "image_format")
 
 
 set(SOURCEFILES
-	${SRCNAME}.c)
+	${SRCNAME}.c
+	imtoASCII.c
+	writeBMP.c
+)
 
 set(INCLUDEFILES
-	${SRCNAME}.h)
+	${SRCNAME}.h
+	imtoASCII.h
+	writeBMP.h
+)
 
 
 # DEFAULT SETTINGS 

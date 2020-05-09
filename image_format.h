@@ -5,20 +5,11 @@
 void __attribute__((constructor)) libinit_image_format();
 
 
-errno_t IMAGE_FORMAT_im_to_ASCII(
-    const char *IDname,
-    const char *foutname
-);
-
-//int IMAGE_FORMAT_FITS_to_ASCII(const char *finname, const char *foutname);
+#include "image_format/writeBMP.h"
+#include "image_format/imtoASCII.h"
 
 
-errno_t image_writeBMP_auto(
-    const char *IDnameR,
-    const char *IDnameG,
-    const char *IDnameB,
-    const char *outname
-);
+
 
 
 imageID CR2toFITS(
