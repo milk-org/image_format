@@ -7,58 +7,11 @@
  */
 
 
-/* ================================================================== */
-/* ================================================================== */
-/*            MODULE INFO                                             */
-/* ================================================================== */
-/* ================================================================== */
-
-
-// module default short name
-// all CLI calls to this module functions will be <shortname>.<funcname>
-// if set to "", then calls use <funcname>
 #define MODULE_SHORTNAME_DEFAULT "imgformat"
-
-// Module short description
 #define MODULE_DESCRIPTION       "Conversion between image format, I/O"
 
 
-
-
-
-
-
-
-/* =============================================================================================== */
-/* =============================================================================================== */
-/*                                        HEADER FILES                                             */
-/* =============================================================================================== */
-/* =============================================================================================== */
-
-
-#include <stdint.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <sys/file.h>
-
 #include "CommandLineInterface/CLIcore.h"
-#include "COREMOD_memory/COREMOD_memory.h"
-#include "COREMOD_arith/COREMOD_arith.h"
-#include "COREMOD_tools/COREMOD_tools.h"
-#include "COREMOD_iofits/COREMOD_iofits.h"
-#include "statistic/statistic.h"
-
-#include "image_format/image_format.h"
-
-
-//#include <modules/image_basic/image_basic.h>
-#include "info/info.h"
-//#include "fft/fft.h"
-//#include <modules/image_filter/image_filter.h>
-#include "image_gen/image_gen.h"
-
 
 #include "CR2toFITS.h"
 #include "imtoASCII.h"
@@ -71,128 +24,23 @@
 
 
 
-
-/* =============================================================================================== */
-/* =============================================================================================== */
-/*                                      DEFINES, MACROS                                            */
-/* =============================================================================================== */
-/* =============================================================================================== */
-
-#define SWAP(x,y)  tmp=(x);x=(y);y=tmp;
-
-#define PI 3.14159265358979323846264338328
-
-
-
-
-
-
-
-
-/* =============================================================================================== */
-/* =============================================================================================== */
-/*                                  GLOBAL DATA DECLARATION                                        */
-/* =============================================================================================== */
-/* =============================================================================================== */
-
-//extern DATA data;
-
-//static int INITSTATUS_image_format = 0;
-
-
-
-
-
-
-typedef struct
+/*typedef struct
 {
     int rows;
     int cols;
     unsigned char *data;
 } sImage;
-
+*/
 /* This pragma is necessary so that the data in the structures is aligned to 2-byte
    boundaries.  Some different compilers have a different syntax for this line.  For
    example, if you're using cc on Solaris, the line should be #pragma pack(2).
 */
-#pragma pack(2)
+//#pragma pack(2)
 
 
-
-
-
-
-
-
-/* ================================================================== */
-/* ================================================================== */
-/*            INITIALIZE LIBRARY                                      */
-/* ================================================================== */
-/* ================================================================== */
-
-// Module initialization macro in CLIcore.h
-// macro argument defines module name for bindings
-//
 INIT_MODULE_LIB(image_format)
 
 
-
-
-
-
-
-/* =============================================================================================== */
-/* =============================================================================================== */
-/*                           FUNCTIONS TIED TO COMMAND LINE INTERFACE (CLI)                        */
-/* =============================================================================================== */
-/* =============================================================================================== */
-
-
-
-
-
-
-/** @name CLI bindings */
-
-
-// CLI commands
-//
-// function CLI_checkarg used to check arguments
-// 1: float
-// 2: long
-// 3: string
-// 4: existing image
-//
-
-
-
-//int IMAGE_FORMAT_2Dim_to_ASCII(const char *IDname, const char *fname)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* =============================================================================================== */
-/* =============================================================================================== */
-/*                                    MODULE INITIALIZATION                                        */
-/* =============================================================================================== */
-/* =============================================================================================== */
-
-
-
-/** @name Module initialization */
 
 static errno_t init_module_CLI()
 {
@@ -226,19 +74,9 @@ static errno_t init_module_CLI()
 
 
 
-/* =============================================================================================== */
-/* =============================================================================================== */
-/*                                    FUNCTIONS SOURCE CODE                                        */
-/* =============================================================================================== */
-/* =============================================================================================== */
-/** @name image_format functions */
 
 
-
-
-
-
-
+/*
 
 
 long getImageInfo(
@@ -264,7 +102,7 @@ long getImageInfo(
             PRINT_ERROR("fread() returns <1 value");
         }
 
-        /* calculate value based on adding bytes */
+        // calculate value based on adding bytes 
         value = (long)(value + (*ptrC) * (pow(256, (i - 1))));
     }
 
@@ -380,25 +218,25 @@ errno_t read_BMPimage(
 
 
 
-    /*--------INITIALIZE POINTER----------*/
+    //--------INITIALIZE POINTER----------
     someChar = '0';
     pChar = &someChar;
 
     printf("Reading file %s\n", filename);
 
-    /*----DECLARE INPUT AND OUTPUT FILES----*/
+    // ----DECLARE INPUT AND OUTPUT FILES----
     bmpInput = fopen(filename, "rb");
     rasterOutput = fopen("data24.txt", "w");
 
     fseek(bmpInput, 0L, SEEK_END);
 
-    /*-----GET BMP INFO-----*/
+    //-----GET BMP INFO-----
     originalImage.cols = (int)getImageInfo(bmpInput, 18, 4) + 1;
     originalImage.rows = (int)getImageInfo(bmpInput, 22, 4);
     fileSize = getImageInfo(bmpInput, 2, 4);
     nColors = getImageInfo(bmpInput, 46, 4);
 
-    /*----PRINT BMP INFO TO SCREEN-----*/
+    //----PRINT BMP INFO TO SCREEN-----
     printf("Width: %d\n", originalImage.cols);
     printf("Height: %d\n", originalImage.rows);
     printf("File size: %ld\n", fileSize);
@@ -413,39 +251,37 @@ errno_t read_BMPimage(
     IDB = create_2Dimage_ID(IDname_B, (long) originalImage.cols,
                             (long) originalImage.rows);
 
-    /*----FOR 24-BIT BMP, THERE IS NO COLOR TABLE-----*/
+    // ----FOR 24-BIT BMP, THERE IS NO COLOR TABLE-----
     fseek(bmpInput, 54, SEEK_SET);
 
-    /*-----------READ RASTER DATA-----------*/
+    // -----------READ RASTER DATA-----------
     for(r = 0; r <= originalImage.rows - 1; r++)
     {
         for(c = 0; c <= originalImage.cols - 1; c++)
         {
 
-            /*----READ FIRST BYTE TO GET BLUE VALUE-----*/
+            // ----READ FIRST BYTE TO GET BLUE VALUE-----
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
             {
                 PRINT_ERROR("fread() returns <1 value");
             }
             BlueValue = *pChar;
 
-            /*-----READ NEXT BYTE TO GET GREEN VALUE-----*/
+            // -----READ NEXT BYTE TO GET GREEN VALUE-----
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
             {
                 PRINT_ERROR("fread() returns <1 value");
             }
             GreenValue = *pChar;
 
-            /*-----READ NEXT BYTE TO GET RED VALUE-----*/
+            // -----READ NEXT BYTE TO GET RED VALUE-----
             if(fread(pChar, sizeof(char), 1, bmpInput) < 1)
             {
                 PRINT_ERROR("fread() returns <1 value");
             }
             RedValue = *pChar;
 
-            /*---------WRITE TO FILES ---------*/
-            /*fprintf(rasterOutput, "(%d %d) = \tRed \t%d", r, c, RedValue);
-            fprintf(rasterOutput, "\tGreen \t%d \tBlue \t%d\n", GreenValue, BlueValue);*/
+            // ---------WRITE TO FILES ---------
             data.image[IDR].array.F[r * originalImage.cols + c] = 1.0 * RedValue;
             data.image[IDG].array.F[r * originalImage.cols + c] = 1.0 * GreenValue;
             data.image[IDB].array.F[r * originalImage.cols + c] = 1.0 * BlueValue;
@@ -462,13 +298,7 @@ errno_t read_BMPimage(
 
 
 
-/**
- * ## Purpose
- *
- * load CR2 file
- *
- * @note assumes dcraw is installed
- */
+
 imageID loadCR2(
     const char *fnameCR2,
     const char *IDname
@@ -790,7 +620,7 @@ imageID IMAGE_FORMAT_read_binary16(
 
 
 
-
+*/
 
 
 
