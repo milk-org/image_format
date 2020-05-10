@@ -5,13 +5,31 @@ set(SRCNAME "image_format")
 
 set(SOURCEFILES
 	${SRCNAME}.c
+	CR2toFITS.c
+	CR2tomov.c
+	extract_RGGBchan.c
+	FITS_to_ushortintbin_lock.c
+	FITS_to_floatbin_lock.c
+	FITStorgbFITSsimple.c
 	imtoASCII.c
+	loadCR2toFITSRGB.c
+	read_binary32f.c
+	readPGM.c
 	writeBMP.c
 )
 
 set(INCLUDEFILES
 	${SRCNAME}.h
+	CR2toFITS.h
+	CR2tomov.h
+	extract_RGGBchan.h
+	FITS_to_ushortintbin_lock.h
+	FITS_to_floatbin_lock.h
+	FITStorgbFITSsimple.h
 	imtoASCII.h
+	loadCR2toFITSRGB.h
+	read_binary32f.h
+	readPGM.h
 	writeBMP.h
 )
 
