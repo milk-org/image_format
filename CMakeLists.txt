@@ -2,6 +2,8 @@
 set(LIBNAME "milkimageformat")
 set(SRCNAME "image_format")
 
+message("")
+message(" SRCNAME = ${SRCNAME} -> LIBNAME = ${LIBNAME}")
 
 set(SOURCEFILES
 	${SRCNAME}.c
