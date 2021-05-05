@@ -1,6 +1,6 @@
 /** @file writeBMP.c
  */
- 
+
 
 
 #include "CommandLineInterface/CLIcore.h"
@@ -332,7 +332,12 @@ errno_t image_writeBMP_auto(
     IDB = image_ID(IDnameB);
     width = (uint32_t) data.image[IDR].md[0].size[0];
     height = (uint32_t) data.image[IDR].md[0].size[1];
+
     array = (unsigned char *) malloc(sizeof(unsigned char) * width * height * 3);
+    if(array == NULL) {
+        PRINT_ERROR("malloc returns NULL pointer");
+        abort();
+    }
 
     for(ii = 0; ii < width; ii++)
         for(jj = 0; jj < height; jj++)
@@ -371,7 +376,12 @@ errno_t image_writeBMP(
     IDB = image_ID(IDnameB);
     width = (uint32_t) data.image[IDR].md[0].size[0];
     height = (uint32_t) data.image[IDR].md[0].size[1];
+
     array = (unsigned char *) malloc(sizeof(unsigned char) * width * height * 3);
+    if(array == NULL) {
+        PRINT_ERROR("malloc returns NULL pointer");
+        abort();
+    }
 
     for(ii = 0; ii < width; ii++)
         for(jj = 0; jj < height; jj++)

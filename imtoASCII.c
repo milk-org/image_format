@@ -88,6 +88,11 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
     ID = image_ID(IDname);
     naxis = data.image[ID].md[0].naxis;
     coord = (long *) malloc(sizeof(long) * naxis);
+    if(coord == NULL) {
+        PRINT_ERROR("malloc returns NULL pointer");
+        abort();
+    }
+
     npix = 1;
     for(k = 0; k < naxis; k++)
     {
@@ -109,38 +114,38 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
         }
         switch(data.image[ID].md[0].datatype)
         {
-            case _DATATYPE_UINT8:
-                fprintf(fpout, " %5u\n", data.image[ID].array.UI8[ii]);
-                break;
-            case _DATATYPE_UINT16:
-                fprintf(fpout, " %5u\n", data.image[ID].array.UI16[ii]);
-                break;
-            case _DATATYPE_UINT32:
-                fprintf(fpout, " %u\n", data.image[ID].array.UI32[ii]);
-                break;
-            case _DATATYPE_UINT64:
-                fprintf(fpout, " %lu\n", data.image[ID].array.UI64[ii]);
-                break;
+        case _DATATYPE_UINT8:
+            fprintf(fpout, " %5u\n", data.image[ID].array.UI8[ii]);
+            break;
+        case _DATATYPE_UINT16:
+            fprintf(fpout, " %5u\n", data.image[ID].array.UI16[ii]);
+            break;
+        case _DATATYPE_UINT32:
+            fprintf(fpout, " %u\n", data.image[ID].array.UI32[ii]);
+            break;
+        case _DATATYPE_UINT64:
+            fprintf(fpout, " %lu\n", data.image[ID].array.UI64[ii]);
+            break;
 
-            case _DATATYPE_INT8:
-                fprintf(fpout, " %5d\n", data.image[ID].array.SI8[ii]);
-                break;
-            case _DATATYPE_INT16:
-                fprintf(fpout, " %5d\n", data.image[ID].array.SI16[ii]);
-                break;
-            case _DATATYPE_INT32:
-                fprintf(fpout, " %5d\n", data.image[ID].array.SI32[ii]);
-                break;
-            case _DATATYPE_INT64:
-                fprintf(fpout, " %5ld\n", data.image[ID].array.SI64[ii]);
-                break;
+        case _DATATYPE_INT8:
+            fprintf(fpout, " %5d\n", data.image[ID].array.SI8[ii]);
+            break;
+        case _DATATYPE_INT16:
+            fprintf(fpout, " %5d\n", data.image[ID].array.SI16[ii]);
+            break;
+        case _DATATYPE_INT32:
+            fprintf(fpout, " %5d\n", data.image[ID].array.SI32[ii]);
+            break;
+        case _DATATYPE_INT64:
+            fprintf(fpout, " %5ld\n", data.image[ID].array.SI64[ii]);
+            break;
 
-            case _DATATYPE_FLOAT:
-                fprintf(fpout, " %f\n", data.image[ID].array.F[ii]);
-                break;
-            case _DATATYPE_DOUBLE:
-                fprintf(fpout, " %lf\n", data.image[ID].array.D[ii]);
-                break;
+        case _DATATYPE_FLOAT:
+            fprintf(fpout, " %f\n", data.image[ID].array.F[ii]);
+            break;
+        case _DATATYPE_DOUBLE:
+            fprintf(fpout, " %lf\n", data.image[ID].array.D[ii]);
+            break;
         }
         coord[0]++;
 
