@@ -93,6 +93,10 @@ imageID IMAGE_FORMAT_FITS_to_floatbin_lock(
     ysize = data.image[ID].md[0].size[1];
 
     valarray = (float *) malloc(sizeof(float) * xsize * ysize);
+    if(valarray == NULL) {
+        PRINT_ERROR("malloc returns NULL pointer");
+        abort();
+    }
 
     if(data.image[ID].md[0].datatype == _DATATYPE_FLOAT)
     {

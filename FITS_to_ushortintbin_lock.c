@@ -87,6 +87,10 @@ imageID IMAGE_FORMAT_FITS_to_ushortintbin_lock(
 
     valarray = (unsigned short int *) malloc(sizeof(unsigned short int) * xsize *
                ysize);
+    if(valarray == NULL) {
+        PRINT_ERROR("malloc returns NULL pointer");
+        abort();
+    }
 
     if(data.image[ID].md[0].datatype == _DATATYPE_FLOAT)
     {
