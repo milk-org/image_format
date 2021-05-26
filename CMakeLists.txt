@@ -7,6 +7,7 @@ message(" SRCNAME = ${SRCNAME} -> LIBNAME = ${LIBNAME}")
 
 set(SOURCEFILES
 	${SRCNAME}.c
+	combineHDR.c
 	CR2toFITS.c
 	CR2tomov.c
 	extract_RGGBchan.c
@@ -22,6 +23,7 @@ set(SOURCEFILES
 
 set(INCLUDEFILES
 	${SRCNAME}.h
+	combineHDR.h
 	CR2toFITS.h
 	CR2tomov.h
 	extract_RGGBchan.h

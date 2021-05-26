@@ -1,106 +1,61 @@
 /** @file writeBMP.c
  */
 
-
-
 #include "CommandLineInterface/CLIcore.h"
-#include "COREMOD_memory/COREMOD_memory.h"
-#include "COREMOD_arith/COREMOD_arith.h"
-
-
-#define BMP_BIG_ENDIAN 0
 
 
 
-#define BI_RGB 0
-#define BM 19778
-#define BMP_FALSE 0
-#define BMP_TRUE 1
+
+const int BYTES_PER_PIXEL = 3; /// red, green, & blue
+const int FILE_HEADER_SIZE = 14;
+const int INFO_HEADER_SIZE = 40;
 
 
-typedef struct
+// Local variables pointers
+static char *BMPfname;
+static char *imRname;
+static char *imGname;
+static char *imBname;
+
+
+static CLICMDARGDEF farg[] =
 {
-    uint16_t bfType;
-    uint32_t bfSize;
-    uint16_t bfReserved1;
-    uint16_t bfReserved2;
-    uint32_t bfOffBits;
-} BITMAPFILEHEADER;
-
-typedef struct
-{
-    uint32_t biSize;
-    uint32_t biWidth;
-    uint32_t biHeight;
-    uint16_t biPlanes;
-    uint16_t biBitCount;
-    uint32_t biCompression;
-    uint32_t biSizeImage;
-    uint32_t biXPelsPerMeter;
-    uint32_t biYPelsPerMeter;
-    uint32_t biClrUsed;
-    uint32_t biClrImportant;
-} BITMAPINFOHEADER;
-
-
-// ==========================================
-// Forward declaration(s)
-// ==========================================
-
-
-errno_t image_writeBMP_auto(
-    const char *__restrict__ IDnameR,
-    const char *__restrict__ IDnameG,
-    const char *__restrict__ IDnameB,
-    const char *__restrict__ outname
-);
-
-
-
-// ==========================================
-// Command line interface wrapper function(s)
-// ==========================================
-
-static errno_t image_writeBMP_cli()
-{
-    if(0
-            + CLI_checkarg(1, 4)
-            + CLI_checkarg(2, 4)
-            + CLI_checkarg(3, 4)
-            + CLI_checkarg(4, 3)
-            == 0)
     {
-        image_writeBMP_auto(
-            data.cmdargtoken[1].val.string,
-            data.cmdargtoken[2].val.string,
-            data.cmdargtoken[3].val.string,
-            data.cmdargtoken[4].val.string);
-        return RETURN_SUCCESS;
-    }
-    else
+        CLIARG_STR, ".bmp_fname", "BMP file name", "out.bmp",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &BMPfname
+    },
     {
-        return RETURN_FAILURE;
+        CLIARG_IMG, ".imRname", "Red channel image", "imR",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &imRname
+    },
+    {
+        CLIARG_IMG, ".imGname", "Green channel image", "imG",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &imGname
+    },
+    {
+        CLIARG_IMG, ".imBname", "Blue channel image", "imB",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &imBname
     }
-}
+};
 
-
-
-
-// ==========================================
-// Register CLI command(s)
-// ==========================================
-
-errno_t writeBMP_addCLIcmd()
+static CLICMDDATA CLIcmddata =
 {
+    "mkBMPim",
+    "make BMP image",
+    CLICMD_FIELDS_DEFAULTS
+};
 
-    RegisterCLIcommand(
-        "saveBMP",
-        __FILE__,
-        image_writeBMP_cli,
-        "write RGB image as BMP - auto scaling",
-        "<red image> <green image> <blue image> <output BMP file name>",
-        "saveBMP imr img imb im.bmp",
-        "int image_writeBMP_auto(const char *IDnameR, const char *IDnameG, const char *IDnameB, const char *outname)"
+
+
+// detailed help
+static errno_t help_function()
+{
+    printf(
+        "Create BMP format image\n"
     );
 
     return RETURN_SUCCESS;
@@ -116,253 +71,107 @@ errno_t writeBMP_addCLIcmd()
 
 
 
-
-
-/* This function is for byte swapping on big endian systems */
-uint16_t setUint16(uint16_t x)
-{
-    if(BMP_BIG_ENDIAN)
-    {
-        return (x & 0x00FF) << 8 | (x & 0xFF00) >> 8;
-    }
-    else
-    {
-        return x;
-    }
-}
-
-
-
-
-/* This function is for byte swapping on big endian systems */
-uint32_t setUint32(uint32_t x)
-{
-    if(BMP_BIG_ENDIAN)
-    {
-        return (x & 0x000000FF) << 24 | (x & 0x0000FF00) << 8 |
-               (x & 0x00FF0000) >> 8 | (x & 0xFF000000) >> 24;
-    }
-    else
-    {
-        return x;
-    }
-}
-
-
-
-
-
-
-
-/**
- * ## Purpose
- *
- * This function writes out a 24-bit Windows bitmap file that is readable by Microsoft Paint. \n
- * The image data is a 1D array of (r, g, b) triples, where individual (r, g, b) values can \n
- * each take on values between 0 and 255, inclusive.
- *
- * ## Arguments
- *
- * @param[in]
- * filename		char*
- * 				A string representing the filename that will be written
- *
- * @param[in]
- * width		uint32_t
- * 				The width, in pixels, of the bitmap
- *
- * @param[in[
- * height		uint32_t
- * 				The height, in pixels, of the bitmap
- *
- * @param[in]
- * image		image*
- * 				The image data, where each pixel is 3 unsigned chars (r, g, b)
- *
- * @note Written by Greg Slabaugh (slabaugh@ece.gatech.edu), 10/19/00
-*/
-static uint32_t write24BitBmpFile(
-    const char    *__restrict__ filename,
-    uint32_t        width,
-    uint32_t        height,
-    unsigned char *__restrict__ image
+static unsigned char* createBitmapFileHeader (
+    int height,
+    int stride
 )
 {
-    BITMAPINFOHEADER bmpInfoHeader;
-    BITMAPFILEHEADER bmpFileHeader;
-    FILE *filep;
-    uint32_t row, column;
-    uint32_t extrabytes, bytesize;
-    unsigned char *paddedImage = NULL;
-    unsigned char *imagePtr;
+    int fileSize = FILE_HEADER_SIZE + INFO_HEADER_SIZE + (stride * height);
 
-    extrabytes = (4 - (width * 3) % 4) % 4;
+    static unsigned char fileHeader[] = {
+        0,0,     /// signature
+        0,0,0,0, /// image file size in bytes
+        0,0,0,0, /// reserved
+        0,0,0,0, /// start of pixel array
+    };
 
-    /* This is the size of the padded bitmap */
-    bytesize = (width * 3 + extrabytes) * height;
+    fileHeader[ 0] = (unsigned char)('B');
+    fileHeader[ 1] = (unsigned char)('M');
+    fileHeader[ 2] = (unsigned char)(fileSize      );
+    fileHeader[ 3] = (unsigned char)(fileSize >>  8);
+    fileHeader[ 4] = (unsigned char)(fileSize >> 16);
+    fileHeader[ 5] = (unsigned char)(fileSize >> 24);
+    fileHeader[10] = (unsigned char)(FILE_HEADER_SIZE + INFO_HEADER_SIZE);
 
-    /* Fill the bitmap file header structure */
-    bmpFileHeader.bfType = setUint16(BM);   /* Bitmap header */
-    bmpFileHeader.bfSize = setUint32(0);      /* This can be 0 for BI_RGB bitmaps */
-    bmpFileHeader.bfReserved1 = setUint16(0);
-    bmpFileHeader.bfReserved2 = setUint16(0);
-    bmpFileHeader.bfOffBits = setUint32(sizeof(BITMAPFILEHEADER) + sizeof(
-                                            BITMAPINFOHEADER));
-
-    /* Fill the bitmap info structure */
-    bmpInfoHeader.biSize = setUint32(sizeof(BITMAPINFOHEADER));
-    bmpInfoHeader.biWidth = setUint32(width);
-    bmpInfoHeader.biHeight = setUint32(height);
-    bmpInfoHeader.biPlanes = setUint16(1);
-    bmpInfoHeader.biBitCount = setUint16(24);            /* 24 - bit bitmap */
-    bmpInfoHeader.biCompression = setUint32(BI_RGB);
-    bmpInfoHeader.biSizeImage = setUint32(
-                                    bytesize);     /* includes padding for 4 byte alignment */
-    bmpInfoHeader.biXPelsPerMeter = setUint32(0);
-    bmpInfoHeader.biYPelsPerMeter = setUint32(0);
-    bmpInfoHeader.biClrUsed = setUint32(0);
-    bmpInfoHeader.biClrImportant = setUint32(0);
+    return fileHeader;
+}
 
 
-    /* Open file */
-    if((filep = fopen(filename, "wb")) == NULL)
-    {
-        printf("Error opening file %s\n", filename);
-        return BMP_FALSE;
-    }
+static unsigned char* createBitmapInfoHeader (int height, int width)
+{
+    static unsigned char infoHeader[] = {
+        0,0,0,0, /// header size
+        0,0,0,0, /// image width
+        0,0,0,0, /// image height
+        0,0,     /// number of color planes
+        0,0,     /// bits per pixel
+        0,0,0,0, /// compression
+        0,0,0,0, /// image size
+        0,0,0,0, /// horizontal resolution
+        0,0,0,0, /// vertical resolution
+        0,0,0,0, /// colors in color table
+        0,0,0,0, /// important color count
+    };
 
-    /* Write bmp file header */
-    if(fwrite(&bmpFileHeader, 1, sizeof(BITMAPFILEHEADER),
-              filep) < sizeof(BITMAPFILEHEADER))
-    {
-        printf("Error writing bitmap file header\n");
-        fclose(filep);
-        return BMP_FALSE;
-    }
+    infoHeader[ 0] = (unsigned char)(INFO_HEADER_SIZE);
+    infoHeader[ 4] = (unsigned char)(width      );
+    infoHeader[ 5] = (unsigned char)(width >>  8);
+    infoHeader[ 6] = (unsigned char)(width >> 16);
+    infoHeader[ 7] = (unsigned char)(width >> 24);
+    infoHeader[ 8] = (unsigned char)(height      );
+    infoHeader[ 9] = (unsigned char)(height >>  8);
+    infoHeader[10] = (unsigned char)(height >> 16);
+    infoHeader[11] = (unsigned char)(height >> 24);
+    infoHeader[12] = (unsigned char)(1);
+    infoHeader[14] = (unsigned char)(BYTES_PER_PIXEL*8);
 
-    /* Write bmp info header */
-    if(fwrite(&bmpInfoHeader, 1, sizeof(BITMAPINFOHEADER),
-              filep) < sizeof(BITMAPINFOHEADER))
-    {
-        printf("Error writing bitmap info header\n");
-        fclose(filep);
-        return BMP_FALSE;
-    }
-
-
-    /* Allocate memory for some temporary storage */
-    paddedImage = (unsigned char *)calloc(sizeof(unsigned char), bytesize);
-    if(paddedImage == NULL)
-    {
-        printf("Error allocating memory \n");
-        fclose(filep);
-        return BMP_FALSE;
-    }
-
-    /* This code does three things.  First, it flips the image data upside down, as the .bmp
-    format requires an upside down image.  Second, it pads the image data with extrabytes
-    number of bytes so that the width in bytes of the image data that is written to the
-    file is a multiple of 4.  Finally, it swaps (r, g, b) for (b, g, r).  This is another
-    quirk of the .bmp file format. */
-
-    for(row = 0; row < height; row++)
-    {
-        unsigned char *paddedImagePtr;
-
-
-        imagePtr = image + (height - 1 - row) * width * 3;
-        paddedImagePtr = paddedImage + row * (width * 3 + extrabytes);
-        for(column = 0; column < width; column++)
-        {
-            *paddedImagePtr = *(imagePtr + 2);
-            *(paddedImagePtr + 1) = *(imagePtr + 1);
-            *(paddedImagePtr + 2) = *imagePtr;
-            imagePtr += 3;
-            paddedImagePtr += 3;
-        }
-
-
-    }
-
-    /* Write bmp data */
-    if(fwrite(paddedImage, 1, bytesize, filep) < bytesize)
-    {
-        printf("Error writing bitmap data\n");
-        free(paddedImage);
-        fclose(filep);
-        return BMP_FALSE;
-    }
-
-    /* Close file */
-    fclose(filep);
-    free(paddedImage);
-
-    return BMP_TRUE;
+    return infoHeader;
 }
 
 
 
-
-
-errno_t image_writeBMP_auto(
-    const char *__restrict__ IDnameR,
-    const char *__restrict__ IDnameG,
-    const char *__restrict__ IDnameB,
-    const char *__restrict__ outname
+static void generateBitmapImage (
+    unsigned char* image,
+    int height,
+    int width,
+    char* imageFileName
 )
 {
-    imageID IDR, IDG, IDB;
-    uint32_t width;
-    uint32_t height;
-    unsigned char *array;
-    uint32_t ii, jj;
-    double minr, ming, minb, maxr, maxg, maxb;
+    int widthInBytes = width * BYTES_PER_PIXEL;
 
+    unsigned char padding[3] = {0, 0, 0};
+    int paddingSize = (4 - (widthInBytes) % 4) % 4;
 
-    minr = arith_image_min(IDnameR);
-    ming = arith_image_min(IDnameG);
-    minb = arith_image_min(IDnameB);
+    int stride = (widthInBytes) + paddingSize;
 
-    maxr = arith_image_max(IDnameR);
-    maxg = arith_image_max(IDnameG);
-    maxb = arith_image_max(IDnameB);
+    FILE* imageFile = fopen(imageFileName, "wb");
 
-    IDR = image_ID(IDnameR);
-    IDG = image_ID(IDnameG);
-    IDB = image_ID(IDnameB);
-    width = (uint32_t) data.image[IDR].md[0].size[0];
-    height = (uint32_t) data.image[IDR].md[0].size[1];
+    unsigned char* fileHeader = createBitmapFileHeader(height, stride);
+    fwrite(fileHeader, 1, FILE_HEADER_SIZE, imageFile);
 
-    array = (unsigned char *) malloc(sizeof(unsigned char) * width * height * 3);
-    if(array == NULL) {
-        PRINT_ERROR("malloc returns NULL pointer");
-        abort();
+    unsigned char* infoHeader = createBitmapInfoHeader(height, width);
+    fwrite(infoHeader, 1, INFO_HEADER_SIZE, imageFile);
+
+    int i;
+    for (i = 0; i < height; i++) {
+        fwrite(image + (i*widthInBytes), BYTES_PER_PIXEL, width, imageFile);
+        fwrite(padding, 1, paddingSize, imageFile);
     }
 
-    for(ii = 0; ii < width; ii++)
-        for(jj = 0; jj < height; jj++)
-        {
-            array[(jj * width + ii) * 3] = (unsigned char)((data.image[IDR].array.F[(height
-                                           - jj - 1) * width + ii] - minr) * (255.0 / (maxr - minr)));
-            array[(jj * width + ii) * 3 + 1] = (unsigned char)((
-                                                   data.image[IDG].array.F[(height - jj - 1) * width + ii] - ming) * (255.0 /
-                                                           (maxg - ming)));
-            array[(jj * width + ii) * 3 + 2] = (unsigned char)((
-                                                   data.image[IDB].array.F[(height - jj - 1) * width + ii] - minb) * (255.0 /
-                                                           (maxb - minb)));
-        }
-    write24BitBmpFile(outname, width, height, array);
-    free(array);
-
-    return RETURN_SUCCESS;
+    fclose(imageFile);
 }
+
+
+
+
+
 
 
 errno_t image_writeBMP(
     const char *__restrict__ IDnameR,
     const char *__restrict__ IDnameG,
     const char *__restrict__ IDnameB,
-    const char *__restrict__ outname
+    char *__restrict__ outname
 )
 {
     imageID IDR, IDG, IDB;
@@ -370,6 +179,8 @@ errno_t image_writeBMP(
     uint32_t height;
     unsigned char *array;
     uint32_t ii, jj;
+
+    printf("Function %s\n", __FUNCTION__ );
 
     IDR = image_ID(IDnameR);
     IDG = image_ID(IDnameG);
@@ -386,17 +197,58 @@ errno_t image_writeBMP(
     for(ii = 0; ii < width; ii++)
         for(jj = 0; jj < height; jj++)
         {
-            array[(jj * width + ii) * 3] = (unsigned char)(data.image[IDR].array.F[(height -
-                                           jj - 1) * width + ii]);
-            array[(jj * width + ii) * 3 + 1] = (unsigned char)(
-                                                   data.image[IDG].array.F[(height - jj - 1) * width + ii]);
-            array[(jj * width + ii) * 3 + 2] = (unsigned char)(
-                                                   data.image[IDB].array.F[(height - jj - 1) * width + ii]);
+            array[(jj * width + ii) * 3] =
+                (unsigned char)(data.image[IDB].array.F[(height -
+                                jj - 1) * width + ii]);
+
+            array[(jj * width + ii) * 3 + 1] =
+                (unsigned char)(
+                    data.image[IDG].array.F[(height - jj - 1) * width + ii]);
+
+            array[(jj * width + ii) * 3 + 2] =
+                (unsigned char)(
+                    data.image[IDR].array.F[(height - jj - 1) * width + ii]);
         }
-    write24BitBmpFile(outname, width, height, array);
+    generateBitmapImage(array, height, width, outname);
+
     free(array);
 
     return RETURN_SUCCESS;
 }
 
+
+
+
+
+
+
+
+
+static errno_t compute_function()
+{
+    INSERT_STD_PROCINFO_COMPUTEFUNC_START
+
+    image_writeBMP(
+        imRname,
+        imGname,
+        imBname,
+        BMPfname
+    );
+
+    INSERT_STD_PROCINFO_COMPUTEFUNC_END
+
+    return RETURN_SUCCESS;
+}
+
+
+
+
+INSERT_STD_FPSCLIfunctions
+
+// Register function in CLI
+errno_t CLIADDCMD_image_format__mkBMPimage()
+{
+    INSERT_STD_CLIREGISTERFUNC
+    return RETURN_SUCCESS;
+}
 

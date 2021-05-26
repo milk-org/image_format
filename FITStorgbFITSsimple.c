@@ -75,8 +75,10 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
     if(RGBmode == 0)
     {
-        PRINT_ERROR("Unknown RGB image mode\n");
-        exit(0);
+        printf("image size : %ld %ld\n", Xsize, Ysize);
+        RGBmode = 1;
+        //PRINT_ERROR("Unknown RGB image mode\n");
+        //exit(0);
     }
 
 
@@ -219,388 +221,61 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
     switch(SamplFactor)
     {
 
-        case 0 :
+    case 0 :
 
-            if(image_ID(ID_name_r) != -1)
-            {
-                delete_image_ID(ID_name_r);
-            }
-            IDr = create_2Dimage_ID(ID_name_r, Xsize, Ysize);
-            IDrc = create_2Dimage_ID("imrc", Xsize, Ysize);
+        if(image_ID(ID_name_r) != -1)
+        {
+            delete_image_ID(ID_name_r);
+        }
+        IDr = create_2Dimage_ID(ID_name_r, Xsize, Ysize);
+        IDrc = create_2Dimage_ID("imrc", Xsize, Ysize);
 
-            if(image_ID(ID_name_g) != -1)
-            {
-                delete_image_ID(ID_name_g);
-            }
-            IDg = create_2Dimage_ID(ID_name_g, Xsize, Ysize);
-            IDgc = create_2Dimage_ID("imgc", Xsize, Ysize);
+        if(image_ID(ID_name_g) != -1)
+        {
+            delete_image_ID(ID_name_g);
+        }
+        IDg = create_2Dimage_ID(ID_name_g, Xsize, Ysize);
+        IDgc = create_2Dimage_ID("imgc", Xsize, Ysize);
 
-            if(image_ID(ID_name_b) != -1)
-            {
-                delete_image_ID(ID_name_b);
-            }
-            IDb = create_2Dimage_ID(ID_name_b, Xsize, Ysize);
-            IDbc = create_2Dimage_ID("imbc", Xsize, Ysize);
+        if(image_ID(ID_name_b) != -1)
+        {
+            delete_image_ID(ID_name_b);
+        }
+        IDb = create_2Dimage_ID(ID_name_b, Xsize, Ysize);
+        IDbc = create_2Dimage_ID("imbc", Xsize, Ysize);
 
-            if(RGBmode == 1) // GBRG
-            {
-                ID00 = IDg;
-                ID00c = IDgc;
+        if(RGBmode == 1) // GBRG
+        {
+            ID00 = IDg;
+            ID00c = IDgc;
 
-                ID10 = IDb;
-                ID10c = IDbc;
+            ID10 = IDb;
+            ID10c = IDbc;
 
-                ID01 = IDr;
-                ID01c = IDrc;
+            ID01 = IDr;
+            ID01c = IDrc;
 
-                ID11 = IDg;
-                ID11c = IDgc;
-            }
+            ID11 = IDg;
+            ID11c = IDgc;
+        }
 
-            if(RGBmode == 2)
-            {
-                ID00 = IDr;
-                ID00c = IDrc;
+        if(RGBmode == 2)
+        {
+            ID00 = IDr;
+            ID00c = IDrc;
 
-                ID10 = IDg;
-                ID10c = IDgc;
+            ID10 = IDg;
+            ID10c = IDgc;
 
-                ID01 = IDg;
-                ID01c = IDgc;
+            ID01 = IDg;
+            ID01c = IDgc;
 
-                ID11 = IDb;
-                ID11c = IDbc;
-            }
+            ID11 = IDb;
+            ID11c = IDbc;
+        }
 
-            if(FastMode == 0)
-            {
-                for(ii1 = 0; ii1 < Xsize / 2; ii1++)
-                    for(jj1 = 0; jj1 < Ysize / 2; jj1++)
-                    {
-                        ii = ii1 * 2;
-                        jj = jj1 * 2;
-
-                        ii2 = ii;
-                        jj2 = jj + 1;
-                        data.image[ID01].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                        data.image[ID01c].array.F[jj2 * Xsize + ii2] = 1.0 -
-                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
-
-                        ii2 = ii + 1;
-                        jj2 = jj + 1;
-                        data.image[ID11].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                        data.image[ID11c].array.F[jj2 * Xsize + ii2] = 1.0 -
-                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
-
-                        ii2 = ii;
-                        jj2 = jj;
-                        data.image[ID00].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                        data.image[ID00c].array.F[jj2 * Xsize + ii2] = 1.0 -
-                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
-
-                        ii2 = ii + 1;
-                        jj2 = jj;
-                        data.image[ID10].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                        data.image[ID10c].array.F[jj2 * Xsize + ii2] = 1.0 -
-                                data.image[IDbp].array.F[jj2 * Xsize + ii2];
-                    }
-
-                for(ii = 0; ii < Xsize; ii++)
-                    for(jj = 0; jj < Ysize; jj++)
-                    {
-                        if(data.image[IDrc].array.F[jj * Xsize + ii] < 0.5)
-                        {
-                            v = 0.0;
-                            vc = 0.0;
-                            for(dii = -2; dii < 3; dii++)
-                                for(djj = -2; djj < 3; djj++)
-                                {
-                                    ii1 = ii + dii;
-                                    jj1 = jj + djj;
-                                    if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
-                                        if((dii != 0) || (djj != 0))
-                                        {
-                                            if(data.image[IDrc].array.F[jj1 * Xsize + ii1] > 0.5)
-                                            {
-                                                coeff = exp(-5.0 * (dii * dii + djj * djj));
-                                                vc += coeff;
-                                                v += data.image[IDr].array.F[jj1 * Xsize + ii1] * coeff;
-                                            }
-                                        }
-                                }
-                            data.image[IDr].array.F[jj * Xsize + ii] = v / vc;
-                        }
-
-                        if(data.image[IDgc].array.F[jj * Xsize + ii] < 0.5)
-                        {
-                            v = 0.0;
-                            vc = 0.0;
-                            for(dii = -2; dii < 3; dii++)
-                                for(djj = -2; djj < 3; djj++)
-                                {
-                                    ii1 = ii + dii;
-                                    jj1 = jj + djj;
-                                    if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
-                                        if((dii != 0) || (djj != 0))
-                                        {
-                                            if(data.image[IDgc].array.F[jj1 * Xsize + ii1] > 0.5)
-                                            {
-                                                coeff = exp(-5.0 * (dii * dii + djj * djj));
-                                                vc += coeff;
-                                                v += data.image[IDg].array.F[jj1 * Xsize + ii1] * coeff;
-                                            }
-                                        }
-                                }
-                            data.image[IDg].array.F[jj * Xsize + ii] = v / vc;
-                        }
-
-                        if(data.image[IDbc].array.F[jj * Xsize + ii] < 0.5)
-                        {
-                            v = 0.0;
-                            vc = 0.0;
-                            for(dii = -2; dii < 3; dii++)
-                                for(djj = -2; djj < 3; djj++)
-                                {
-                                    ii1 = ii + dii;
-                                    jj1 = jj + djj;
-                                    if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
-                                        if((dii != 0) || (djj != 0))
-                                        {
-                                            if(data.image[IDbc].array.F[jj1 * Xsize + ii1] > 0.5)
-                                            {
-                                                coeff = exp(-5.0 * (dii * dii + djj * djj));
-                                                vc += coeff;
-                                                v += data.image[IDb].array.F[jj1 * Xsize + ii1] * coeff;
-                                            }
-                                        }
-                                }
-                            data.image[IDb].array.F[jj * Xsize + ii] = v / vc;
-                        }
-                    }
-            }
-            else
-            {
-                if(RGBmode == 1) // GBRG
-                {
-                    // G
-                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-
-                            ii2 = ii;
-                            jj2 = jj;
-                            data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                    + ii2];
-                            ii2 = ii + 1;
-                            jj2 = jj + 1;
-                            data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                    + ii2];
-                        }
-                    // replace blue pixels
-                    for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
-                        for(jj1 = 1; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii + 1;
-                            jj2 = jj;
-                            data.image[IDg].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[jj2
-                                    * Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize +
-                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
-                                    data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
-                        }
-                    // replace red pixels
-                    for(ii1 = 1; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii;
-                            jj2 = jj + 1;
-                            data.image[IDg].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[jj2
-                                    * Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize +
-                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
-                                    data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
-                        }
-
-
-
-                    // R
-                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-                            ii2 = ii;
-                            jj2 = jj + 1;
-                            data.image[IDr].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                    + ii2];
-                        }
-                    // replace g1 pixels
-                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 1; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii;
-                            jj2 = jj;
-                            data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[(jj2
-                                    - 1) * Xsize + ii2] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
-                        }
-                    // replace g2 pixels
-                    for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii + 1;
-                            jj2 = jj + 1;
-                            data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[jj2 *
-                                    Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
-                        }
-                    // replace b pixels
-                    for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
-                        for(jj1 = 1; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii + 1;
-                            jj2 = jj;
-                            data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[(jj2
-                                    - 1) * Xsize + (ii2 - 1)] + data.image[ID].array.F[(jj2 - 1) * Xsize +
-                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize +
-                                                    (ii2 - 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
-                        }
-
-
-                    // B
-                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-                            ii2 = ii + 1;
-                            jj2 = jj;
-                            data.image[IDb].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
-                                    + ii2];
-                        }
-
-                    // replace g2 pixels
-                    for(ii1 = 0; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii + 1;
-                            jj2 = jj + 1;
-                            data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[(jj2
-                                    - 1) * Xsize + ii2] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
-                        }
-                    // replace g1 pixels
-                    for(ii1 = 1; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii;
-                            jj2 = jj;
-                            data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[jj2 *
-                                    Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
-                        }
-                    // replace r pixels
-                    for(ii1 = 1; ii1 < Xsize / 2; ii1++)
-                        for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
-                        {
-                            ii = ii1 * 2;
-                            jj = jj1 * 2;
-
-                            ii2 = ii;
-                            jj2 = jj + 1;
-                            data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[(jj2
-                                    - 1) * Xsize + (ii2 - 1)] + data.image[ID].array.F[(jj2 - 1) * Xsize +
-                                            (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize +
-                                                    (ii2 - 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
-                        }
-
-                }
-            }
-
-
-
-            //  delete_image_ID("badpix1");
-
-            delete_image_ID("imrc");
-            delete_image_ID("imgc");
-            delete_image_ID("imbc");
-            //  delete_image_ID("imraw");
-            break;
-
-        case 1:
-            if(image_ID(ID_name_r) != -1)
-            {
-                delete_image_ID(ID_name_r);
-            }
-            IDr = create_2Dimage_ID(ID_name_r, Xsize / 2, Ysize / 2);
-            IDrc = create_2Dimage_ID("imrc", Xsize / 2, Ysize / 2);
-
-            if(image_ID(ID_name_g) != -1)
-            {
-                delete_image_ID(ID_name_g);
-            }
-            IDg = create_2Dimage_ID(ID_name_g, Xsize / 2, Ysize / 2);
-            IDgc = create_2Dimage_ID("imgc", Xsize / 2, Ysize / 2);
-
-            if(image_ID(ID_name_b) != -1)
-            {
-                delete_image_ID(ID_name_b);
-            }
-            IDb = create_2Dimage_ID(ID_name_b, Xsize / 2, Ysize / 2);
-            IDbc = create_2Dimage_ID("imbc", Xsize / 2, Ysize / 2);
-
-            if(RGBmode == 1) // GBRG
-            {
-                ID00 = IDg;
-                ID00c = IDgc;
-
-                ID10 = IDb;
-                ID10c = IDbc;
-
-                ID01 = IDr;
-                ID01c = IDrc;
-
-                ID11 = IDg;
-                ID11c = IDgc;
-            }
-
-            if(RGBmode == 2)
-            {
-                ID00 = IDr;
-                ID00c = IDrc;
-
-                ID10 = IDg;
-                ID10c = IDgc;
-
-                ID01 = IDg;
-                ID01c = IDgc;
-
-                ID11 = IDb;
-                ID11c = IDbc;
-            }
-
+        if(FastMode == 0)
+        {
             for(ii1 = 0; ii1 < Xsize / 2; ii1++)
                 for(jj1 = 0; jj1 < Ysize / 2; jj1++)
                 {
@@ -609,45 +284,372 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
                     ii2 = ii;
                     jj2 = jj + 1;
-                    data.image[ID01].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
-                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID01c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                    data.image[ID01].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                            + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID01c].array.F[jj2 * Xsize + ii2] = 1.0 -
                             data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                     ii2 = ii + 1;
                     jj2 = jj + 1;
-                    data.image[ID11].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
-                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID11c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                    data.image[ID11].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                            + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID11c].array.F[jj2 * Xsize + ii2] = 1.0 -
                             data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                     ii2 = ii;
                     jj2 = jj;
-                    data.image[ID00].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
-                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID00c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                    data.image[ID00].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                            + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID00c].array.F[jj2 * Xsize + ii2] = 1.0 -
                             data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                     ii2 = ii + 1;
                     jj2 = jj;
-                    data.image[ID10].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
-                            Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID10c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                    data.image[ID10].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                            + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID10c].array.F[jj2 * Xsize + ii2] = 1.0 -
                             data.image[IDbp].array.F[jj2 * Xsize + ii2];
-
-                    data.image[IDr].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDrc].array.F[jj1 *
-                            Xsize / 2 + ii1] + eps;
-                    data.image[IDg].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDgc].array.F[jj1 *
-                            Xsize / 2 + ii1] + eps;
-                    data.image[IDb].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDbc].array.F[jj1 *
-                            Xsize / 2 + ii1] + eps;
                 }
 
-            delete_image_ID("imrc");
-            delete_image_ID("imgc");
-            delete_image_ID("imbc");
+            for(ii = 0; ii < Xsize; ii++)
+                for(jj = 0; jj < Ysize; jj++)
+                {
+                    if(data.image[IDrc].array.F[jj * Xsize + ii] < 0.5)
+                    {
+                        v = 0.0;
+                        vc = 0.0;
+                        for(dii = -2; dii < 3; dii++)
+                            for(djj = -2; djj < 3; djj++)
+                            {
+                                ii1 = ii + dii;
+                                jj1 = jj + djj;
+                                if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                    if((dii != 0) || (djj != 0))
+                                    {
+                                        if(data.image[IDrc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                        {
+                                            coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                            vc += coeff;
+                                            v += data.image[IDr].array.F[jj1 * Xsize + ii1] * coeff;
+                                        }
+                                    }
+                            }
+                        data.image[IDr].array.F[jj * Xsize + ii] = v / vc;
+                    }
 
-            break;
+                    if(data.image[IDgc].array.F[jj * Xsize + ii] < 0.5)
+                    {
+                        v = 0.0;
+                        vc = 0.0;
+                        for(dii = -2; dii < 3; dii++)
+                            for(djj = -2; djj < 3; djj++)
+                            {
+                                ii1 = ii + dii;
+                                jj1 = jj + djj;
+                                if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                    if((dii != 0) || (djj != 0))
+                                    {
+                                        if(data.image[IDgc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                        {
+                                            coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                            vc += coeff;
+                                            v += data.image[IDg].array.F[jj1 * Xsize + ii1] * coeff;
+                                        }
+                                    }
+                            }
+                        data.image[IDg].array.F[jj * Xsize + ii] = v / vc;
+                    }
+
+                    if(data.image[IDbc].array.F[jj * Xsize + ii] < 0.5)
+                    {
+                        v = 0.0;
+                        vc = 0.0;
+                        for(dii = -2; dii < 3; dii++)
+                            for(djj = -2; djj < 3; djj++)
+                            {
+                                ii1 = ii + dii;
+                                jj1 = jj + djj;
+                                if((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                    if((dii != 0) || (djj != 0))
+                                    {
+                                        if(data.image[IDbc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                        {
+                                            coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                            vc += coeff;
+                                            v += data.image[IDb].array.F[jj1 * Xsize + ii1] * coeff;
+                                        }
+                                    }
+                            }
+                        data.image[IDb].array.F[jj * Xsize + ii] = v / vc;
+                    }
+                }
+        }
+        else
+        {
+            if(RGBmode == 1) // GBRG
+            {
+                // G
+                for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+
+                        ii2 = ii;
+                        jj2 = jj;
+                        data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2];
+                        ii2 = ii + 1;
+                        jj2 = jj + 1;
+                        data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2];
+                    }
+                // replace blue pixels
+                for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
+                    for(jj1 = 1; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii + 1;
+                        jj2 = jj;
+                        data.image[IDg].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[jj2
+                                * Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize +
+                                        (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
+                                data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
+                    }
+                // replace red pixels
+                for(ii1 = 1; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii;
+                        jj2 = jj + 1;
+                        data.image[IDg].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[jj2
+                                * Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize +
+                                        (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
+                                data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
+                    }
+
+
+
+                // R
+                for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+                        ii2 = ii;
+                        jj2 = jj + 1;
+                        data.image[IDr].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2];
+                    }
+                // replace g1 pixels
+                for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 1; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii;
+                        jj2 = jj;
+                        data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[(jj2
+                                - 1) * Xsize + ii2] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
+                    }
+                // replace g2 pixels
+                for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii + 1;
+                        jj2 = jj + 1;
+                        data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[jj2 *
+                                Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
+                    }
+                // replace b pixels
+                for(ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
+                    for(jj1 = 1; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii + 1;
+                        jj2 = jj;
+                        data.image[IDr].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[(jj2
+                                - 1) * Xsize + (ii2 - 1)] + data.image[ID].array.F[(jj2 - 1) * Xsize +
+                                        (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize +
+                                                (ii2 - 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
+                    }
+
+
+                // B
+                for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+                        ii2 = ii + 1;
+                        jj2 = jj;
+                        data.image[IDb].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize
+                                + ii2];
+                    }
+
+                // replace g2 pixels
+                for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii + 1;
+                        jj2 = jj + 1;
+                        data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[(jj2
+                                - 1) * Xsize + ii2] + data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
+                    }
+                // replace g1 pixels
+                for(ii1 = 1; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii;
+                        jj2 = jj;
+                        data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.5 * (data.image[ID].array.F[jj2 *
+                                Xsize + (ii2 - 1)] + data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
+                    }
+                // replace r pixels
+                for(ii1 = 1; ii1 < Xsize / 2; ii1++)
+                    for(jj1 = 0; jj1 < Ysize / 2 - 1; jj1++)
+                    {
+                        ii = ii1 * 2;
+                        jj = jj1 * 2;
+
+                        ii2 = ii;
+                        jj2 = jj + 1;
+                        data.image[IDb].array.F[jj2 * Xsize + ii2] = 0.25 * (data.image[ID].array.F[(jj2
+                                - 1) * Xsize + (ii2 - 1)] + data.image[ID].array.F[(jj2 - 1) * Xsize +
+                                        (ii2 + 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize +
+                                                (ii2 - 1)] + data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
+                    }
+
+            }
+        }
+
+
+
+        //  delete_image_ID("badpix1");
+
+        delete_image_ID("imrc");
+        delete_image_ID("imgc");
+        delete_image_ID("imbc");
+        //  delete_image_ID("imraw");
+        break;
+
+    case 1:
+        if(image_ID(ID_name_r) != -1)
+        {
+            delete_image_ID(ID_name_r);
+        }
+        IDr = create_2Dimage_ID(ID_name_r, Xsize / 2, Ysize / 2);
+        IDrc = create_2Dimage_ID("imrc", Xsize / 2, Ysize / 2);
+
+        if(image_ID(ID_name_g) != -1)
+        {
+            delete_image_ID(ID_name_g);
+        }
+        IDg = create_2Dimage_ID(ID_name_g, Xsize / 2, Ysize / 2);
+        IDgc = create_2Dimage_ID("imgc", Xsize / 2, Ysize / 2);
+
+        if(image_ID(ID_name_b) != -1)
+        {
+            delete_image_ID(ID_name_b);
+        }
+        IDb = create_2Dimage_ID(ID_name_b, Xsize / 2, Ysize / 2);
+        IDbc = create_2Dimage_ID("imbc", Xsize / 2, Ysize / 2);
+
+        if(RGBmode == 1) // GBRG
+        {
+            ID00 = IDg;
+            ID00c = IDgc;
+
+            ID10 = IDb;
+            ID10c = IDbc;
+
+            ID01 = IDr;
+            ID01c = IDrc;
+
+            ID11 = IDg;
+            ID11c = IDgc;
+        }
+
+        if(RGBmode == 2)
+        {
+            ID00 = IDr;
+            ID00c = IDrc;
+
+            ID10 = IDg;
+            ID10c = IDgc;
+
+            ID01 = IDg;
+            ID01c = IDgc;
+
+            ID11 = IDb;
+            ID11c = IDbc;
+        }
+
+        for(ii1 = 0; ii1 < Xsize / 2; ii1++)
+            for(jj1 = 0; jj1 < Ysize / 2; jj1++)
+            {
+                ii = ii1 * 2;
+                jj = jj1 * 2;
+
+                ii2 = ii;
+                jj2 = jj + 1;
+                data.image[ID01].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                        Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID01c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                        data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                ii2 = ii + 1;
+                jj2 = jj + 1;
+                data.image[ID11].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                        Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID11c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                        data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                ii2 = ii;
+                jj2 = jj;
+                data.image[ID00].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                        Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID00c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                        data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                ii2 = ii + 1;
+                jj2 = jj;
+                data.image[ID10].array.F[jj1 * Xsize / 2 + ii1] += data.image[ID].array.F[jj2 *
+                        Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID10c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 -
+                        data.image[IDbp].array.F[jj2 * Xsize + ii2];
+
+                data.image[IDr].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDrc].array.F[jj1 *
+                        Xsize / 2 + ii1] + eps;
+                data.image[IDg].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDgc].array.F[jj1 *
+                        Xsize / 2 + ii1] + eps;
+                data.image[IDb].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDbc].array.F[jj1 *
+                        Xsize / 2 + ii1] + eps;
+            }
+
+        delete_image_ID("imrc");
+        delete_image_ID("imgc");
+        delete_image_ID("imbc");
+
+        break;
 
     }
 

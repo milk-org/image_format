@@ -110,8 +110,9 @@ errno_t image_format_extract_RGGBchan(
 
     if(RGBmode == 0)
     {
-        PRINT_ERROR("Unknown RGB image mode\n");
-        exit(0);
+        //PRINT_ERROR("Unknown RGB image mode\n");
+        //exit(0);
+        RGBmode = 1;
     }
 
     xsize2 = Xsize / 2;
@@ -121,10 +122,10 @@ errno_t image_format_extract_RGGBchan(
     fflush(stdout);
 
 
-    IDr = create_2Dimage_ID(IDoutR_name, xsize2, ysize2);
+    IDr  = create_2Dimage_ID(IDoutR_name, xsize2, ysize2);
     IDg1 = create_2Dimage_ID(IDoutG1_name, xsize2, ysize2);
     IDg2 = create_2Dimage_ID(IDoutG2_name, xsize2, ysize2);
-    IDb = create_2Dimage_ID(IDoutB_name, xsize2, ysize2);
+    IDb  = create_2Dimage_ID(IDoutB_name, xsize2, ysize2);
 
     printf("STEP 2\n");
     fflush(stdout);
@@ -151,14 +152,19 @@ errno_t image_format_extract_RGGBchan(
         {
             ii1 = 2 * ii;
             jj1 = 2 * jj;
-            data.image[ID01].array.F[jj * xsize2 + ii] = data.image[ID].array.F[(jj1 + 1) *
-                    Xsize + ii1];
-            data.image[ID00].array.F[jj * xsize2 + ii] = data.image[ID].array.F[jj1 * Xsize
-                    + ii1];
-            data.image[ID11].array.F[jj * xsize2 + ii] = data.image[ID].array.F[(jj1 + 1) *
-                    Xsize + (ii1 + 1)];
-            data.image[ID10].array.F[jj * xsize2 + ii] = data.image[ID].array.F[jj1 * Xsize
-                    + (ii1 + 1)];
+
+            data.image[ID01].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[(jj1 + 1)*Xsize + ii1];
+
+            data.image[ID00].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[jj1 * Xsize + ii1];
+
+            data.image[ID11].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[(jj1 + 1) * Xsize + (ii1 + 1)];
+
+            data.image[ID10].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[jj1 * Xsize + (ii1 + 1)];
+
         }
 
     return RETURN_SUCCESS;

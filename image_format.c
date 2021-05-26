@@ -13,6 +13,7 @@
 
 #include "CommandLineInterface/CLIcore.h"
 
+#include "combineHDR.h"
 #include "CR2toFITS.h"
 #include "imtoASCII.h"
 #include "extract_RGGBchan.h"
@@ -45,8 +46,13 @@ INIT_MODULE_LIB(image_format)
 static errno_t init_module_CLI()
 {
 
+    CLIADDCMD_image_format__combineHDR();
+
 	imtoASCII_addCLIcmd();
-	writeBMP_addCLIcmd();
+
+    CLIADDCMD_image_format__mkBMPimage();
+//	writeBMP_addCLIcmd();
+
 	CR2toFITS_addCLIcmd();
 	extract_RGGBchan_addCLIcmd();
 	loadCR2toFITSRGB_addCLIcmd();
