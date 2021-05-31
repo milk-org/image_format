@@ -90,7 +90,8 @@ errno_t combine_HDR_image(
         float etime;
         int HDRindex = 0;
         char imHDRin[200];
-        while( fscanf(fpin, "%s %f\n", FITSfname, &etime) == 2)
+        char timestring[200];
+        while( fscanf(fpin, "%s %f %s\n", FITSfname, &etime, timestring) == 3)
         {
             printf("Input file [%11.6f] : %s\n", etime, FITSfname);
             etimearray[HDRindex] = etime;
@@ -109,7 +110,7 @@ errno_t combine_HDR_image(
     uint32_t zsize = NB_HDRindex;
 
 
-    int binstep = 10;
+    int binstep = 5;
     uint32_t xsize1 = (uint32_t) (xsize/binstep);
     uint32_t ysize1 = (uint32_t) (ysize/binstep);
     //
@@ -162,7 +163,7 @@ errno_t combine_HDR_image(
     {
         printf("---------------- Convolve binned image ------------\n");
         fflush(stdout);
-        int NBfiter = 10;
+        int NBfiter = 5;
         float *pixcol = (float*) malloc(sizeof(float)*ysize1);
         float *pixline = (float*) malloc(sizeof(float)*xsize1);
         for(int fiter = 0; fiter < NBfiter; fiter++)
@@ -261,7 +262,7 @@ errno_t combine_HDR_image(
     {
         printf("---------------- Convolve layer image ------------\n");
         fflush(stdout);
-        int NBfiter = 1000;
+        int NBfiter = 100;
         float *pixcol = (float*) malloc(sizeof(float)*ysize1);
         float *pixline = (float*) malloc(sizeof(float)*xsize1);
         for(int fiter = 0; fiter < NBfiter; fiter++)
@@ -365,7 +366,19 @@ errno_t combine_HDR_image(
             float pval0 = data.image[IDimHDRc].array.F[layer0*xsize*ysize + jj*xsize + ii] / etimearray[layer0];
             float pval1 = data.image[IDimHDRc].array.F[layer1*xsize*ysize + jj*xsize + ii] / etimearray[layer1];
 
-            data.image[IDout].array.F[jj*xsize+ii] = pval0 * (1.0-layercoeff) + pval1 * layercoeff;
+            double alpha0 = 2.0;
+            double alpha1 = 6.0;
+            double alpha3 = 3.0;
+            double alpha4 = 3.0;
+            double layermax = 2.0;
+            if(layer>layermax)
+            {
+                layer = layermax;
+            }
+            double x1 = 1.0 / pow( 1.0 + 1.0/pow(layer/alpha0,alpha1), 1.0/alpha1);
+            double layercoeff1 = 1.0 / ( 1.0 + alpha3*pow(6.0, alpha4*x1) );
+
+            data.image[IDout].array.F[jj*xsize+ii] = layercoeff1 * (pval0 * (1.0-layercoeff) + pval1 * layercoeff);
         }
     }
 
