@@ -187,7 +187,7 @@ errno_t loadCR2toFITSRGB(
                                              fnameFITSb, 0);
     }
 
-    delete_image_ID("tmpfits1");
+    delete_image_ID("tmpfits1", DELETE_IMAGE_ERRMODE_WARNING);
 
     FLUXFACTOR = 1.0;
 

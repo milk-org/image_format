@@ -225,21 +225,21 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
         if(image_ID(ID_name_r) != -1)
         {
-            delete_image_ID(ID_name_r);
+            delete_image_ID(ID_name_r, DELETE_IMAGE_ERRMODE_WARNING);
         }
         IDr = create_2Dimage_ID(ID_name_r, Xsize, Ysize);
         IDrc = create_2Dimage_ID("imrc", Xsize, Ysize);
 
         if(image_ID(ID_name_g) != -1)
         {
-            delete_image_ID(ID_name_g);
+            delete_image_ID(ID_name_g, DELETE_IMAGE_ERRMODE_WARNING);
         }
         IDg = create_2Dimage_ID(ID_name_g, Xsize, Ysize);
         IDgc = create_2Dimage_ID("imgc", Xsize, Ysize);
 
         if(image_ID(ID_name_b) != -1)
         {
-            delete_image_ID(ID_name_b);
+            delete_image_ID(ID_name_b, DELETE_IMAGE_ERRMODE_WARNING);
         }
         IDb = create_2Dimage_ID(ID_name_b, Xsize, Ysize);
         IDbc = create_2Dimage_ID("imbc", Xsize, Ysize);
@@ -545,30 +545,30 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
 
         //  delete_image_ID("badpix1");
 
-        delete_image_ID("imrc");
-        delete_image_ID("imgc");
-        delete_image_ID("imbc");
+        delete_image_ID("imrc", DELETE_IMAGE_ERRMODE_WARNING);
+        delete_image_ID("imgc", DELETE_IMAGE_ERRMODE_WARNING);
+        delete_image_ID("imbc", DELETE_IMAGE_ERRMODE_WARNING);
         //  delete_image_ID("imraw");
         break;
 
     case 1:
         if(image_ID(ID_name_r) != -1)
         {
-            delete_image_ID(ID_name_r);
+            delete_image_ID(ID_name_r, DELETE_IMAGE_ERRMODE_WARNING);
         }
         IDr = create_2Dimage_ID(ID_name_r, Xsize / 2, Ysize / 2);
         IDrc = create_2Dimage_ID("imrc", Xsize / 2, Ysize / 2);
 
         if(image_ID(ID_name_g) != -1)
         {
-            delete_image_ID(ID_name_g);
+            delete_image_ID(ID_name_g, DELETE_IMAGE_ERRMODE_WARNING);
         }
         IDg = create_2Dimage_ID(ID_name_g, Xsize / 2, Ysize / 2);
         IDgc = create_2Dimage_ID("imgc", Xsize / 2, Ysize / 2);
 
         if(image_ID(ID_name_b) != -1)
         {
-            delete_image_ID(ID_name_b);
+            delete_image_ID(ID_name_b, DELETE_IMAGE_ERRMODE_WARNING);
         }
         IDb = create_2Dimage_ID(ID_name_b, Xsize / 2, Ysize / 2);
         IDbc = create_2Dimage_ID("imbc", Xsize / 2, Ysize / 2);
@@ -645,9 +645,9 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
                         Xsize / 2 + ii1] + eps;
             }
 
-        delete_image_ID("imrc");
-        delete_image_ID("imgc");
-        delete_image_ID("imbc");
+        delete_image_ID("imrc", DELETE_IMAGE_ERRMODE_WARNING);
+        delete_image_ID("imgc", DELETE_IMAGE_ERRMODE_WARNING);
+        delete_image_ID("imbc", DELETE_IMAGE_ERRMODE_WARNING);
 
         break;
 

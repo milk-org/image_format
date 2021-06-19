@@ -265,13 +265,13 @@ errno_t CR2tomov()
                     /*		  if(binfact!=1)
                       {
                         basic_contract("imr","imrc",binfact,binfact);
-                        delete_image_ID("imr");
+                        delete_image_ID("imr", DELETE_IMAGE_ERRMODE_WARNING);
                         chname_image_ID("imrc","imr");
                         basic_contract("img","imgc",binfact,binfact);
-                        delete_image_ID("img");
+                        delete_image_ID("img", DELETE_IMAGE_ERRMODE_WARNING);
                         chname_image_ID("imgc","img");
                         basic_contract("imb","imbc",binfact,binfact);
-                        delete_image_ID("imb");
+                        delete_image_ID("imb", DELETE_IMAGE_ERRMODE_WARNING);
                         chname_image_ID("imbc","imb");
                         }*/
                     ID = image_ID("imr");
@@ -354,7 +354,7 @@ errno_t CR2tomov()
                 vp998r = data.variable[ID].value.f;
                 ID = variable_ID("vp999");
                 vp999r = data.variable[ID].value.f;
-                delete_image_ID("imr");
+                delete_image_ID("imr", DELETE_IMAGE_ERRMODE_WARNING);
 
                 info_image_stats("img", "");
                 ID = variable_ID("vp01");
@@ -381,7 +381,7 @@ errno_t CR2tomov()
                 vp998g = data.variable[ID].value.f;
                 ID = variable_ID("vp999");
                 vp999g = data.variable[ID].value.f;
-                delete_image_ID("img");
+                delete_image_ID("img", DELETE_IMAGE_ERRMODE_WARNING);
 
                 info_image_stats("imb", "");
                 ID = variable_ID("vp01");
@@ -408,7 +408,7 @@ errno_t CR2tomov()
                 vp998b = data.variable[ID].value.f;
                 ID = variable_ID("vp999");
                 vp999b = data.variable[ID].value.f;
-                delete_image_ID("imb");
+                delete_image_ID("imb", DELETE_IMAGE_ERRMODE_WARNING);
 
 
                 fp1 = fopen(fnamestat, "w");
@@ -422,17 +422,17 @@ errno_t CR2tomov()
 
                 if(MKim == 0)
                 {
-                    delete_image_ID("imr");
-                    delete_image_ID("img");
-                    delete_image_ID("imb");
+                    delete_image_ID("imr", DELETE_IMAGE_ERRMODE_WARNING);
+                    delete_image_ID("img", DELETE_IMAGE_ERRMODE_WARNING);
+                    delete_image_ID("imb", DELETE_IMAGE_ERRMODE_WARNING);
                 }
             }
 
             if(MKim == 1)
             {
-                delete_image_ID("imr");
-                delete_image_ID("img");
-                delete_image_ID("imb");
+                delete_image_ID("imr", DELETE_IMAGE_ERRMODE_WARNING);
+                delete_image_ID("img", DELETE_IMAGE_ERRMODE_WARNING);
+                delete_image_ID("imb", DELETE_IMAGE_ERRMODE_WARNING);
             }
 
 
@@ -844,9 +844,9 @@ errno_t CR2tomov()
 
 
                         image_writeBMP("imr", "img", "imb", "imrgb.bmp");
-                        delete_image_ID("imr");
-                        delete_image_ID("img");
-                        delete_image_ID("imb");
+                        delete_image_ID("imr", DELETE_IMAGE_ERRMODE_WARNING);
+                        delete_image_ID("img", DELETE_IMAGE_ERRMODE_WARNING);
+                        delete_image_ID("imb", DELETE_IMAGE_ERRMODE_WARNING);
                         //		  WRITE_FULLFILENAME(fnamejpg,"./JPEG/im%05ld.jpg",i);
 
                         EXECUTE_SYSTEM_COMMAND("bmptoppm imrgb.bmp | ppmtojpeg --quality 95 > _tmpjpeg.jpg; mv _tmpjpeg.jpg %s",

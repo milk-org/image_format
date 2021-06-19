@@ -172,7 +172,7 @@ imageID CR2toFITS(
     }
 
     save_fl_fits("tmpfits1", fnameFITS);
-    delete_image_ID("tmpfits1");
+    delete_image_ID("tmpfits1", DELETE_IMAGE_ERRMODE_WARNING);
 
     return ID;
 }
