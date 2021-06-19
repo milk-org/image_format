@@ -228,10 +228,10 @@ errno_t CR2tomov()
 
     if(CR2toFITSrgb == 1)
     {
-        load_fits("bias.fits", "bias", 1);
-        load_fits("dark.fits", "dark", 1);
-        load_fits("badpix.fits", "badpix", 1);
-        load_fits("flat.fits", "flat", 1);
+        load_fits("bias.fits", "bias", 1, NULL);
+        load_fits("dark.fits", "dark", 1, NULL);
+        load_fits("badpix.fits", "badpix", 1, NULL);
+        load_fits("flat.fits", "flat", 1, NULL);
 
         EXECUTE_SYSTEM_COMMAND("ls ./CR2/*.CR2 > flist.tmp");
 
@@ -324,9 +324,9 @@ errno_t CR2tomov()
                     WRITE_FULLFILENAME(fnameoutr, "./FITS/imr%05ld.fits", cnt);
                     WRITE_FULLFILENAME(fnameoutg, "./FITS/img%05ld.fits", cnt);
                     WRITE_FULLFILENAME(fnameoutb, "./FITS/imb%05ld.fits", cnt);
-                    load_fits(fnameoutr, "imr", 1);
-                    load_fits(fnameoutg, "img", 1);
-                    load_fits(fnameoutb, "imb", 1);
+                    load_fits(fnameoutr, "imr", 1, NULL);
+                    load_fits(fnameoutg, "img", 1, NULL);
+                    load_fits(fnameoutb, "imb", 1, NULL);
                 }
 
                 info_image_stats("imr", "");
@@ -645,34 +645,34 @@ errno_t CR2tomov()
                         WRITE_FULLFILENAME(fnamer, "./FITS/imr%05ld.f.fits", i);
                         if(file_exists(fnamer) == 1)
                         {
-                            IDr = load_fits(fnamer, "imr", 1);
+                            load_fits(fnamer, "imr", 1, &IDr);
                         }
                         else
                         {
                             WRITE_FULLFILENAME(fnamer, "./FITS/imr%05ld.fits", i);
-                            IDr = load_fits(fnamer, "imr", 1);
+                            load_fits(fnamer, "imr", 1, &IDr);
                         }
 
                         WRITE_FULLFILENAME(fnameg, "./FITS/img%05ld.f.fits", i);
                         if(file_exists(fnameg) == 1)
                         {
-                            IDg = load_fits(fnameg, "img", 1);
+                            load_fits(fnameg, "img", 1, &IDg);
                         }
                         else
                         {
                             WRITE_FULLFILENAME(fnameg, "./FITS/img%05ld.fits", i);
-                            IDg = load_fits(fnameg, "img", 1);
+                            load_fits(fnameg, "img", 1, &IDg);
                         }
 
                         WRITE_FULLFILENAME(fnameb, "./FITS/imb%05ld.f.fits", i);
                         if(file_exists(fnameb) == 1)
                         {
-                            IDb = load_fits(fnameb, "imb", 1);
+                            load_fits(fnameb, "imb", 1, &IDb);
                         }
                         else
                         {
                             WRITE_FULLFILENAME(fnameb, "./FITS/imb%05ld.fits", i);
-                            IDb = load_fits(fnameb, "imb", 1);
+                            load_fits(fnameb, "imb", 1, &IDb);
                         }
 
 

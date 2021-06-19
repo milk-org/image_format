@@ -93,10 +93,12 @@ errno_t combine_HDR_image(
         char timestring[200];
         while( fscanf(fpin, "%s %f %s\n", FITSfname, &etime, timestring) == 3)
         {
+            imageID ID;
             printf("Input file [%11.6f] : %s\n", etime, FITSfname);
             etimearray[HDRindex] = etime;
             sprintf(imHDRin, "imHRDin_%03d", HDRindex);
-            IDarray[HDRindex] = load_fits(FITSfname, imHDRin, 2);
+            load_fits(FITSfname, imHDRin, 2, &ID);
+            IDarray[HDRindex] = ID;
             HDRindex++;
         }
         fclose(fpin);
