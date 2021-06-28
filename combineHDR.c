@@ -215,14 +215,14 @@ errno_t combine_HDR_image(
 
 
 
-    double alpha1 = 1.0;
+    //double alpha1 = 1.0;
 
     // contruct layer image
     imageID IDlayer = create_2Dimage_ID("imlayer", xsize1, ysize1);
     imageID IDlayermin = create_2Dimage_ID("imlayermin", xsize1, ysize1);
     for(uint32_t ij1=0; ij1< xsize1*ysize1; ij1++)
     {
-        float layer = 0.0;
+        //float layer = 0.0;
         uint32_t layer0 = 0;
         uint32_t layer1 = 0;
         uint32_t kk = 0;
@@ -247,11 +247,11 @@ errno_t combine_HDR_image(
             layer1 ++;
             valmax = data.image[IDimHDRc1].array.F[layer0*xsize1*ysize1+ij1];
         }
-        float valmin = data.image[IDimHDRc1].array.F[layer1*xsize1*ysize1+ij1];
+        //float valmin = data.image[IDimHDRc1].array.F[layer1*xsize1*ysize1+ij1];
 
-        float x = valmax/satvalue;
-        float c1 = pow( 0.5*(1.0+cos(x*M_PI)), alpha1);
-        float c2 = 1.0-c1;
+        //float x = valmax/satvalue;
+        //float c1 = pow( 0.5*(1.0+cos(x*M_PI)), alpha1);
+        //float c2 = 1.0-c1;
 
         data.image[IDlayer].array.F[ij1] = 1.0*layer0;
         data.image[IDlayermin].array.F[ij1] = 1.0*layer0; // don't go below this layer
