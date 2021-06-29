@@ -118,10 +118,14 @@ errno_t combine_HDR_image(
     //
     // Assemble cube and subsampled cube
     //
-    imageID IDimHDRc = create_3Dimage_ID("imHDRc", xsize, ysize, zsize);
+    imageID IDimHDRc;
+    create_3Dimage_ID("imHDRc", xsize, ysize, zsize, &IDimHDRc);
 
-    imageID IDimHDRc1 = create_3Dimage_ID("imHDRc1", xsize1, ysize1, zsize);
-    imageID IDimHDRc1w = create_3Dimage_ID("imHDRc1w", xsize1, ysize1, zsize);
+    imageID IDimHDRc1;
+    create_3Dimage_ID("imHDRc1", xsize1, ysize1, zsize, &IDimHDRc1);
+
+    imageID IDimHDRc1w;
+    create_3Dimage_ID("imHDRc1w", xsize1, ysize1, zsize, &IDimHDRc1w);
 
     for(uint32_t kk=0; kk<zsize; kk++)
     {
@@ -218,8 +222,12 @@ errno_t combine_HDR_image(
     //double alpha1 = 1.0;
 
     // contruct layer image
-    imageID IDlayer = create_2Dimage_ID("imlayer", xsize1, ysize1);
-    imageID IDlayermin = create_2Dimage_ID("imlayermin", xsize1, ysize1);
+    imageID IDlayer;
+    create_2Dimage_ID("imlayer", xsize1, ysize1, &IDlayer);
+
+    imageID IDlayermin;
+    create_2Dimage_ID("imlayermin", xsize1, ysize1, &IDlayermin);
+
     for(uint32_t ij1=0; ij1< xsize1*ysize1; ij1++)
     {
         //float layer = 0.0;
@@ -325,7 +333,9 @@ errno_t combine_HDR_image(
 
 
     // construct HDR image
-    imageID IDout = create_2Dimage_ID(outimname, xsize, ysize);
+    imageID IDout;
+    create_2Dimage_ID(outimname, xsize, ysize, &IDout);
+
     for(uint32_t jj=0; jj<ysize; jj++)
     {
         float y = 1.0*jj/ysize;

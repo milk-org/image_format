@@ -122,10 +122,10 @@ errno_t image_format_extract_RGGBchan(
     fflush(stdout);
 
 
-    IDr  = create_2Dimage_ID(IDoutR_name, xsize2, ysize2);
-    IDg1 = create_2Dimage_ID(IDoutG1_name, xsize2, ysize2);
-    IDg2 = create_2Dimage_ID(IDoutG2_name, xsize2, ysize2);
-    IDb  = create_2Dimage_ID(IDoutB_name, xsize2, ysize2);
+    create_2Dimage_ID(IDoutR_name, xsize2, ysize2, &IDr);
+    create_2Dimage_ID(IDoutG1_name, xsize2, ysize2, &IDg1);
+    create_2Dimage_ID(IDoutG2_name, xsize2, ysize2, &IDg2);
+    create_2Dimage_ID(IDoutB_name, xsize2, ysize2, &IDb);
 
     printf("STEP 2\n");
     fflush(stdout);

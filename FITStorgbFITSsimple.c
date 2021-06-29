@@ -92,7 +92,7 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
         IDbias = image_ID("bias");
         if(IDbias == -1)
         {
-            IDbias = create_2Dimage_ID("bias", Xsize, Ysize);
+            create_2Dimage_ID("bias", Xsize, Ysize, &IDbias);
             for(ii = 0; ii < Xsize * Ysize; ii++)
             {
                 data.image[IDbias].array.F[ii] = 0.0;
@@ -103,7 +103,7 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
         IDdark = image_ID("dark");
         if(IDdark == -1)
         {
-            IDdark = create_2Dimage_ID("dark", Xsize, Ysize);
+            create_2Dimage_ID("dark", Xsize, Ysize, &IDdark);
             for(ii = 0; ii < Xsize * Ysize; ii++)
             {
                 data.image[IDdark].array.F[ii] = 0.0;
@@ -114,7 +114,7 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
         IDbadpix = image_ID("badpix");
         if(IDbadpix == -1)
         {
-            IDbadpix = create_2Dimage_ID("badpix", Xsize, Ysize);
+            create_2Dimage_ID("badpix", Xsize, Ysize, &IDbadpix);
             for(ii = 0; ii < Xsize * Ysize; ii++)
             {
                 data.image[IDbadpix].array.F[ii] = 0.0;
@@ -128,7 +128,7 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
         IDflat = image_ID("flat");
         if(IDflat == -1)
         {
-            IDflat = create_2Dimage_ID("flat", Xsize, Ysize);
+            create_2Dimage_ID("flat", Xsize, Ysize, &IDflat);
             for(ii = 0; ii < Xsize * Ysize; ii++)
             {
                 data.image[IDflat].array.F[ii] = 1.0;
@@ -227,22 +227,22 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
         {
             delete_image_ID(ID_name_r, DELETE_IMAGE_ERRMODE_WARNING);
         }
-        IDr = create_2Dimage_ID(ID_name_r, Xsize, Ysize);
-        IDrc = create_2Dimage_ID("imrc", Xsize, Ysize);
+        create_2Dimage_ID(ID_name_r, Xsize, Ysize, &IDr);
+        create_2Dimage_ID("imrc", Xsize, Ysize, &IDrc);
 
         if(image_ID(ID_name_g) != -1)
         {
             delete_image_ID(ID_name_g, DELETE_IMAGE_ERRMODE_WARNING);
         }
-        IDg = create_2Dimage_ID(ID_name_g, Xsize, Ysize);
-        IDgc = create_2Dimage_ID("imgc", Xsize, Ysize);
+        create_2Dimage_ID(ID_name_g, Xsize, Ysize, &IDg);
+        create_2Dimage_ID("imgc", Xsize, Ysize, &IDgc);
 
         if(image_ID(ID_name_b) != -1)
         {
             delete_image_ID(ID_name_b, DELETE_IMAGE_ERRMODE_WARNING);
         }
-        IDb = create_2Dimage_ID(ID_name_b, Xsize, Ysize);
-        IDbc = create_2Dimage_ID("imbc", Xsize, Ysize);
+        create_2Dimage_ID(ID_name_b, Xsize, Ysize, &IDb);
+        create_2Dimage_ID("imbc", Xsize, Ysize, &IDbc);
 
         if(RGBmode == 1) // GBRG
         {
@@ -556,22 +556,22 @@ errno_t convert_rawbayerFITStorgbFITS_simple(
         {
             delete_image_ID(ID_name_r, DELETE_IMAGE_ERRMODE_WARNING);
         }
-        IDr = create_2Dimage_ID(ID_name_r, Xsize / 2, Ysize / 2);
-        IDrc = create_2Dimage_ID("imrc", Xsize / 2, Ysize / 2);
+        create_2Dimage_ID(ID_name_r, Xsize / 2, Ysize / 2, &IDr);
+        create_2Dimage_ID("imrc", Xsize / 2, Ysize / 2, &IDrc);
 
         if(image_ID(ID_name_g) != -1)
         {
             delete_image_ID(ID_name_g, DELETE_IMAGE_ERRMODE_WARNING);
         }
-        IDg = create_2Dimage_ID(ID_name_g, Xsize / 2, Ysize / 2);
-        IDgc = create_2Dimage_ID("imgc", Xsize / 2, Ysize / 2);
+        create_2Dimage_ID(ID_name_g, Xsize / 2, Ysize / 2, &IDg);
+        create_2Dimage_ID("imgc", Xsize / 2, Ysize / 2, &IDgc);
 
         if(image_ID(ID_name_b) != -1)
         {
             delete_image_ID(ID_name_b, DELETE_IMAGE_ERRMODE_WARNING);
         }
-        IDb = create_2Dimage_ID(ID_name_b, Xsize / 2, Ysize / 2);
-        IDbc = create_2Dimage_ID("imbc", Xsize / 2, Ysize / 2);
+        create_2Dimage_ID(ID_name_b, Xsize / 2, Ysize / 2, &IDb);
+        create_2Dimage_ID("imbc", Xsize / 2, Ysize / 2, &IDbc);
 
         if(RGBmode == 1) // GBRG
         {

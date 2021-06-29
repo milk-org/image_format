@@ -281,9 +281,9 @@ errno_t CR2tomov()
                     IDrtot = image_ID("imrtot");
                     if(IDrtot == -1)
                     {
-                        IDrtot = create_2Dimage_ID("imrtot", xsize, ysize);
-                        IDgtot = create_2Dimage_ID("imgtot", xsize, ysize);
-                        IDbtot = create_2Dimage_ID("imbtot", xsize, ysize);
+                        create_2Dimage_ID("imrtot", xsize, ysize, &IDrtot);
+                        create_2Dimage_ID("imgtot", xsize, ysize, &IDgtot);
+                        create_2Dimage_ID("imbtot", xsize, ysize, &IDbtot);
                     }
 
                     IDr = image_ID("imr");

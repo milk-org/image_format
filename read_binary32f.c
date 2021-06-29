@@ -74,6 +74,8 @@ imageID IMAGE_FORMAT_read_binary32f(
     const char *__restrict__ IDname
 )
 {
+    DEBUG_TRACE_FSTART();
+
     FILE *fp;
     float *buffer;
     unsigned long fileLen;
@@ -109,7 +111,8 @@ imageID IMAGE_FORMAT_read_binary32f(
     }
     fclose(fp);
 
-    ID = create_2Dimage_ID(IDname, xsize, ysize);
+    FUNC_CHECK_RETURN(
+        create_2Dimage_ID(IDname, xsize, ysize, &ID));
 
     i = 0;
     for(jj = 0; jj < ysize; jj++)
@@ -121,7 +124,7 @@ imageID IMAGE_FORMAT_read_binary32f(
 
     free(buffer);
 
-
+    DEBUG_TRACE_FEXIT();
     return ID;
 }
 

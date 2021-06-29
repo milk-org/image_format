@@ -120,7 +120,7 @@ imageID read_PGMimage(
             else
             {
                 printf("Reading PGM image\n");
-                ID = create_2Dimage_ID(ID_name, xsize, ysize);
+                create_2Dimage_ID(ID_name, xsize, ysize, &ID);
                 fgetc(fp);
                 for(jj = 0; jj < ysize; jj++)
                 {
