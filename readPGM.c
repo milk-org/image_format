@@ -14,8 +14,8 @@
  * @note written to read output of "dcraw -t 0 -D -4 xxx.CR2" into FITS
  */
 imageID read_PGMimage(
-    const char *__restrict__ fname,
-    const char *__restrict__ ID_name
+    const char *__restrict fname,
+    const char *__restrict ID_name
 )
 {
     FILE *fp;

@@ -3,7 +3,7 @@
 
 
 imageID read_PGMimage(
-    const char *__restrict__ fname,
-    const char *__restrict__ ID_name
+    const char *__restrict fname,
+    const char *__restrict ID_name
 );
 

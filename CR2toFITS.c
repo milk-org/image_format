@@ -20,8 +20,8 @@ static int CR2toFITS_NORM = 0;
 // ==========================================
 
 imageID CR2toFITS(
-    const char *__restrict__ fnameCR2,
-    const char *__restrict__ fnameFITS
+    const char *__restrict fnameCR2,
+    const char *__restrict fnameFITS
 );
 
 
@@ -76,8 +76,8 @@ errno_t CR2toFITS_addCLIcmd()
  * @note assumes dcraw is installed
  */
 imageID CR2toFITS(
-    const char *__restrict__ fnameCR2,
-    const char *__restrict__ fnameFITS
+    const char *__restrict fnameCR2,
+    const char *__restrict fnameFITS
 )
 {
     FILE *fp;

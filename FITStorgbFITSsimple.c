@@ -18,10 +18,10 @@ static float FLUXFACTOR = 1.0;
 // Sampling factor : 0=full resolution (slow), 1=half resolution (fast), 2=quarter resolution (very fast)
 // Fast mode does not reject bad pixels
 errno_t convert_rawbayerFITStorgbFITS_simple(
-    const char *__restrict__ ID_name,
-    const char *__restrict__ ID_name_r,
-    const char *__restrict__ ID_name_g,
-    const char *__restrict__ ID_name_b,
+    const char *__restrict ID_name,
+    const char *__restrict ID_name_r,
+    const char *__restrict ID_name_g,
+    const char *__restrict ID_name_b,
     int         SamplFactor
 )
 {

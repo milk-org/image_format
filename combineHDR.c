@@ -68,10 +68,10 @@ static errno_t help_function()
 
 
 errno_t combine_HDR_image(
-    const char *__restrict__ flistname,
+    const char *__restrict flistname,
     float satvalue,
     float biasvalue,
-    char *__restrict__ outimname
+    char *__restrict outimname
 )
 {
     int HDRmaxindex = 100;

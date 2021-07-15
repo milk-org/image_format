@@ -13,8 +13,8 @@
 // ==========================================
 
 errno_t IMAGE_FORMAT_im_to_ASCII(
-    const char *__restrict__ IDname,
-    const char *__restrict__ foutname
+    const char *__restrict IDname,
+    const char *__restrict foutname
 );
 
 
@@ -73,8 +73,8 @@ errno_t imtoASCII_addCLIcmd()
 
 
 errno_t IMAGE_FORMAT_im_to_ASCII(
-    const char *__restrict__ IDname,
-    const char *__restrict__ foutname
+    const char *__restrict IDname,
+    const char *__restrict foutname
 )
 {
     long ii;

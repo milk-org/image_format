@@ -11,11 +11,11 @@
 // ==========================================
 
 errno_t image_format_extract_RGGBchan(
-    const char *__restrict__ ID_name,
-    const char *__restrict__ IDoutR_name,
-    const char *__restrict__ IDoutG1_name,
-    const char *__restrict__ IDoutG2_name,
-    const char *__restrict__ IDoutB_name
+    const char *__restrict ID_name,
+    const char *__restrict IDoutR_name,
+    const char *__restrict IDoutG1_name,
+    const char *__restrict IDoutG2_name,
+    const char *__restrict IDoutB_name
 );
 
 
@@ -74,11 +74,11 @@ errno_t extract_RGGBchan_addCLIcmd()
 // output written in im_r, im_g1, im_g2 and im_b
 //
 errno_t image_format_extract_RGGBchan(
-    const char *__restrict__ ID_name,
-    const char *__restrict__ IDoutR_name,
-    const char *__restrict__ IDoutG1_name,
-    const char *__restrict__ IDoutG2_name,
-    const char *__restrict__ IDoutB_name
+    const char *__restrict ID_name,
+    const char *__restrict IDoutR_name,
+    const char *__restrict IDoutG1_name,
+    const char *__restrict IDoutG2_name,
+    const char *__restrict IDoutB_name
 )
 {
     imageID ID;

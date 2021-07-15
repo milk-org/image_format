@@ -23,10 +23,10 @@ static float FLUXFACTOR = 1.0;
 // ==========================================
 
 errno_t loadCR2toFITSRGB(
-    const char *__restrict__ fnameCR2,
-    const char *__restrict__ fnameFITSr,
-    const char *__restrict__ fnameFITSg,
-    const char *__restrict__ fnameFITSb
+    const char *__restrict fnameCR2,
+    const char *__restrict fnameFITSr,
+    const char *__restrict fnameFITSg,
+    const char *__restrict fnameFITSb
 );
 
 
@@ -82,10 +82,10 @@ errno_t loadCR2toFITSRGB_addCLIcmd()
 
 // assumes dcraw is installed
 errno_t loadCR2toFITSRGB(
-    const char *__restrict__ fnameCR2,
-    const char *__restrict__ fnameFITSr,
-    const char *__restrict__ fnameFITSg,
-    const char *__restrict__ fnameFITSb
+    const char *__restrict fnameCR2,
+    const char *__restrict fnameFITSr,
+    const char *__restrict fnameFITSg,
+    const char *__restrict fnameFITSb
 )
 {
     EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
