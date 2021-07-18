@@ -300,15 +300,15 @@ errno_t CR2tomov()
                         data.image[IDgtot].array.F[ii] += data.image[IDg].array.F[ii];
                         data.image[IDbtot].array.F[ii] += data.image[IDb].array.F[ii];
                     }
-                    save_fl_fits("imrtot", "!imrtot.fits");
-                    save_fl_fits("imgtot", "!imgtot.fits");
-                    save_fl_fits("imbtot", "!imbtot.fits");
+                    save_fl_fits("imrtot", "imrtot.fits");
+                    save_fl_fits("imgtot", "imgtot.fits");
+                    save_fl_fits("imbtot", "imbtot.fits");
 
-                    WRITE_FULLFILENAME(fnameoutr, "!./FITS/imr%05ld.fits", cnt);
+                    WRITE_FULLFILENAME(fnameoutr, "./FITS/imr%05ld.fits", cnt);
                     save_fl_fits("imr", fnameoutr);
-                    WRITE_FULLFILENAME(fnameoutg, "!./FITS/img%05ld.fits", cnt);
+                    WRITE_FULLFILENAME(fnameoutg, "./FITS/img%05ld.fits", cnt);
                     save_fl_fits("img", fnameoutg);
-                    WRITE_FULLFILENAME(fnameoutb, "!./FITS/imb%05ld.fits", cnt);
+                    WRITE_FULLFILENAME(fnameoutb, "./FITS/imb%05ld.fits", cnt);
                     save_fl_fits("imb", fnameoutb);
                 }
             }
