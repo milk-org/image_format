@@ -22,8 +22,7 @@
 #include "loadCR2toFITSRGB.h"
 #include "read_binary32f.h"
 #include "writeBMP.h"
-
-
+#include "extract_utr.h"
 
 /*typedef struct
 {
@@ -47,6 +46,7 @@ static errno_t init_module_CLI()
 {
 
     CLIADDCMD_image_format__combineHDR();
+    CLIADDCMD_uptheramp__cred_ql_utr();
 
 	imtoASCII_addCLIcmd();
 
