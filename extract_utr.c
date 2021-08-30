@@ -39,7 +39,7 @@ static CLICMDDATA CLIcmddata =
 
 static errno_t help_function()
 {
-    // TODO Write the help
+    printf("Perform real-time up-the-ramp data reduction on CRED1/2 streams.\n");
     return RETURN_SUCCESS;
 }
 
@@ -51,9 +51,11 @@ THE IMPORTANT, CUSTOM PART
 
 */
 
-static errno_t copy_cast_I16TOF(float* out, uint16_t* in, int n_val) {
-    for (long ii = 0; ii < n_val; ++ii) {
-        out[ii] = (float) in[ii];
+static errno_t copy_cast_I16TOF(float *out, uint16_t *in, int n_val)
+{
+    for (long ii = 0; ii < n_val; ++ii)
+    {
+        out[ii] = (float)in[ii];
     }
 
     return RETURN_SUCCESS;
@@ -73,7 +75,7 @@ static errno_t simple_desat_iterate(float *last_valid, int *frame_count, u_char 
         }
         if (frame_valid[ii])
         {
-            last_valid[ii] = (float) in_img.im->array.UI16[ii];
+            last_valid[ii] = (float)in_img.im->array.UI16[ii];
             ++frame_count[ii];
         }
     }
@@ -100,7 +102,7 @@ static errno_t utr_iterate(float *sum_x, float *sum_y, float *sum_xy, float *sum
         // Proceed for unsaturated pixels
         if (frame_valid[ii])
         {
-            in_val_px = (float) in_img.im->array.UI16[ii];
+            in_val_px = (float)in_img.im->array.UI16[ii];
 
             sum_x[ii] += subframe_count;
             sum_y[ii] += in_val_px;
@@ -137,7 +139,7 @@ static errno_t ql_finalize(float *save_ql, IMGID in_img, IMGID ql_img)
     ql_img.im->md->write = TRUE;
     for (int ii = 0; ii < n_pixels; ++ii)
     {
-        ql_img.im->array.F[ii] = (float) in_img.im->array.UI16[ii] - save_ql[ii];
+        ql_img.im->array.F[ii] = (float)in_img.im->array.UI16[ii] - save_ql[ii];
     }
 
     return RETURN_SUCCESS;
