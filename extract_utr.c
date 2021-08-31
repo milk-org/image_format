@@ -234,6 +234,23 @@ static errno_t compute_function()
         resolveIMGID(&out_img, ERRMODE_ABORT);
     }
 
+
+    /*
+     Keyword setup - initialization
+    */
+    for(int kw = 0; kw < in_img.md->NBkw; ++kw)
+    {
+        strcpy(ql_img.im->kw[kw].name, in_img.im->kw[kw].name);
+        ql_img.im->kw[kw].type = in_img.im->kw[kw].type;
+        ql_img.im->kw[kw].value = in_img.im->kw[kw].value;
+        strcpy(ql_img.im->kw[kw].comment, in_img.im->kw[kw].comment);
+
+        strcpy(out_img.im->kw[kw].name, in_img.im->kw[kw].name);
+        out_img.im->kw[kw].type = in_img.im->kw[kw].type;
+        out_img.im->kw[kw].value = in_img.im->kw[kw].value;
+        strcpy(out_img.im->kw[kw].comment, in_img.im->kw[kw].comment);
+    }
+
     /*
     SETUP
     */
@@ -261,9 +278,10 @@ static errno_t compute_function()
     memset(last_valid, 0, n_pixels * SIZEOF_DATATYPE_FLOAT);
 
     // TELEMETRY
+    int just_init = FALSE;
     int miss_count = 0;
 
-    PRINT_WARNING("Sat value: %f", *sat_value);
+    PRINT_WARNING("Saturation value: %f", *sat_value);
 
     /*
     LOOP
@@ -285,21 +303,30 @@ static errno_t compute_function()
     {
         // Counter in px 3, this is the first frame of the burst so it should be the total number
         // Counter not used in non-NDR mode, thus must set ndr_value to 1
-        ndr_value = cred_counter > 0 ? cred_counter : 1;
+        ndr_value = cred_counter + 1;
 
-        // Backup the first frame for CDS output
-        copy_cast_I16TOF(save_ql, in_img.im->array.UI16, n_pixels);
+        if (ndr_value > 1) { // No need for prep if we're in copy-through, non-NDR mode
 
-        // Reset the buffers for utr
-        utr_reset_buffers(sum_x, sum_y, sum_xy, sum_xx, sum_yy, frame_count, frame_valid, n_pixels);
-        // Reset the buffer for simple_desat
-        memset(last_valid, 0, n_pixels * SIZEOF_DATATYPE_FLOAT);
+            // Backup the first frame for CDS output
+            copy_cast_I16TOF(save_ql, in_img.im->array.UI16, n_pixels);
+
+            // Reset the buffers for utr
+            utr_reset_buffers(sum_x, sum_y, sum_xy, sum_xx, sum_yy, frame_count, frame_valid, n_pixels);
+            // Reset the buffer for simple_desat
+            memset(last_valid, 0, n_pixels * SIZEOF_DATATYPE_FLOAT);
+
+        }
+        just_init = TRUE;
+    } else {
+        just_init = FALSE;
     }
-    else if (cred_counter != prev_cred_counter - 1)
+
+    // just_init allows to ignore this condition when NDR = 1
+    if ( !just_init && cred_counter != prev_cred_counter - 1)
     {
         // TELEMETRY
         ++miss_count;
-        printf("Miss at %d-%d\n", prev_cred_counter, cred_counter);
+        //printf("Miss at %d-%d\n", prev_cred_counter, cred_counter);
     }
 
     if (ndr_value > 1 && ndr_value <= 6)
@@ -316,7 +343,7 @@ static errno_t compute_function()
         // Differentiated behavior:
         if (ndr_value == 1)
         {
-            simple_desat_finalize(last_valid, frame_count, ndr_value, out_img);
+            copy_cast_I16TOF(out_img.im->array.F, in_img.im->array.UI16, n_pixels);
             copy_cast_I16TOF(ql_img.im->array.F, in_img.im->array.UI16, n_pixels);
         }
         else
@@ -332,6 +359,15 @@ static errno_t compute_function()
             ql_finalize(save_ql, in_img, ql_img); // TODO ql output is gonna become useless memcopies
         }
 
+        /*
+        Keyword value carry-over
+        */
+        for(int kw = 0; kw < in_img.md->NBkw; ++kw)
+        {
+            ql_img.im->kw[kw].value = in_img.im->kw[kw].value;
+            out_img.im->kw[kw].value = in_img.im->kw[kw].value;
+        }
+
         processinfo_update_output_stream(processinfo, ql_img.ID); // FIXME can 2 outputs be used ?
         processinfo_update_output_stream(processinfo, out_img.ID);
 
@@ -339,7 +375,7 @@ static errno_t compute_function()
         // TELEMETRY
         if (miss_count > 0)
         {
-            PRINT_WARNING("UTR/SDS ramp - missing %d/%d frames", miss_count, ndr_value + 1);
+            PRINT_WARNING("UTR/SDS ramp - missing %d/%d frames (cnt0 %d)", miss_count, ndr_value, in_img.md->cnt0);
         }
         miss_count = 0;
 
