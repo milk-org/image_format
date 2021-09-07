@@ -12,7 +12,6 @@
 
 // Local variables pointers
 static char *in_imname;
-static char *ql_imname;
 static char *out_imname;
 static double *sat_value;
 
@@ -21,9 +20,6 @@ static CLICMDARGDEF farg[] =
         {CLIARG_IMG, ".in_name", "input image", "im1",
          CLIARG_VISIBLE_DEFAULT,
          (void **)&in_imname},
-        {CLIARG_STR_NOT_IMG, ".ql_name", "double-sampling image", "out1",
-         CLIARG_VISIBLE_DEFAULT,
-         (void **)&ql_imname},
         {CLIARG_STR_NOT_IMG, ".out_name", "up-the-ramp image", "out2",
          CLIARG_VISIBLE_DEFAULT,
          (void **)&out_imname},
@@ -34,7 +30,7 @@ static CLICMDARGDEF farg[] =
 static CLICMDDATA CLIcmddata =
     {
         "cred_ql_utr",
-        "RT compute of CDS and UTR for camera streams",
+        "RT compute of CDS/UTR for camera streams",
         CLICMD_FIELDS_DEFAULTS};
 
 static errno_t help_function()
@@ -189,19 +185,6 @@ static errno_t utr_reset_buffers(float *sum_x, float *sum_y, float *sum_xy, floa
     return RETURN_SUCCESS;
 }
 
-static errno_t ql_finalize(float *save_ql, IMGID in_img, IMGID ql_img)
-{
-    int n_pixels = in_img.md->size[0] * in_img.md->size[1];
-
-    ql_img.im->md->write = TRUE;
-    for (int ii = 0; ii < n_pixels; ++ii)
-    {
-        ql_img.im->array.F[ii] = (float)in_img.im->array.UI16[ii] - save_ql[ii];
-    }
-
-    return RETURN_SUCCESS;
-}
-
 static errno_t utr_finalize(float *sum_x, float *sum_y, float *sum_xy, float *sum_xx, float *sum_yy,
                             int *frame_count, u_char *frame_valid, int tot_num_frames, IMGID utr_img)
 {
@@ -284,15 +267,6 @@ static errno_t compute_function()
     // TODO DATATYPE - WE WANT IN and QL to be INT but UTR to be FLOAT
 
     // Resolve or create outputs, per need
-    IMGID ql_img = makeIMGID(ql_imname);
-    if (resolveIMGID(&ql_img, ERRMODE_WARN) == -1)
-    {
-        PRINT_WARNING("WARNING FOR QL");
-        in_img.datatype = _DATATYPE_FLOAT; // To be passed to ql_img
-        imcreatelikewiseIMGID(&ql_img, &in_img);
-        resolveIMGID(&ql_img, ERRMODE_ABORT);
-    }
-
     IMGID out_img = makeIMGID(out_imname);
     if (resolveIMGID(&out_img, ERRMODE_WARN))
     {
@@ -307,11 +281,6 @@ static errno_t compute_function()
     */
     for (int kw = 0; kw < in_img.md->NBkw; ++kw)
     {
-        strcpy(ql_img.im->kw[kw].name, in_img.im->kw[kw].name);
-        ql_img.im->kw[kw].type = in_img.im->kw[kw].type;
-        ql_img.im->kw[kw].value = in_img.im->kw[kw].value;
-        strcpy(ql_img.im->kw[kw].comment, in_img.im->kw[kw].comment);
-
         strcpy(out_img.im->kw[kw].name, in_img.im->kw[kw].name);
         out_img.im->kw[kw].type = in_img.im->kw[kw].type;
         out_img.im->kw[kw].value = in_img.im->kw[kw].value;
@@ -459,12 +428,10 @@ static errno_t compute_function()
                 if (in_img.md->datatype == _DATATYPE_UINT16)
                 {
                     copy_cast_UI16TOF(out_img.im->array.F, in_img.im->array.UI16, n_pixels);
-                    copy_cast_UI16TOF(ql_img.im->array.F, in_img.im->array.UI16, n_pixels);
                 }
                 else
                 {
                     copy_cast_SI16TOF(out_img.im->array.F, in_img.im->array.SI16, n_pixels);
-                    copy_cast_SI16TOF(ql_img.im->array.F, in_img.im->array.SI16, n_pixels);
                 }
             }
             else
@@ -477,7 +444,6 @@ static errno_t compute_function()
                 {
                     utr_finalize(sum_x, sum_y, sum_xy, sum_xx, sum_yy, frame_count, frame_valid, ndr_value, out_img);
                 }
-                ql_finalize(save_ql, in_img, ql_img); // TODO ql output is gonna become useless memcopies
             }
 
             /*
@@ -485,11 +451,9 @@ static errno_t compute_function()
             */
             for (int kw = 0; kw < in_img.md->NBkw; ++kw)
             {
-                ql_img.im->kw[kw].value = in_img.im->kw[kw].value;
                 out_img.im->kw[kw].value = in_img.im->kw[kw].value;
             }
 
-            processinfo_update_output_stream(processinfo, ql_img.ID); // FIXME can 2 outputs be used ?
             processinfo_update_output_stream(processinfo, out_img.ID);
 
             // TODO compute if we missed frames during that ramp.
