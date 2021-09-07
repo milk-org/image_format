@@ -76,28 +76,31 @@ static errno_t simple_desat_iterate(float *last_valid, int *frame_count, u_char 
 
     int n_pixels = in_img.md->size[0] * in_img.md->size[1];
 
-    for (int ii = 0; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
+    float in_val_px;
+    int k;
+
+    if (reset)
     {
-        // Detect saturation - which can have several forms for CRED1 / CRED2 / clipping to some max
-        if (in_img.im->array.UI16[ii] > sat_val)
+        for (int ii = 8; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
         {
-            frame_valid[ii] = FALSE;
-            if (reset)
-            {
-                last_valid[ii] = 0.f;
-            }
+            in_val_px = (float)in_img.im->array.UI16[ii];
+            k = (in_val_px <= sat_val);
+            frame_valid[ii] = k;
+            frame_count[ii] = 1;
+            
+            last_valid[ii] = k ? in_val_px: 0.0f;
         }
-        else
+    }
+    else
+    {
+        for (int ii = 8; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
         {
-            if (reset)
-            {
-                frame_valid[ii] = TRUE;
-            }
-        }
-        if (frame_valid[ii])
-        {
-            last_valid[ii] = (float)in_img.im->array.UI16[ii];
-            ++frame_count[ii];
+            in_val_px = (float)in_img.im->array.UI16[ii];
+            k = (in_val_px <= sat_val);
+            frame_valid[ii] = k;
+            frame_count[ii] += k;
+
+            last_valid[ii] = k ? in_val_px: last_valid[ii];
         }
     }
 
@@ -116,7 +119,7 @@ static errno_t utr_iterate(float *sum_x, float *sum_y, float *sum_xy, float *sum
 
     if (reset)
     {
-        for (int ii = 0; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
+        for (int ii = 8; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
         {
             in_val_px = (float)in_img.im->array.UI16[ii];
 
@@ -136,7 +139,7 @@ static errno_t utr_iterate(float *sum_x, float *sum_y, float *sum_xy, float *sum
     }
     else
     {                                         // not reset
-        for (int ii = 0; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
+        for (int ii = 8; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
         {
             in_val_px = (float)in_img.im->array.UI16[ii];
 
@@ -240,11 +243,13 @@ static errno_t simple_desat_finalize(float *last_valid, int *frame_count, int to
     int n_pixels = sds_img.md->size[0] * sds_img.md->size[1];
 
     sds_img.im->md->write = TRUE;
+    int val;
 
     // Skip the counters
     for (int ii = 8; ii < n_pixels; ++ii)
     {
-        if (frame_count[ii] >= 1) // Avoid no valid frames
+        val = frame_count[ii] >= 1; // Avoid no valid frames
+        if (val)
         {
             sds_img.im->array.F[ii] = tot_num_frames * last_valid[ii] / frame_count[ii];
         }
@@ -323,7 +328,8 @@ static errno_t compute_function()
     int frame_counter = 0;
     int prev_frame_counter = 0;
 
-    int ndr_value = 1;
+    int ndr_value = 0;
+    int old_ndr_value = 0;
 
     int n_pixels = in_img.md->size[0] * in_img.md->size[1];
 
@@ -357,38 +363,39 @@ static errno_t compute_function()
     INSERT_STD_PROCINFO_COMPUTEFUNC_START
 
     {
+        old_ndr_value = ndr_value;
+
         prev_frame_counter = frame_counter;
         frame_counter = in_img.im->array.UI16[0];
         if (frame_counter == prev_frame_counter)
         {
-            //continue; // This applies to the loop started and closed in PROCINFO macros
+            continue; // This applies to the loop started and closed in PROCINFO macros
         }
 
         // if we hit 0 just before, this is the first image, save it for the CDS
         prev_cred_counter = cred_counter;
         cred_counter = in_img.im->array.UI16[2]; // Counter in px 3
 
-        if (prev_cred_counter > 0 && frame_counter > prev_frame_counter + 1)
+        if (frame_counter > prev_frame_counter + 1)
         {
-            PRINT_WARNING("FRAME MISS %d (%d) %d (%d)", frame_counter, prev_frame_counter, cred_counter, prev_cred_counter);
+            PRINT_WARNING("FRAME MISS %d (%d) %d (%d) - fyi NDR is: %d", frame_counter, prev_frame_counter, cred_counter, prev_cred_counter, ndr_value);
             // TODO don't forget you're missing the first frame of the ramp almost all the time.
         }
         /*
         HOUSEKEEPING
         */
-        /*
         if (prev_cred_counter > 0 && cred_counter > prev_cred_counter)
         {
             PRINT_WARNING("Raw frame 0 missed - a UTR/SDS frame was lost");
         }
-        */
 
         /*
         INITIALIZE ACCS
         */
 
-        if (prev_cred_counter == cred_counter)
-        { // Test: are we maybe in "rawimages off" ? In this case the counter gives the NDR total and never changes
+        if (prev_cred_counter == cred_counter || in_img.im->array.UI16[2] != 0)
+        {   // Test: are we maybe in "rawimages off" ? In this case the counter gives the NDR total and never changes
+            // Test: did we lose sync or imagetags ? 3rd pixel should alway be zero !
             ndr_value = 1;
             just_init = TRUE;
         }
@@ -410,12 +417,6 @@ static errno_t compute_function()
                 {
                     copy_cast_SI16TOF(save_ql, in_img.im->array.SI16, n_pixels);
                 }
-
-                // TODO replace those by a differentiated accumulation just below, based on just_init
-                // Reset the buffers for utr
-                // utr_reset_buffers(sum_x, sum_y, sum_xy, sum_xx, sum_yy, frame_count, frame_valid, n_pixels);
-                // Reset the buffer for simple_desat
-                // memset(last_valid, 0, n_pixels * SIZEOF_DATATYPE_FLOAT);
             }
             just_init = TRUE;
         }
@@ -431,9 +432,14 @@ static errno_t compute_function()
             ++miss_count;
         }
 
+        if (old_ndr_value != ndr_value)
+        {
+            PRINT_WARNING("NDR meas changed from %d to %d", old_ndr_value, ndr_value);
+        }
+
         /*
-    ACCUMULATE
-    */
+        ACCUMULATE
+        */
         if (ndr_value > 1 && ndr_value <= 6)
         {
             simple_desat_iterate(last_valid, frame_count, frame_valid, *sat_value, in_img, just_init);
@@ -444,8 +450,8 @@ static errno_t compute_function()
         }
 
         /*
-    FINALIZE
-    */
+        FINALIZE
+        */
         if (cred_counter == 0 || ndr_value == 1) // If we are hitting 0, compute the UTR, the QL, and post the outputs
         {
             if (ndr_value == 1)
@@ -475,8 +481,8 @@ static errno_t compute_function()
             }
 
             /*
-        Keyword value carry-over
-        */
+            Keyword value carry-over
+            */
             for (int kw = 0; kw < in_img.md->NBkw; ++kw)
             {
                 ql_img.im->kw[kw].value = in_img.im->kw[kw].value;
@@ -490,7 +496,7 @@ static errno_t compute_function()
             // HOUSEKEEPING
             if (miss_count > 0)
             {
-                //PRINT_WARNING("UTR/SDS ramp - missing %d/%d frames (cnt0 %ld)", miss_count, ndr_value, in_img.md->cnt0);
+                PRINT_WARNING("UTR/SDS ramp - missing %d/%d frames (cnt0 %ld)", miss_count, ndr_value, in_img.md->cnt0);
             }
             miss_count = 0;
 
