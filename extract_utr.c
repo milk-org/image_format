@@ -83,8 +83,8 @@ static errno_t simple_desat_iterate(float *last_valid, int *frame_count, u_char 
             k = (in_val_px <= sat_val);
             frame_valid[ii] = k;
             frame_count[ii] = 1;
-            
-            last_valid[ii] = k ? in_val_px: 0.0f;
+
+            last_valid[ii] = k ? in_val_px : 0.0f;
         }
     }
     else
@@ -96,7 +96,7 @@ static errno_t simple_desat_iterate(float *last_valid, int *frame_count, u_char 
             frame_valid[ii] = k;
             frame_count[ii] += k;
 
-            last_valid[ii] = k ? in_val_px: last_valid[ii];
+            last_valid[ii] = k ? in_val_px : last_valid[ii];
         }
     }
 
@@ -151,19 +151,6 @@ static errno_t utr_iterate(float *sum_x, float *sum_y, float *sum_xy, float *sum
             sum_xy[ii] += (k * subframe_count) * in_val_px;
             sum_xx[ii] += (k * subframe_count) * subframe_count;
             sum_yy[ii] += (k * in_val_px) * in_val_px;
-
-            /*
-            if (frame_valid[ii]) {
-                ++frame_count[ii]; // At reset: 0 or 1
-
-                // Only perform those accumulations for unsat pixels, but this avoids if statements.
-                sum_x[ii] += subframe_count;
-                sum_y[ii] += in_val_px;
-                sum_xy[ii] += subframe_count * in_val_px;
-                sum_xx[ii] += subframe_count * subframe_count;
-                sum_yy[ii] += in_val_px * in_val_px;
-            }
-            */
         }
     }
 
@@ -220,7 +207,7 @@ static errno_t utr_finalize(float *sum_x, float *sum_y, float *sum_xy, float *su
     return RETURN_SUCCESS;
 }
 
-static errno_t simple_desat_finalize(float *last_valid, int *frame_count, int tot_num_frames, IMGID sds_img)
+static errno_t simple_desat_finalize(float *last_valid, float *first_read, int *frame_count, int tot_num_frames, IMGID sds_img)
 {
 
     int n_pixels = sds_img.md->size[0] * sds_img.md->size[1];
@@ -231,15 +218,8 @@ static errno_t simple_desat_finalize(float *last_valid, int *frame_count, int to
     // Skip the counters
     for (int ii = 8; ii < n_pixels; ++ii)
     {
-        val = frame_count[ii] >= 1; // Avoid no valid frames
-        if (val)
-        {
-            sds_img.im->array.F[ii] = tot_num_frames * last_valid[ii] / frame_count[ii];
-        }
-        else
-        {
-            sds_img.im->array.F[ii] = -1.0f;
-        }
+        // Avoid no valid frames // We need at least two reads to CDS them.
+        sds_img.im->array.F[ii] = frame_count[ii] >= 2 ? ((tot_num_frames - 1) * (last_valid[ii] - first_read[ii]) / (frame_count[ii] - 1)) : 0.0f;
     }
 
     return RETURN_SUCCESS;
@@ -279,12 +259,19 @@ static errno_t compute_function()
     /*
      Keyword setup - initialization
     */
+    int ndr_kw_loc = -1;
+
     for (int kw = 0; kw < in_img.md->NBkw; ++kw)
     {
         strcpy(out_img.im->kw[kw].name, in_img.im->kw[kw].name);
         out_img.im->kw[kw].type = in_img.im->kw[kw].type;
         out_img.im->kw[kw].value = in_img.im->kw[kw].value;
         strcpy(out_img.im->kw[kw].comment, in_img.im->kw[kw].comment);
+
+        if (strcmp(in_img.im->kw[kw].name, "NDR") == 0)
+        {
+            ndr_kw_loc = kw;
+        }
     }
 
     /*
@@ -293,14 +280,19 @@ static errno_t compute_function()
     // For counting NRD reads
     int cred_counter = 0;
     int prev_cred_counter = 0;
+    int cred_counter_last_init = 0;
+
     // For counting frames and avoiding double processing when catching up with the semaphore
     int frame_counter = 0;
     int prev_frame_counter = 0;
+    int frame_counter_last_init = 0;
 
     int ndr_value = 0;
     int old_ndr_value = 0;
 
     int n_pixels = in_img.md->size[0] * in_img.md->size[1];
+
+    float cds_scaling;
 
     float *sum_x = (float *)malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
     float *sum_xx = (float *)malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
@@ -312,7 +304,7 @@ static errno_t compute_function()
     int *frame_count = (int *)malloc(n_pixels * SIZEOF_DATATYPE_INT32);
     char *frame_valid = (char *)malloc(n_pixels * SIZEOF_DATATYPE_INT8);
     float *last_valid = (float *)malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
-    float *save_ql = (float *)malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
+    float *save_first_read = (float *)malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
 
     // Reset the buffers for utr
     utr_reset_buffers(sum_x, sum_y, sum_xy, sum_xx, sum_yy, frame_count, frame_valid, n_pixels);
@@ -322,6 +314,7 @@ static errno_t compute_function()
     // TELEMETRY
     int just_init = FALSE;
     int miss_count = 0;
+    int publish_output = TRUE;
 
     PRINT_WARNING("Saturation value: %f", *sat_value);
 
@@ -337,7 +330,7 @@ static errno_t compute_function()
         prev_frame_counter = frame_counter;
         frame_counter = in_img.im->array.UI16[0];
         if (frame_counter == prev_frame_counter)
-        {
+        {             // Do not process the same frame twice if late on the semaphores.
             continue; // This applies to the loop started and closed in PROCINFO macros
         }
 
@@ -361,18 +354,17 @@ static errno_t compute_function()
         /*
         INITIALIZE ACCS
         */
+        ndr_value = (int)in_img.im->kw[ndr_kw_loc].value.numl; // This is the TRUE NDR value, per the camera control server.
 
-        if (prev_cred_counter == cred_counter || in_img.im->array.UI16[2] != 0)
-        {   // Test: are we maybe in "rawimages off" ? In this case the counter gives the NDR total and never changes
-            // Test: did we lose sync or imagetags ? 3rd pixel should alway be zero !
-            ndr_value = 1;
+        if (ndr_value == 1 || in_img.im->array.UI16[3] != 0)
+        { // Test: are we maybe in "rawimages off" ? In this case the counter gives the NDR total and never changes
+            // Test: did we lose sync or imagetags ? 4th pixel should alway be zero !
+            frame_counter_last_init = frame_counter;
+            cred_counter_last_init = cred_counter;
             just_init = TRUE;
         }
         else if (prev_cred_counter == 0 || cred_counter > prev_cred_counter)
         { // Test: we are at the first frame of a burst OR we just missed the last frame of the previous burst
-            // Counter in px 3, this is the first frame of the burst so it should be the total number
-            // Counter not used in non-NDR mode, thus must set ndr_value to 1
-            ndr_value = cred_counter + 1;
 
             if (ndr_value > 1)
             { // Test: no need for prep if we're in copy-through, non-NDR mode
@@ -380,13 +372,15 @@ static errno_t compute_function()
                 // Backup the first frame for CDS output
                 if (in_img.md->datatype == _DATATYPE_UINT16)
                 {
-                    copy_cast_UI16TOF(save_ql, in_img.im->array.UI16, n_pixels);
+                    copy_cast_UI16TOF(save_first_read, in_img.im->array.UI16, n_pixels);
                 }
                 else
                 {
-                    copy_cast_SI16TOF(save_ql, in_img.im->array.SI16, n_pixels);
+                    copy_cast_SI16TOF(save_first_read, in_img.im->array.SI16, n_pixels);
                 }
             }
+            frame_counter_last_init = frame_counter;
+            cred_counter_last_init = cred_counter;
             just_init = TRUE;
         }
         else
@@ -423,28 +417,13 @@ static errno_t compute_function()
         */
         if (cred_counter == 0 || ndr_value == 1) // If we are hitting 0, compute the UTR, the QL, and post the outputs
         {
-            if (ndr_value == 1)
-            { // ndr_value == 1: single reads OR rawimages off passthrough mode
-                if (in_img.md->datatype == _DATATYPE_UINT16)
-                {
-                    copy_cast_UI16TOF(out_img.im->array.F, in_img.im->array.UI16, n_pixels);
-                }
-                else
-                {
-                    copy_cast_SI16TOF(out_img.im->array.F, in_img.im->array.SI16, n_pixels);
-                }
-            }
-            else
-            {
-                if (ndr_value <= 6)
-                {
-                    simple_desat_finalize(last_valid, frame_count, ndr_value, out_img);
-                }
-                else
-                {
-                    utr_finalize(sum_x, sum_y, sum_xy, sum_xx, sum_yy, frame_count, frame_valid, ndr_value, out_img);
-                }
-            }
+            // Copy the first 4 pixels from the current image
+            copy_cast_UI16TOF(out_img.im->array.F, in_img.im->array.UI16, 4);
+            // Add some more telemetry
+            out_img.im->array.F[4] = (float)ndr_value; // Value by which stuff is normalized, and type of processing done.
+            out_img.im->array.F[5] = (float)cred_counter_last_init;
+            out_img.im->array.F[6] = (float)frame_counter_last_init;
+            out_img.im->array.F[7] = (float)miss_count;
 
             /*
             Keyword value carry-over
@@ -454,15 +433,50 @@ static errno_t compute_function()
                 out_img.im->kw[kw].value = in_img.im->kw[kw].value;
             }
 
-            processinfo_update_output_stream(processinfo, out_img.ID);
+            if (ndr_value == 1)
+            { // ndr_value == 1: single reads OR rawimages off passthrough mode
+                if (in_img.md->datatype == _DATATYPE_UINT16)
+                {
+                    copy_cast_UI16TOF(out_img.im->array.F + 8, in_img.im->array.UI16 + 8, n_pixels - 8);
+                }
+                else
+                {
+                    copy_cast_SI16TOF(out_img.im->array.F + 8, in_img.im->array.SI16 + 8, n_pixels - 8);
+                }
+                publish_output = TRUE;
+            }
+            else
+            {
+                if (ndr_value <= 6)
+                {
+                    if (frame_counter > frame_counter_last_init)
+                    { // Did we get two reads to do a proper CDS ?
+                        // Compute the exposure scaling in case we missed the first read !
+                        // This will be very important in CDS at high speed
+                        simple_desat_finalize(last_valid, save_first_read, frame_count, ndr_value, out_img);
+                        publish_output = TRUE;
+                    } else {
+                        PRINT_WARNING("CDS / DESAT finalize: not enough reads.");
+                        publish_output = FALSE;
+                    }
+                }
+                else
+                {
+                    utr_finalize(sum_x, sum_y, sum_xy, sum_xx, sum_yy, frame_count, frame_valid, ndr_value, out_img);
+                    publish_output = TRUE;
+                }
+            }
+            if (publish_output) {
+                processinfo_update_output_stream(processinfo, out_img.ID);
+            }
 
             // TODO compute if we missed frames during that ramp.
             // HOUSEKEEPING
             if (miss_count > 0)
             {
                 PRINT_WARNING("UTR/SDS ramp - missing %d/%d frames (cnt0 %ld)", miss_count, ndr_value, in_img.md->cnt0);
+                miss_count = 0;
             }
-            miss_count = 0;
 
             // TODO ??? Weighted stuff.
         }
@@ -481,7 +495,7 @@ static errno_t compute_function()
 
     free(frame_count);
     free(frame_valid);
-    free(save_ql);
+    free(save_first_read);
 
     DEBUG_TRACE_FEXIT();
     return RETURN_SUCCESS;
