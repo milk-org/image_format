@@ -207,7 +207,7 @@ static errno_t utr_finalize(float *sum_x, float *sum_y, float *sum_xy, float *su
     return RETURN_SUCCESS;
 }
 
-static errno_t simple_desat_finalize(float *last_valid, float *first_read, int *frame_count, int tot_num_frames, IMGID sds_img)
+static errno_t simple_desat_finalize(float *last_valid, float *first_read, int *frame_count, int tot_num_frames, int invert, IMGID sds_img)
 {
 
     int n_pixels = sds_img.md->size[0] * sds_img.md->size[1];
@@ -215,11 +215,23 @@ static errno_t simple_desat_finalize(float *last_valid, float *first_read, int *
     sds_img.im->md->write = TRUE;
     int val;
 
+    // IF this is the CRED1 and NDR=2, then the CDS should be inverted, because fuck you why not ?
     // Skip the counters
-    for (int ii = 8; ii < n_pixels; ++ii)
+    if (!invert)
     {
-        // Avoid no valid frames // We need at least two reads to CDS them.
-        sds_img.im->array.F[ii] = frame_count[ii] >= 2 ? ((tot_num_frames - 1) * (last_valid[ii] - first_read[ii]) / (frame_count[ii] - 1)) : 0.0f;
+        for (int ii = 8; ii < n_pixels; ++ii)
+        {
+            // Avoid no valid frames // We need at least two reads to CDS them.
+            sds_img.im->array.F[ii] = frame_count[ii] >= 2 ? ((tot_num_frames - 1) * (last_valid[ii] - first_read[ii]) / (frame_count[ii] - 1)) : 0.0f;
+        }
+    }
+    else
+    { // invert
+        for (int ii = 8; ii < n_pixels; ++ii)
+        {
+            // Avoid no valid frames // We need at least two reads to CDS them.
+            sds_img.im->array.F[ii] = frame_count[ii] >= 2 ? ((tot_num_frames - 1) * (first_read[ii] - last_valid[ii]) / (frame_count[ii] - 1)) : 0.0f;
+        }
     }
 
     return RETURN_SUCCESS;
@@ -281,6 +293,10 @@ static errno_t compute_function()
     int cred_counter = 0;
     int prev_cred_counter = 0;
     int cred_counter_last_init = 0;
+    int cred_counter_repeat = 0;
+
+    // For the imagetags
+    int px_check = 0;
 
     // For counting frames and avoiding double processing when catching up with the semaphore
     int frame_counter = 0;
@@ -338,6 +354,8 @@ static errno_t compute_function()
         prev_cred_counter = cred_counter;
         cred_counter = in_img.im->array.UI16[2]; // Counter in px 3
 
+        px_check = in_img.im->array.UI16[3];
+
         if (frame_counter > prev_frame_counter + 1)
         {
             PRINT_WARNING("FRAME MISS %d (%d) %d (%d) - fyi NDR is: %d", frame_counter, prev_frame_counter, cred_counter, prev_cred_counter, ndr_value);
@@ -356,28 +374,50 @@ static errno_t compute_function()
         */
         ndr_value = (int)in_img.im->kw[ndr_kw_loc].value.numl; // This is the TRUE NDR value, per the camera control server.
 
-        if (ndr_value == 1 || in_img.im->array.UI16[3] != 0)
-        { // Test: are we maybe in "rawimages off" ? In this case the counter gives the NDR total and never changes
-            // Test: did we lose sync or imagetags ? 4th pixel should alway be zero !
+        /*
+        Complicated branching:
+        A / Find if we're in NDR1
+        B / Is this the CRED 1 and the CRED 2
+        C / Find if we're in rawimages off -> override to ndr_value = 1; for CRED2 this is px_check == ndr_val
+        for CRED1 this is 
+            C.1 = px[2] always = 1 in CDS
+            C.2 = px[2] always = 0 in NDR
+        D / Find if we've lost sync: CRED2 4th px should match 0x3ff0, CRED1 4th pix should match 0x0000
+        */
+        // First: CRED1 ndr change accumulator:
+        if (cred_counter == prev_cred_counter)
+        {
+            if (cred_counter_repeat < 10)
+            {
+                ++cred_counter_repeat;
+            }
+        }
+        else
+        {
+            cred_counter_repeat = 0;
+        }
+        if (ndr_value == 1 ||
+            (in_img.md->datatype == _DATATYPE_UINT16 &&
+             (cred_counter_repeat == 10 || !(px_check == 0))) ||
+            (in_img.md->datatype == _DATATYPE_INT16 &&
+             (cred_counter == ndr_value || !((px_check & 0x3ff0) == 0x3ff0))))
+        {
+            ndr_value = 1; // Override
             frame_counter_last_init = frame_counter;
             cred_counter_last_init = cred_counter;
             just_init = TRUE;
         }
         else if (prev_cred_counter == 0 || cred_counter > prev_cred_counter)
         { // Test: we are at the first frame of a burst OR we just missed the last frame of the previous burst
-
-            if (ndr_value > 1)
-            { // Test: no need for prep if we're in copy-through, non-NDR mode
-
-                // Backup the first frame for CDS output
-                if (in_img.md->datatype == _DATATYPE_UINT16)
-                {
-                    copy_cast_UI16TOF(save_first_read, in_img.im->array.UI16, n_pixels);
-                }
-                else
-                {
-                    copy_cast_SI16TOF(save_first_read, in_img.im->array.SI16, n_pixels);
-                }
+            // Note: ndr_value > 1 here.
+            // Backup the first frame for CDS output
+            if (in_img.md->datatype == _DATATYPE_UINT16)
+            {
+                copy_cast_UI16TOF(save_first_read, in_img.im->array.UI16, n_pixels);
+            }
+            else
+            {
+                copy_cast_SI16TOF(save_first_read, in_img.im->array.SI16, n_pixels);
             }
             frame_counter_last_init = frame_counter;
             cred_counter_last_init = cred_counter;
@@ -399,6 +439,8 @@ static errno_t compute_function()
         {
             PRINT_WARNING("NDR meas changed from %d to %d", old_ndr_value, ndr_value);
         }
+
+        //PRINT_WARNING("%d, %d, %d", in_img.im->array.UI16[0], in_img.im->array.UI16[2], in_img.im->array.UI16[39185]);
 
         /*
         ACCUMULATE
@@ -453,9 +495,13 @@ static errno_t compute_function()
                     { // Did we get two reads to do a proper CDS ?
                         // Compute the exposure scaling in case we missed the first read !
                         // This will be very important in CDS at high speed
-                        simple_desat_finalize(last_valid, save_first_read, frame_count, ndr_value, out_img);
+                        simple_desat_finalize(last_valid, save_first_read, frame_count, ndr_value,
+                                              in_img.md->datatype == _DATATYPE_UINT16 && ndr_value == 2,
+                                              out_img);
                         publish_output = TRUE;
-                    } else {
+                    }
+                    else
+                    {
                         PRINT_WARNING("CDS / DESAT finalize: not enough reads.");
                         publish_output = FALSE;
                     }
@@ -466,7 +512,8 @@ static errno_t compute_function()
                     publish_output = TRUE;
                 }
             }
-            if (publish_output) {
+            if (publish_output)
+            {
                 processinfo_update_output_stream(processinfo, out_img.ID);
             }
 
