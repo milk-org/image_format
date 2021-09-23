@@ -370,7 +370,7 @@ static errno_t compute_function()
         Because CRED1 NDR2 counts 0 then 1, rather than the opposite in all other modes.
         TODO actually decide before entering the loop if this is CRED1 or 2 once and for all.
         */
-        if (in_img.md->datatype == _DATATYPE_UINT16 && ndr == 2) {
+        if (in_img.md->datatype == _DATATYPE_UINT16 && ndr_value == 2) {
             cred_counter = 1 - cred_counter;
         }
         if (prev_cred_counter > 0 && cred_counter > prev_cred_counter)
