@@ -256,13 +256,11 @@ static errno_t compute_function()
         strcpy(data.fpsptr->cmdset.triggerstreamname, in_imname);
     }
 
-    // TODO DATATYPE - WE WANT IN and QL to be INT but UTR to be FLOAT
-
     // Resolve or create outputs, per need
     IMGID out_img = makeIMGID(out_imname);
     if (resolveIMGID(&out_img, ERRMODE_WARN))
     {
-        PRINT_WARNING("WARNING FOR UTR");
+        PRINT_WARNING("WARNING - output image not found and being created");
         in_img.datatype = _DATATYPE_FLOAT; // To be passed to out_img
         imcreatelikewiseIMGID(&out_img, &in_img);
         resolveIMGID(&out_img, ERRMODE_ABORT);
@@ -355,24 +353,30 @@ static errno_t compute_function()
         cred_counter = in_img.im->array.UI16[2]; // Counter in px 3
 
         px_check = in_img.im->array.UI16[3];
-
+        
+        // Check the absolute FC
         if (frame_counter > prev_frame_counter + 1)
         {
             PRINT_WARNING("FRAME MISS %d (%d) %d (%d) - fyi NDR is: %d", frame_counter, prev_frame_counter, cred_counter, prev_cred_counter, ndr_value);
             // TODO don't forget you're missing the first frame of the ramp almost all the time.
         }
         /*
-        HOUSEKEEPING
+        INITIALIZE NDR FROM KW
         */
+        ndr_value = (int)in_img.im->kw[ndr_kw_loc].value.numl; // This is the TRUE NDR value, per the camera control server.
+
+        /*
+        HOUSEKEEPING + HIJACK COUNTER FOR CRED1 NDR2
+        Because CRED1 NDR2 counts 0 then 1, rather than the opposite in all other modes.
+        TODO actually decide before entering the loop if this is CRED1 or 2 once and for all.
+        */
+        if (in_img.md->datatype == _DATATYPE_UINT16 && ndr == 2) {
+            cred_counter = 1 - cred_counter;
+        }
         if (prev_cred_counter > 0 && cred_counter > prev_cred_counter)
         {
             PRINT_WARNING("Raw frame 0 missed - a UTR/SDS frame was lost");
         }
-
-        /*
-        INITIALIZE ACCS
-        */
-        ndr_value = (int)in_img.im->kw[ndr_kw_loc].value.numl; // This is the TRUE NDR value, per the camera control server.
 
         /*
         Complicated branching:
@@ -396,6 +400,7 @@ static errno_t compute_function()
         {
             cred_counter_repeat = 0;
         }
+
         if (ndr_value == 1 ||
             (in_img.md->datatype == _DATATYPE_UINT16 &&
              (cred_counter_repeat == 10 || !(px_check == 0))) ||
@@ -496,7 +501,7 @@ static errno_t compute_function()
                         // Compute the exposure scaling in case we missed the first read !
                         // This will be very important in CDS at high speed
                         simple_desat_finalize(last_valid, save_first_read, frame_count, ndr_value,
-                                              in_img.md->datatype == _DATATYPE_UINT16 && ndr_value == 2,
+                                              FALSE, // No inversion even CRED1 CDS
                                               out_img);
                         publish_output = TRUE;
                     }
