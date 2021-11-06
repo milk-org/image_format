@@ -278,7 +278,7 @@ static errno_t compute_function()
         out_img.im->kw[kw].value = in_img.im->kw[kw].value;
         strcpy(out_img.im->kw[kw].comment, in_img.im->kw[kw].comment);
 
-        if (strcmp(in_img.im->kw[kw].name, "NDR") == 0)
+        if (strcmp(in_img.im->kw[kw].name, "DET-NSMP") == 0)
         {
             ndr_kw_loc = kw;
         }
