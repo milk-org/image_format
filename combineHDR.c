@@ -18,22 +18,22 @@ static CLICMDARGDEF farg[] =
     {
         CLIARG_STR, ".flistname", "file list name", "HDRfilelist.txt",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &flistname
+        (void **) &flistname, NULL
     },
     {
         CLIARG_FLOAT, ".satlevel", "Saturation level", "satval",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &satlevel
+        (void **) &satlevel, NULL
     },
     {
         CLIARG_FLOAT, ".biaslevel", "Bias level", "biasval",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &biaslevel
+        (void **) &biaslevel, NULL
     },
     {
         CLIARG_STR_NOT_IMG, ".outimname", "output image", "outim",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &outimname
+        (void **) &outimname, NULL
     }
 };
 

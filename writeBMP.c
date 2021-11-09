@@ -23,22 +23,22 @@ static CLICMDARGDEF farg[] =
     {
         CLIARG_STR, ".bmp_fname", "BMP file name", "out.bmp",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &BMPfname
+        (void **) &BMPfname, NULL
     },
     {
         CLIARG_IMG, ".imRname", "Red channel image", "imR",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &imRname
+        (void **) &imRname, NULL
     },
     {
         CLIARG_IMG, ".imGname", "Green channel image", "imG",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &imGname
+        (void **) &imGname, NULL
     },
     {
         CLIARG_IMG, ".imBname", "Blue channel image", "imB",
         CLIARG_VISIBLE_DEFAULT,
-        (void **) &imBname
+        (void **) &imBname, NULL
     }
 };
 
