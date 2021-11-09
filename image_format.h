@@ -1,5 +1,5 @@
-//#ifndef _IMAGEFORMATMODULE_H
-//#define _IMAGEFORMATMODULE_H
+#ifndef _IMAGEFORMATMODULE_H
+#define _IMAGEFORMATMODULE_H
 
 
 void __attribute__((constructor)) libinit_image_format();
@@ -16,7 +16,6 @@ void __attribute__((constructor)) libinit_image_format();
 #include "image_format/read_binary32f.h"
 #include "image_format/writeBMP.h"
 #include "image_format/readPGM.h"
+#include "image_format/extract_utr.h"
 
-
-
-
+#endif

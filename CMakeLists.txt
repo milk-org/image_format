@@ -19,6 +19,7 @@ set(SOURCEFILES
 	read_binary32f.c
 	readPGM.c
 	writeBMP.c
+	extract_utr.c
 )
 
 set(INCLUDEFILES
@@ -35,6 +36,7 @@ set(INCLUDEFILES
 	read_binary32f.h
 	readPGM.h
 	writeBMP.h
+	extract_utr.h
 )
 
 
