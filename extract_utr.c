@@ -16,22 +16,27 @@ static char *out_imname;
 static double *sat_value;
 
 static CLICMDARGDEF farg[] =
-    {
-        {CLIARG_IMG, ".in_name", "input image", "im1",
-         CLIARG_VISIBLE_DEFAULT,
-         (void **)&in_imname},
-        {CLIARG_STR_NOT_IMG, ".out_name", "up-the-ramp image", "out2",
-         CLIARG_VISIBLE_DEFAULT,
-         (void **)&out_imname},
-        {CLIARG_FLOAT, ".sat_value", "Saturation threshold", "satval",
-         CLIARG_VISIBLE_DEFAULT,
-         (void **)&sat_value}};
+{
+    {   CLIARG_IMG, ".in_name", "input image", "im1",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **)&in_imname, NULL
+    },
+    {   CLIARG_STR_NOT_IMG, ".out_name", "up-the-ramp image", "out2",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **)&out_imname, NULL
+    },
+    {   CLIARG_FLOAT, ".sat_value", "Saturation threshold", "satval",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **)&sat_value, NULL
+    }
+};
 
 static CLICMDDATA CLIcmddata =
-    {
-        "cred_ql_utr",
-        "RT compute of CDS/UTR for camera streams",
-        CLICMD_FIELDS_DEFAULTS};
+{
+    "cred_ql_utr",
+    "RT compute of CDS/UTR for camera streams",
+    CLICMD_FIELDS_DEFAULTS
+};
 
 static errno_t help_function()
 {
@@ -134,7 +139,7 @@ static errno_t utr_iterate(float *sum_x, float *sum_y, float *sum_xy, float *sum
         }
     }
     else
-    {                                         // not reset
+    {   // not reset
         for (int ii = 8; ii < n_pixels; ++ii) // For all pixels, including the tags [we could skip the 1st row on the CREDs]
         {
             in_val_px = (float)in_img.im->array.UI16[ii];
@@ -226,7 +231,7 @@ static errno_t simple_desat_finalize(float *last_valid, float *first_read, int *
         }
     }
     else
-    { // invert
+    {   // invert
         for (int ii = 8; ii < n_pixels; ++ii)
         {
             // Avoid no valid frames // We need at least two reads to CDS them.
@@ -344,7 +349,7 @@ static errno_t compute_function()
         prev_frame_counter = frame_counter;
         frame_counter = in_img.im->array.UI16[0];
         if (frame_counter == prev_frame_counter)
-        {             // Do not process the same frame twice if late on the semaphores.
+        {   // Do not process the same frame twice if late on the semaphores.
             continue; // This applies to the loop started and closed in PROCINFO macros
         }
 
@@ -353,7 +358,7 @@ static errno_t compute_function()
         cred_counter = in_img.im->array.UI16[2]; // Counter in px 3
 
         px_check = in_img.im->array.UI16[3];
-        
+
         // Check the absolute FC
         if (frame_counter > prev_frame_counter + 1)
         {
@@ -383,7 +388,7 @@ static errno_t compute_function()
         A / Find if we're in NDR1
         B / Is this the CRED 1 and the CRED 2
         C / Find if we're in rawimages off -> override to ndr_value = 1; for CRED2 this is px_check == ndr_val
-        for CRED1 this is 
+        for CRED1 this is
             C.1 = px[2] always = 1 in CDS
             C.2 = px[2] always = 0 in NDR
         D / Find if we've lost sync: CRED2 4th px should match 0x3ff0, CRED1 4th pix should match 0x0000
@@ -402,10 +407,10 @@ static errno_t compute_function()
         }
 
         if (ndr_value == 1 ||
-            (in_img.md->datatype == _DATATYPE_UINT16 &&
-             (cred_counter_repeat == 10 || !(px_check == 0))) ||
-            (in_img.md->datatype == _DATATYPE_INT16 &&
-             (cred_counter == ndr_value || !((px_check & 0x3ff0) == 0x3ff0))))
+                (in_img.md->datatype == _DATATYPE_UINT16 &&
+                 (cred_counter_repeat == 10 || !(px_check == 0))) ||
+                (in_img.md->datatype == _DATATYPE_INT16 &&
+                 (cred_counter == ndr_value || !((px_check & 0x3ff0) == 0x3ff0))))
         {
             ndr_value = 1; // Override
             frame_counter_last_init = frame_counter;
@@ -413,7 +418,7 @@ static errno_t compute_function()
             just_init = TRUE;
         }
         else if (prev_cred_counter == 0 || cred_counter > prev_cred_counter)
-        { // Test: we are at the first frame of a burst OR we just missed the last frame of the previous burst
+        {   // Test: we are at the first frame of a burst OR we just missed the last frame of the previous burst
             // Note: ndr_value > 1 here.
             // Backup the first frame for CDS output
             if (in_img.md->datatype == _DATATYPE_UINT16)
@@ -481,7 +486,7 @@ static errno_t compute_function()
             }
 
             if (ndr_value == 1)
-            { // ndr_value == 1: single reads OR rawimages off passthrough mode
+            {   // ndr_value == 1: single reads OR rawimages off passthrough mode
                 if (in_img.md->datatype == _DATATYPE_UINT16)
                 {
                     copy_cast_UI16TOF(out_img.im->array.F + 8, in_img.im->array.UI16 + 8, n_pixels - 8);
@@ -497,7 +502,7 @@ static errno_t compute_function()
                 if (ndr_value <= 6)
                 {
                     if (frame_counter > frame_counter_last_init)
-                    { // Did we get two reads to do a proper CDS ?
+                    {   // Did we get two reads to do a proper CDS ?
                         // Compute the exposure scaling in case we missed the first read !
                         // This will be very important in CDS at high speed
                         simple_desat_finalize(last_valid, save_first_read, frame_count, ndr_value,
@@ -555,9 +560,9 @@ static errno_t compute_function()
 
 INSERT_STD_FPSCLIfunctions
 
-    // Register function in CLI
-    errno_t
-    CLIADDCMD_uptheramp__cred_ql_utr()
+// Register function in CLI
+errno_t
+CLIADDCMD_uptheramp__cred_ql_utr()
 {
     INSERT_STD_CLIREGISTERFUNC
 
