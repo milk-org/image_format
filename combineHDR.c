@@ -7,6 +7,10 @@
 
 #include "COREMOD_iofits/COREMOD_iofits.h"
 
+#include "image_filter/image_filter.h"
+
+
+
 // Local variables pointers
 static char *flistname;
 static double *satlevel;
@@ -81,6 +85,9 @@ errno_t combine_HDR_image(
     float etimearray[HDRmaxindex];
     imageID IDarray[HDRmaxindex];
 
+
+
+
     {
         FILE *fpin;
 
@@ -139,7 +146,7 @@ errno_t combine_HDR_image(
                 float x = 1.0*ii/xsize;
                 uint32_t ii1 = (uint32_t) (x*xsize1);
 
-                float pval = 1.0 * data.image[IDarray[kk]].array.UI16[jj*xsize + ii] - biasvalue;
+                float pval = 1.0 * data.image[IDarray[kk]].array.F[jj*xsize + ii] - biasvalue;
 
                 data.image[IDimHDRc].array.F[kk*xsize*ysize + jj*xsize + ii] = pval;
 
@@ -218,7 +225,6 @@ errno_t combine_HDR_image(
     }
 
 
-
     //double alpha1 = 1.0;
 
     // contruct layer image
@@ -272,7 +278,7 @@ errno_t combine_HDR_image(
     {
         printf("---------------- Convolve layer image ------------\n");
         fflush(stdout);
-        int NBfiter = 100;
+        int NBfiter = 500;
         float *pixcol = (float*) malloc(sizeof(float)*ysize1);
         float *pixline = (float*) malloc(sizeof(float)*xsize1);
         for(int fiter = 0; fiter < NBfiter; fiter++)
@@ -329,6 +335,8 @@ errno_t combine_HDR_image(
 
 
 
+    gauss_filter("imlayer","imlayerg", 50.0, 150);
+    imageID IDlayerg = image_ID("imlayerg");
 
 
 
@@ -378,7 +386,9 @@ errno_t combine_HDR_image(
             float pval0 = data.image[IDimHDRc].array.F[layer0*xsize*ysize + jj*xsize + ii] / etimearray[layer0];
             float pval1 = data.image[IDimHDRc].array.F[layer1*xsize*ysize + jj*xsize + ii] / etimearray[layer1];
 
-            double alpha0 = 2.0;
+            double alpha0 = 10.0;
+            double alpha1 = 2.5;
+            /*
             double alpha1 = 6.0;
             double alpha3 = 3.0;
             double alpha4 = 3.0;
@@ -389,7 +399,15 @@ errno_t combine_HDR_image(
             }
             double x1 = 1.0 / pow( 1.0 + 1.0/pow(layer/alpha0,alpha1), 1.0/alpha1);
             double layercoeff1 = 1.0 / ( 1.0 + alpha3*pow(6.0, alpha4*x1) );
+*/
+            double layerg = data.image[IDlayerg].array.F[jj1*xsize1 + ii1];
+            if(layerg > 3.0)
+            {
+                layerg = 3.0;
+            }
+            double layercoeff1 = 1.0/pow(alpha0, layerg);
 
+            //data.image[IDout].array.F[jj*xsize+ii] = (pval0 * (1.0-layercoeff) + pval1 * layercoeff);
             data.image[IDout].array.F[jj*xsize+ii] = layercoeff1 * (pval0 * (1.0-layercoeff) + pval1 * layercoeff);
         }
     }
