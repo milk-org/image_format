@@ -1,23 +1,15 @@
 /** @file read_binary32f.c
  */
 
-#include "CommandLineInterface/CLIcore.h"
 #include "COREMOD_memory/COREMOD_memory.h"
-
-
+#include "CommandLineInterface/CLIcore.h"
 
 // ==========================================
 // Forward declaration(s)
 // ==========================================
 
-imageID IMAGE_FORMAT_read_binary32f(
-    const char *__restrict fname,
-    long        xsize,
-    long        ysize,
-    const char *__restrict IDname
-);
-
-
+imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname, long xsize, long ysize,
+                                    const char *__restrict IDname);
 
 // ==========================================
 // Command line interface wrapper function(s)
@@ -25,12 +17,10 @@ imageID IMAGE_FORMAT_read_binary32f(
 
 static errno_t IMAGE_FORMAT_read_binary32f_cli()
 {
-    if(CLI_checkarg(1, 3) + CLI_checkarg(2, 2) + CLI_checkarg(3,
-            2) + CLI_checkarg(4, 3) == 0)
+    if (CLI_checkarg(1, 3) + CLI_checkarg(2, 2) + CLI_checkarg(3, 2) + CLI_checkarg(4, 3) == 0)
     {
-        IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string,
-                                    data.cmdargtoken[2].val.numl, data.cmdargtoken[3].val.numl,
-                                    data.cmdargtoken[4].val.string);
+        IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.numl,
+                                    data.cmdargtoken[3].val.numl, data.cmdargtoken[4].val.string);
         return RETURN_SUCCESS;
     }
     else
@@ -38,8 +28,6 @@ static errno_t IMAGE_FORMAT_read_binary32f_cli()
         return RETURN_FAILURE;
     }
 }
-
-
 
 // ==========================================
 // Register CLI command(s)
@@ -49,30 +37,14 @@ errno_t read_binary32f_addCLIcmd()
 {
 
     RegisterCLIcommand(
-        "readb32fim",
-        __FILE__,
-        IMAGE_FORMAT_read_binary32f_cli,
-        "read 32-bit float RAW image",
-        "<bin file> <xsize> <ysize> <output image>",
-        "readb32fim im.bin xsize ysize im",
-        "long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)"
-    );
+        "readb32fim", __FILE__, IMAGE_FORMAT_read_binary32f_cli, "read 32-bit float RAW image",
+        "<bin file> <xsize> <ysize> <output image>", "readb32fim im.bin xsize ysize im",
+        "long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)");
 
     return RETURN_SUCCESS;
 }
 
-
-
-
-
-
-
-imageID IMAGE_FORMAT_read_binary32f(
-    const char *__restrict fname,
-    long        xsize,
-    long        ysize,
-    const char *__restrict IDname
-)
+imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname, long xsize, long ysize, const char *__restrict IDname)
 {
     DEBUG_TRACE_FSTART();
 
@@ -84,7 +56,7 @@ imageID IMAGE_FORMAT_read_binary32f(
     //long v1;
 
     //Open file
-    if((fp = fopen(fname, "rb")) == NULL)
+    if ((fp = fopen(fname, "rb")) == NULL)
     {
         PRINT_ERROR("Cannot open file");
         return (0);
@@ -97,26 +69,25 @@ imageID IMAGE_FORMAT_read_binary32f(
 
     //Allocate memory
     buffer = (float *)malloc(fileLen + 1);
-    if(!buffer)
+    if (!buffer)
     {
         fprintf(stderr, "Memory error!");
         fclose(fp);
-        return(0);
+        return (0);
     }
 
     //Read file contents into buffer
-    if(fread(buffer, fileLen, 1, fp) < 1)
+    if (fread(buffer, fileLen, 1, fp) < 1)
     {
         PRINT_ERROR("fread() returns <1 value");
     }
     fclose(fp);
 
-    FUNC_CHECK_RETURN(
-        create_2Dimage_ID(IDname, xsize, ysize, &ID));
+    FUNC_CHECK_RETURN(create_2Dimage_ID(IDname, xsize, ysize, &ID));
 
     i = 0;
-    for(jj = 0; jj < ysize; jj++)
-        for(ii = 0; ii < xsize; ii++)
+    for (jj = 0; jj < ysize; jj++)
+        for (ii = 0; ii < xsize; ii++)
         {
             data.image[ID].array.F[jj * xsize + ii] = buffer[i];
             i++;
@@ -127,6 +98,3 @@ imageID IMAGE_FORMAT_read_binary32f(
     DEBUG_TRACE_FEXIT();
     return ID;
 }
-
-
-

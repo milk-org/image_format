@@ -6,23 +6,21 @@
  *
  */
 
-
 #define MODULE_SHORTNAME_DEFAULT "imgformat"
-#define MODULE_DESCRIPTION       "Conversion between image format, I/O"
-
+#define MODULE_DESCRIPTION "Conversion between image format, I/O"
 
 #include "CommandLineInterface/CLIcore.h"
 
-#include "combineHDR.h"
 #include "CR2toFITS.h"
-#include "imtoASCII.h"
-#include "extract_RGGBchan.h"
 #include "FITS_to_floatbin_lock.h"
 #include "FITS_to_ushortintbin_lock.h"
+#include "combineHDR.h"
+#include "extract_RGGBchan.h"
+#include "extract_utr.h"
+#include "imtoASCII.h"
 #include "loadCR2toFITSRGB.h"
 #include "read_binary32f.h"
 #include "writeBMP.h"
-#include "extract_utr.h"
 
 /*typedef struct
 {
@@ -37,10 +35,7 @@
 */
 //#pragma pack(2)
 
-
 INIT_MODULE_LIB(image_format)
-
-
 
 static errno_t init_module_CLI()
 {
@@ -48,39 +43,22 @@ static errno_t init_module_CLI()
     CLIADDCMD_image_format__combineHDR();
     CLIADDCMD_uptheramp__cred_ql_utr();
 
-	imtoASCII_addCLIcmd();
+    imtoASCII_addCLIcmd();
 
     CLIADDCMD_image_format__mkBMPimage();
-//	writeBMP_addCLIcmd();
+    //	writeBMP_addCLIcmd();
 
-	CR2toFITS_addCLIcmd();
-	extract_RGGBchan_addCLIcmd();
-	loadCR2toFITSRGB_addCLIcmd();
-	FITS_to_floatbin_lock_addCLIcmd();
-	FITS_to_ushortintbin_lock_addCLIcmd();
-	read_binary32f_addCLIcmd();
+    CR2toFITS_addCLIcmd();
+    extract_RGGBchan_addCLIcmd();
+    loadCR2toFITSRGB_addCLIcmd();
+    FITS_to_floatbin_lock_addCLIcmd();
+    FITS_to_ushortintbin_lock_addCLIcmd();
+    read_binary32f_addCLIcmd();
 
-
-// add atexit functions here
+    // add atexit functions here
 
     return RETURN_SUCCESS;
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /*
 
@@ -108,7 +86,7 @@ long getImageInfo(
             PRINT_ERROR("fread() returns <1 value");
         }
 
-        // calculate value based on adding bytes 
+        // calculate value based on adding bytes
         value = (long)(value + (*ptrC) * (pow(256, (i - 1))));
     }
 
@@ -347,11 +325,11 @@ long CR2toFITS_strfilter(
 		if(slen > STRINGMAXLEN_FULLFILENAME-1) {
 			slen = STRINGMAXLEN_FULLFILENAME-1;
 		}
-		
+
         fname[slen - 1] = '\0';
-        
+
         strncpy(fname1, fname, slen - 4);
-        
+
         fname1[slen - 4] = '.';
         fname1[slen - 3] = 'f';
         fname1[slen - 2] = 'i';
@@ -627,9 +605,3 @@ imageID IMAGE_FORMAT_read_binary16(
 
 
 */
-
-
-
-
-
-

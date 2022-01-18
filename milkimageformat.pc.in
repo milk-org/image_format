@@ -9,5 +9,4 @@ Version: @PROJECT_VERSION@
 
 Requires:
 Libs: -L${libdir} -lImageStreamIO -lCLIcore
-Cflags: -I${includedir} 
-
+Cflags: -I${includedir}

@@ -1,35 +1,24 @@
 /** @file imtoASCII.c
  */
 
-
-#include "CommandLineInterface/CLIcore.h"
 #include "COREMOD_memory/COREMOD_memory.h"
-
-
-
+#include "CommandLineInterface/CLIcore.h"
 
 // ==========================================
 // Forward declaration(s)
 // ==========================================
 
-errno_t IMAGE_FORMAT_im_to_ASCII(
-    const char *__restrict IDname,
-    const char *__restrict foutname
-);
-
-
+errno_t IMAGE_FORMAT_im_to_ASCII(const char *__restrict IDname, const char *__restrict foutname);
 
 // ==========================================
 // Command line interface wrapper function(s)
 // ==========================================
 
-
 static errno_t IMAGE_FORMAT_im_to_ASCII_cli()
 {
-    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 3) == 0)
+    if (CLI_checkarg(1, 4) + CLI_checkarg(2, 3) == 0)
     {
-        IMAGE_FORMAT_im_to_ASCII(data.cmdargtoken[1].val.string,
-                                 data.cmdargtoken[2].val.string);
+        IMAGE_FORMAT_im_to_ASCII(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
         return RETURN_SUCCESS;
     }
     else
@@ -38,10 +27,6 @@ static errno_t IMAGE_FORMAT_im_to_ASCII_cli()
     }
 }
 
-
-
-
-
 // ==========================================
 // Register CLI command(s)
 // ==========================================
@@ -49,33 +34,14 @@ static errno_t IMAGE_FORMAT_im_to_ASCII_cli()
 errno_t imtoASCII_addCLIcmd()
 {
 
-    RegisterCLIcommand(
-        "im2ascii",
-        __FILE__,
-        IMAGE_FORMAT_im_to_ASCII_cli,
-        "convert image file to ASCII",
-        "<input image> <output ASCII file>",
-        "im2ascii im im.txt",
-        "int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)"
-    );
+    RegisterCLIcommand("im2ascii", __FILE__, IMAGE_FORMAT_im_to_ASCII_cli, "convert image file to ASCII",
+                       "<input image> <output ASCII file>", "im2ascii im im.txt",
+                       "int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)");
 
     return RETURN_SUCCESS;
 }
 
-
-
-
-
-
-
-
-
-
-
-errno_t IMAGE_FORMAT_im_to_ASCII(
-    const char *__restrict IDname,
-    const char *__restrict foutname
-)
+errno_t IMAGE_FORMAT_im_to_ASCII(const char *__restrict IDname, const char *__restrict foutname)
 {
     long ii;
     long k;
@@ -87,14 +53,15 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
 
     ID = image_ID(IDname);
     naxis = data.image[ID].md[0].naxis;
-    coord = (long *) malloc(sizeof(long) * naxis);
-    if(coord == NULL) {
+    coord = (long *)malloc(sizeof(long) * naxis);
+    if (coord == NULL)
+    {
         PRINT_ERROR("malloc returns NULL pointer");
         abort();
     }
 
     npix = 1;
-    for(k = 0; k < naxis; k++)
+    for (k = 0; k < naxis; k++)
     {
         npix *= data.image[ID].md[0].size[k];
         coord[k] = 0;
@@ -104,15 +71,15 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
 
     fpout = fopen(foutname, "w");
 
-    for(ii = 0; ii < npix; ii++)
+    for (ii = 0; ii < npix; ii++)
     {
         int kOK;
 
-        for(k = 0; k < naxis; k++)
+        for (k = 0; k < naxis; k++)
         {
             fprintf(fpout, "%4ld ", coord[k]);
         }
-        switch(data.image[ID].md[0].datatype)
+        switch (data.image[ID].md[0].datatype)
         {
         case _DATATYPE_UINT8:
             fprintf(fpout, " %5u\n", data.image[ID].array.UI8[ii]);
@@ -151,9 +118,9 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
 
         k = 0;
         kOK = 0;
-        while((kOK == 0) && (k < naxis))
+        while ((kOK == 0) && (k < naxis))
         {
-            if(coord[k] == data.image[ID].md[0].size[k])
+            if (coord[k] == data.image[ID].md[0].size[k])
             {
                 coord[k] = 0;
                 coord[k + 1]++;
@@ -171,5 +138,3 @@ errno_t IMAGE_FORMAT_im_to_ASCII(
 
     return RETURN_SUCCESS;
 }
-
-
