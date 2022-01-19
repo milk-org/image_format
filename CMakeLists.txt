@@ -20,6 +20,7 @@ set(SOURCEFILES
 	readPGM.c
 	writeBMP.c
 	extract_utr.c
+	stream_temporal_stats.c
 )
 
 set(INCLUDEFILES
@@ -37,6 +38,7 @@ set(INCLUDEFILES
 	readPGM.h
 	writeBMP.h
 	extract_utr.h
+	stream_temporal_stats.h
 )
 
 

@@ -42,6 +42,7 @@ static errno_t init_module_CLI()
 
     CLIADDCMD_image_format__combineHDR();
     CLIADDCMD_uptheramp__cred_cds_utr();
+    CLIADDCMD_temporal_stats();
 
     imtoASCII_addCLIcmd();
 

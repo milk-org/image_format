@@ -14,6 +14,7 @@ void __attribute__((constructor)) libinit_image_format();
 #include "image_format/loadCR2toFITSRGB.h"
 #include "image_format/readPGM.h"
 #include "image_format/read_binary32f.h"
+#include "image_format/stream_temporal_stats.h"
 #include "image_format/writeBMP.h"
 
 #endif // _IMAGEFORMATMODULE_H
