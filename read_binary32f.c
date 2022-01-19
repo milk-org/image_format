@@ -1,8 +1,9 @@
 /** @file read_binary32f.c
  */
 
-#include "COREMOD_memory/COREMOD_memory.h"
 #include "CommandLineInterface/CLIcore.h"
+
+#include "COREMOD_memory/COREMOD_memory.h"
 
 // ==========================================
 // Forward declaration(s)
