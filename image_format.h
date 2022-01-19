@@ -16,4 +16,4 @@ void __attribute__((constructor)) libinit_image_format();
 #include "image_format/read_binary32f.h"
 #include "image_format/writeBMP.h"
 
-#endif
+#endif // _IMAGEFORMATMODULE_H
