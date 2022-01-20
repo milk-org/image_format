@@ -123,34 +123,34 @@ static errno_t ave_std_accumulate(IMGID in_img, void *sum_x, void *sum_xx, int r
         switch (in_img.datatype)
         {
         case _DATATYPE_UINT8:
-            FOREACH_CAST(0, n_pixels, UI8, float);
+            FOREACH_CASTADD(0, n_pixels, UI8, float);
             break;
         case _DATATYPE_INT8:
-            FOREACH_CAST(0, n_pixels, SI8, float);
+            FOREACH_CASTADD(0, n_pixels, SI8, float);
             break;
         case _DATATYPE_UINT16:
-            FOREACH_CAST(0, n_pixels, UI16, float);
+            FOREACH_CASTADD(0, n_pixels, UI16, float);
             break;
         case _DATATYPE_INT16:
-            FOREACH_CAST(0, n_pixels, SI16, float);
+            FOREACH_CASTADD(0, n_pixels, SI16, float);
             break;
         case _DATATYPE_UINT32:
-            FOREACH_CAST(0, n_pixels, UI32, float);
+            FOREACH_CASTADD(0, n_pixels, UI32, float);
             break;
         case _DATATYPE_INT32:
-            FOREACH_CAST(0, n_pixels, SI32, float);
+            FOREACH_CASTADD(0, n_pixels, SI32, float);
             break;
         case _DATATYPE_UINT64:
-            FOREACH_CAST(0, n_pixels, UI64, double);
+            FOREACH_CASTADD(0, n_pixels, UI64, double);
             break;
         case _DATATYPE_INT64:
-            FOREACH_CAST(0, n_pixels, SI64, double);
+            FOREACH_CASTADD(0, n_pixels, SI64, double);
             break;
         case _DATATYPE_FLOAT:
-            FOREACH_CAST(0, n_pixels, F, float);
+            FOREACH_CASTADD(0, n_pixels, F, float);
             break;
         case _DATATYPE_DOUBLE:
-            FOREACH_CAST(0, n_pixels, D, double);
+            FOREACH_CASTADD(0, n_pixels, D, double);
             break;
         case _DATATYPE_COMPLEX_FLOAT:
         case _DATATYPE_COMPLEX_DOUBLE:
@@ -198,7 +198,6 @@ errno_t ave_finalize(IMGID out_ave_img, void *sum_x, int n_frames_acc)
 errno_t std_finalize(IMGID out_std_img, void *sum_x, void *sum_xx, int n_frames_acc)
 {
     int n_pixels = out_std_img.md->size[0] * out_std_img.md->size[1];
-    // TODO MACRO this if a third type may occur
 
     out_std_img.md->write = TRUE;
 
