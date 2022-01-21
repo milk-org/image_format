@@ -10,18 +10,42 @@
 #include "image_filter/image_filter.h"
 
 // Local variables pointers
-static char *flistname;
+static char   *flistname;
 static double *satlevel;
 static double *biaslevel;
-static char *outimname;
+static char   *outimname;
 
-static CLICMDARGDEF farg[] = {
-    {CLIARG_STR, ".flistname", "file list name", "HDRfilelist.txt", CLIARG_VISIBLE_DEFAULT, (void **)&flistname, NULL},
-    {CLIARG_FLOAT, ".satlevel", "Saturation level", "satval", CLIARG_VISIBLE_DEFAULT, (void **)&satlevel, NULL},
-    {CLIARG_FLOAT, ".biaslevel", "Bias level", "biasval", CLIARG_VISIBLE_DEFAULT, (void **)&biaslevel, NULL},
-    {CLIARG_STR_NOT_IMG, ".outimname", "output image", "outim", CLIARG_VISIBLE_DEFAULT, (void **)&outimname, NULL}};
+static CLICMDARGDEF farg[] = {{CLIARG_STR,
+                               ".flistname",
+                               "file list name",
+                               "HDRfilelist.txt",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &flistname,
+                               NULL},
+                              {CLIARG_FLOAT,
+                               ".satlevel",
+                               "Saturation level",
+                               "satval",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &satlevel,
+                               NULL},
+                              {CLIARG_FLOAT,
+                               ".biaslevel",
+                               "Bias level",
+                               "biasval",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &biaslevel,
+                               NULL},
+                              {CLIARG_STR_NOT_IMG,
+                               ".outimname",
+                               "output image",
+                               "outim",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &outimname,
+                               NULL}};
 
-static CLICMDDATA CLIcmddata = {"combineHDR", "combine HDR image", CLICMD_FIELDS_DEFAULTS};
+static CLICMDDATA CLIcmddata = {
+    "combineHDR", "combine HDR image", CLICMD_FIELDS_DEFAULTS};
 
 // detailed help
 static errno_t help_function()
@@ -31,13 +55,16 @@ static errno_t help_function()
     return RETURN_SUCCESS;
 }
 
-errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, float biasvalue, char *__restrict outimname)
+errno_t combine_HDR_image(const char *__restrict flistname,
+                          float satvalue,
+                          float biasvalue,
+                          char *__restrict outimname)
 {
     int HDRmaxindex = 100;
 
     // Read input files and exposure times
-    int NB_HDRindex = 0;
-    float etimearray[HDRmaxindex];
+    int     NB_HDRindex = 0;
+    float   etimearray[HDRmaxindex];
     imageID IDarray[HDRmaxindex];
 
     {
@@ -47,9 +74,9 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
         char FITSfname[200];
 
         float etime;
-        int HDRindex = 0;
-        char imHDRin[200];
-        char timestring[200];
+        int   HDRindex = 0;
+        char  imHDRin[200];
+        char  timestring[200];
         while (fscanf(fpin, "%s %f %s\n", FITSfname, &etime, timestring) == 3)
         {
             imageID ID;
@@ -70,9 +97,9 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
     uint32_t ysize = data.image[IDarray[0]].md->size[1];
     uint32_t zsize = NB_HDRindex;
 
-    int binstep = 5;
-    uint32_t xsize1 = (uint32_t)(xsize / binstep);
-    uint32_t ysize1 = (uint32_t)(ysize / binstep);
+    int      binstep = 5;
+    uint32_t xsize1  = (uint32_t) (xsize / binstep);
+    uint32_t ysize1  = (uint32_t) (ysize / binstep);
     //
     // Assemble cube and subsampled cube
     //
@@ -89,20 +116,25 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
     {
         for (uint32_t jj = 0; jj < ysize; jj++)
         {
-            float y = 1.0 * jj / ysize;
-            uint32_t jj1 = (uint32_t)(y * ysize1);
+            float    y   = 1.0 * jj / ysize;
+            uint32_t jj1 = (uint32_t) (y * ysize1);
 
             for (uint32_t ii = 0; ii < xsize; ii++)
             {
-                float x = 1.0 * ii / xsize;
-                uint32_t ii1 = (uint32_t)(x * xsize1);
+                float    x   = 1.0 * ii / xsize;
+                uint32_t ii1 = (uint32_t) (x * xsize1);
 
-                float pval = 1.0 * data.image[IDarray[kk]].array.F[jj * xsize + ii] - biasvalue;
+                float pval =
+                    1.0 * data.image[IDarray[kk]].array.F[jj * xsize + ii] -
+                    biasvalue;
 
-                data.image[IDimHDRc].array.F[kk * xsize * ysize + jj * xsize + ii] = pval;
+                data.image[IDimHDRc]
+                    .array.F[kk * xsize * ysize + jj * xsize + ii] = pval;
 
-                data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] += pval;
-                data.image[IDimHDRc1w].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] += 1.0;
+                data.image[IDimHDRc1]
+                    .array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] += pval;
+                data.image[IDimHDRc1w]
+                    .array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] += 1.0;
             }
         }
     }
@@ -113,8 +145,10 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
         {
             for (uint32_t ii1 = 0; ii1 < xsize1; ii1++)
             {
-                data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] /=
-                    data.image[IDimHDRc1w].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1];
+                data.image[IDimHDRc1]
+                    .array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] /=
+                    data.image[IDimHDRc1w]
+                        .array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1];
             }
         }
     }
@@ -122,9 +156,9 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
     {
         printf("---------------- Convolve binned image ------------\n");
         fflush(stdout);
-        int NBfiter = 5;
-        float *pixcol = (float *)malloc(sizeof(float) * ysize1);
-        float *pixline = (float *)malloc(sizeof(float) * xsize1);
+        int    NBfiter = 5;
+        float *pixcol  = (float *) malloc(sizeof(float) * ysize1);
+        float *pixline = (float *) malloc(sizeof(float) * xsize1);
         for (int fiter = 0; fiter < NBfiter; fiter++)
         {
             printf(".");
@@ -137,13 +171,21 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
                     for (uint32_t ii1 = 1; ii1 < xsize1 - 1; ii1++)
                     {
                         pixline[ii1] =
-                            0.3 * data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1 - 1] +
-                            0.4 * data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] +
-                            0.3 * data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1 + 1];
+                            0.3 * data.image[IDimHDRc1]
+                                      .array.F[kk * xsize1 * ysize1 +
+                                               jj1 * xsize1 + ii1 - 1] +
+                            0.4 * data.image[IDimHDRc1]
+                                      .array.F[kk * xsize1 * ysize1 +
+                                               jj1 * xsize1 + ii1] +
+                            0.3 * data.image[IDimHDRc1]
+                                      .array.F[kk * xsize1 * ysize1 +
+                                               jj1 * xsize1 + ii1 + 1];
                     }
                     for (uint32_t ii1 = 1; ii1 < xsize1 - 1; ii1++)
                     {
-                        data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] = pixline[ii1];
+                        data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 +
+                                                      jj1 * xsize1 + ii1] =
+                            pixline[ii1];
                     }
                 }
 
@@ -152,13 +194,21 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
                     for (uint32_t jj1 = 1; jj1 < ysize1 - 1; jj1++)
                     {
                         pixcol[jj1] =
-                            0.3 * data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + (jj1 - 1) * xsize1 + ii1] +
-                            0.4 * data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] +
-                            0.3 * data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + (jj1 + 1) * xsize1 + ii1];
+                            0.3 * data.image[IDimHDRc1]
+                                      .array.F[kk * xsize1 * ysize1 +
+                                               (jj1 - 1) * xsize1 + ii1] +
+                            0.4 * data.image[IDimHDRc1]
+                                      .array.F[kk * xsize1 * ysize1 +
+                                               jj1 * xsize1 + ii1] +
+                            0.3 * data.image[IDimHDRc1]
+                                      .array.F[kk * xsize1 * ysize1 +
+                                               (jj1 + 1) * xsize1 + ii1];
                     }
                     for (uint32_t jj1 = 1; jj1 < ysize1 - 1; jj1++)
                     {
-                        data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + jj1 * xsize1 + ii1] = pixcol[jj1];
+                        data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 +
+                                                      jj1 * xsize1 + ii1] =
+                            pixcol[jj1];
                     }
                 }
             }
@@ -184,8 +234,10 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
         //float layer = 0.0;
         uint32_t layer0 = 0;
         uint32_t layer1 = 0;
-        uint32_t kk = 0;
-        while ((kk < zsize) && (data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + ij1] > satvalue))
+        uint32_t kk     = 0;
+        while ((kk < zsize) &&
+               (data.image[IDimHDRc1].array.F[kk * xsize1 * ysize1 + ij1] >
+                satvalue))
         {
             layer0 = kk;
             kk++;
@@ -197,13 +249,15 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
             layer1 = zsize - 1;
         }
 
-        float valmax = data.image[IDimHDRc1].array.F[layer0 * xsize1 * ysize1 + ij1];
+        float valmax =
+            data.image[IDimHDRc1].array.F[layer0 * xsize1 * ysize1 + ij1];
         if ((valmax > satvalue) && (layer1 < zsize - 1))
         {
             // increment layers
             layer0++;
             layer1++;
-            valmax = data.image[IDimHDRc1].array.F[layer0 * xsize1 * ysize1 + ij1];
+            valmax =
+                data.image[IDimHDRc1].array.F[layer0 * xsize1 * ysize1 + ij1];
         }
         //float valmin = data.image[IDimHDRc1].array.F[layer1*xsize1*ysize1+ij1];
 
@@ -212,15 +266,16 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
         //float c2 = 1.0-c1;
 
         data.image[IDlayer].array.F[ij1] = 1.0 * layer0;
-        data.image[IDlayermin].array.F[ij1] = 1.0 * layer0; // don't go below this layer
+        data.image[IDlayermin].array.F[ij1] =
+            1.0 * layer0; // don't go below this layer
     }
 
     {
         printf("---------------- Convolve layer image ------------\n");
         fflush(stdout);
-        int NBfiter = 500;
-        float *pixcol = (float *)malloc(sizeof(float) * ysize1);
-        float *pixline = (float *)malloc(sizeof(float) * xsize1);
+        int    NBfiter = 500;
+        float *pixcol  = (float *) malloc(sizeof(float) * ysize1);
+        float *pixline = (float *) malloc(sizeof(float) * xsize1);
         for (int fiter = 0; fiter < NBfiter; fiter++)
         {
             printf(".");
@@ -229,13 +284,17 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
             {
                 for (uint32_t ii1 = 1; ii1 < xsize1 - 1; ii1++)
                 {
-                    pixline[ii1] = 0.3 * data.image[IDlayer].array.F[jj1 * xsize1 + ii1 - 1] +
-                                   0.4 * data.image[IDlayer].array.F[jj1 * xsize1 + ii1] +
-                                   0.3 * data.image[IDlayer].array.F[jj1 * xsize1 + ii1 + 1];
+                    pixline[ii1] =
+                        0.3 * data.image[IDlayer]
+                                  .array.F[jj1 * xsize1 + ii1 - 1] +
+                        0.4 * data.image[IDlayer].array.F[jj1 * xsize1 + ii1] +
+                        0.3 *
+                            data.image[IDlayer].array.F[jj1 * xsize1 + ii1 + 1];
                 }
                 for (uint32_t ii1 = 1; ii1 < xsize1 - 1; ii1++)
                 {
-                    data.image[IDlayer].array.F[jj1 * xsize1 + ii1] = pixline[ii1];
+                    data.image[IDlayer].array.F[jj1 * xsize1 + ii1] =
+                        pixline[ii1];
                 }
             }
 
@@ -243,13 +302,17 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
             {
                 for (uint32_t jj1 = 1; jj1 < ysize1 - 1; jj1++)
                 {
-                    pixcol[jj1] = 0.3 * data.image[IDlayer].array.F[(jj1 - 1) * xsize1 + ii1] +
-                                  0.4 * data.image[IDlayer].array.F[jj1 * xsize1 + ii1] +
-                                  0.3 * data.image[IDlayer].array.F[(jj1 + 1) * xsize1 + ii1];
+                    pixcol[jj1] =
+                        0.3 * data.image[IDlayer]
+                                  .array.F[(jj1 - 1) * xsize1 + ii1] +
+                        0.4 * data.image[IDlayer].array.F[jj1 * xsize1 + ii1] +
+                        0.3 * data.image[IDlayer]
+                                  .array.F[(jj1 + 1) * xsize1 + ii1];
                 }
                 for (uint32_t jj1 = 1; jj1 < ysize1 - 1; jj1++)
                 {
-                    data.image[IDlayer].array.F[jj1 * xsize1 + ii1] = pixcol[jj1];
+                    data.image[IDlayer].array.F[jj1 * xsize1 + ii1] =
+                        pixcol[jj1];
                 }
             }
 
@@ -282,8 +345,8 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
 
     for (uint32_t jj = 0; jj < ysize; jj++)
     {
-        float y = 1.0 * jj / ysize;
-        uint32_t jj1 = (uint32_t)(y * ysize1);
+        float    y   = 1.0 * jj / ysize;
+        uint32_t jj1 = (uint32_t) (y * ysize1);
         if (jj1 == ysize1 - 1)
         {
             jj1 = ysize1 - 2;
@@ -292,8 +355,8 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
 
         for (uint32_t ii = 0; ii < xsize; ii++)
         {
-            float x = 1.0 * ii / xsize;
-            uint32_t ii1 = (uint32_t)(x * xsize1);
+            float    x   = 1.0 * ii / xsize;
+            uint32_t ii1 = (uint32_t) (x * xsize1);
             if (ii1 == xsize1 - 1)
             {
                 ii1 = xsize1 - 2;
@@ -303,13 +366,17 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
             // get layer
             float layer00 = data.image[IDlayer].array.F[jj1 * xsize1 + ii1];
             float layer10 = data.image[IDlayer].array.F[jj1 * xsize1 + ii1 + 1];
-            float layer01 = data.image[IDlayer].array.F[(jj1 + 1) * xsize1 + ii1];
-            float layer11 = data.image[IDlayer].array.F[(jj1 + 1) * xsize1 + ii1 + 1];
+            float layer01 =
+                data.image[IDlayer].array.F[(jj1 + 1) * xsize1 + ii1];
+            float layer11 =
+                data.image[IDlayer].array.F[(jj1 + 1) * xsize1 + ii1 + 1];
 
-            float layer = layer00 * (1.0 - ii1frac) * (1.0 - jj1frac) + layer01 * (1.0 - ii1frac) * jj1frac +
-                          layer10 * ii1frac * (1.0 - jj1frac) + layer11 * ii1frac * jj1frac;
+            float layer = layer00 * (1.0 - ii1frac) * (1.0 - jj1frac) +
+                          layer01 * (1.0 - ii1frac) * jj1frac +
+                          layer10 * ii1frac * (1.0 - jj1frac) +
+                          layer11 * ii1frac * jj1frac;
 
-            uint32_t layer0 = (uint32_t)layer;
+            uint32_t layer0 = (uint32_t) layer;
             uint32_t layer1 = layer0 + 1;
             if (layer1 == zsize)
             {
@@ -317,8 +384,14 @@ errno_t combine_HDR_image(const char *__restrict flistname, float satvalue, floa
             }
             float layercoeff = layer - 1.0 * layer0;
 
-            float pval0 = data.image[IDimHDRc].array.F[layer0 * xsize * ysize + jj * xsize + ii] / etimearray[layer0];
-            float pval1 = data.image[IDimHDRc].array.F[layer1 * xsize * ysize + jj * xsize + ii] / etimearray[layer1];
+            float pval0 =
+                data.image[IDimHDRc]
+                    .array.F[layer0 * xsize * ysize + jj * xsize + ii] /
+                etimearray[layer0];
+            float pval1 =
+                data.image[IDimHDRc]
+                    .array.F[layer1 * xsize * ysize + jj * xsize + ii] /
+                etimearray[layer1];
 
             double alpha0 = 10.0;
             double alpha1 = 2.5;

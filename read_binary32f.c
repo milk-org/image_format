@@ -9,7 +9,9 @@
 // Forward declaration(s)
 // ==========================================
 
-imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname, long xsize, long ysize,
+imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname,
+                                    long xsize,
+                                    long ysize,
                                     const char *__restrict IDname);
 
 // ==========================================
@@ -18,10 +20,14 @@ imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname, long xsize, lo
 
 static errno_t IMAGE_FORMAT_read_binary32f_cli()
 {
-    if (CLI_checkarg(1, 3) + CLI_checkarg(2, 2) + CLI_checkarg(3, 2) + CLI_checkarg(4, 3) == 0)
+    if (CLI_checkarg(1, 3) + CLI_checkarg(2, 2) + CLI_checkarg(3, 2) +
+            CLI_checkarg(4, 3) ==
+        0)
     {
-        IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.numl,
-                                    data.cmdargtoken[3].val.numl, data.cmdargtoken[4].val.string);
+        IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string,
+                                    data.cmdargtoken[2].val.numl,
+                                    data.cmdargtoken[3].val.numl,
+                                    data.cmdargtoken[4].val.string);
         return RETURN_SUCCESS;
     }
     else
@@ -37,23 +43,30 @@ static errno_t IMAGE_FORMAT_read_binary32f_cli()
 errno_t read_binary32f_addCLIcmd()
 {
 
-    RegisterCLIcommand(
-        "readb32fim", __FILE__, IMAGE_FORMAT_read_binary32f_cli, "read 32-bit float RAW image",
-        "<bin file> <xsize> <ysize> <output image>", "readb32fim im.bin xsize ysize im",
-        "long IMAGE_FORMAT_read_binary32f(const char *fname, long xsize, long ysize, const char *IDname)");
+    RegisterCLIcommand("readb32fim",
+                       __FILE__,
+                       IMAGE_FORMAT_read_binary32f_cli,
+                       "read 32-bit float RAW image",
+                       "<bin file> <xsize> <ysize> <output image>",
+                       "readb32fim im.bin xsize ysize im",
+                       "long IMAGE_FORMAT_read_binary32f(const char *fname, "
+                       "long xsize, long ysize, const char *IDname)");
 
     return RETURN_SUCCESS;
 }
 
-imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname, long xsize, long ysize, const char *__restrict IDname)
+imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname,
+                                    long xsize,
+                                    long ysize,
+                                    const char *__restrict IDname)
 {
     DEBUG_TRACE_FSTART();
 
-    FILE *fp;
-    float *buffer;
+    FILE         *fp;
+    float        *buffer;
     unsigned long fileLen;
-    long i, ii, jj;
-    imageID ID;
+    long          i, ii, jj;
+    imageID       ID;
     //long v1;
 
     //Open file
@@ -69,7 +82,7 @@ imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname, long xsize, lo
     fseek(fp, 0, SEEK_SET);
 
     //Allocate memory
-    buffer = (float *)malloc(fileLen + 1);
+    buffer = (float *) malloc(fileLen + 1);
     if (!buffer)
     {
         fprintf(stderr, "Memory error!");

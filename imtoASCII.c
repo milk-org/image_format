@@ -9,7 +9,8 @@
 // Forward declaration(s)
 // ==========================================
 
-errno_t IMAGE_FORMAT_im_to_ASCII(const char *__restrict IDname, const char *__restrict foutname);
+errno_t IMAGE_FORMAT_im_to_ASCII(const char *__restrict IDname,
+                                 const char *__restrict foutname);
 
 // ==========================================
 // Command line interface wrapper function(s)
@@ -19,7 +20,8 @@ static errno_t IMAGE_FORMAT_im_to_ASCII_cli()
 {
     if (CLI_checkarg(1, 4) + CLI_checkarg(2, 3) == 0)
     {
-        IMAGE_FORMAT_im_to_ASCII(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string);
+        IMAGE_FORMAT_im_to_ASCII(data.cmdargtoken[1].val.string,
+                                 data.cmdargtoken[2].val.string);
         return RETURN_SUCCESS;
     }
     else
@@ -35,26 +37,32 @@ static errno_t IMAGE_FORMAT_im_to_ASCII_cli()
 errno_t imtoASCII_addCLIcmd()
 {
 
-    RegisterCLIcommand("im2ascii", __FILE__, IMAGE_FORMAT_im_to_ASCII_cli, "convert image file to ASCII",
-                       "<input image> <output ASCII file>", "im2ascii im im.txt",
-                       "int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)");
+    RegisterCLIcommand(
+        "im2ascii",
+        __FILE__,
+        IMAGE_FORMAT_im_to_ASCII_cli,
+        "convert image file to ASCII",
+        "<input image> <output ASCII file>",
+        "im2ascii im im.txt",
+        "int IMAGE_FORMAT_im_to_ASCII(const char *IDname, const char *fname)");
 
     return RETURN_SUCCESS;
 }
 
-errno_t IMAGE_FORMAT_im_to_ASCII(const char *__restrict IDname, const char *__restrict foutname)
+errno_t IMAGE_FORMAT_im_to_ASCII(const char *__restrict IDname,
+                                 const char *__restrict foutname)
 {
-    long ii;
-    long k;
+    long    ii;
+    long    k;
     imageID ID;
-    FILE *fpout;
-    long naxis;
-    long *coord;
-    long npix;
+    FILE   *fpout;
+    long    naxis;
+    long   *coord;
+    long    npix;
 
-    ID = image_ID(IDname);
+    ID    = image_ID(IDname);
     naxis = data.image[ID].md[0].naxis;
-    coord = (long *)malloc(sizeof(long) * naxis);
+    coord = (long *) malloc(sizeof(long) * naxis);
     if (coord == NULL)
     {
         PRINT_ERROR("malloc returns NULL pointer");
@@ -117,7 +125,7 @@ errno_t IMAGE_FORMAT_im_to_ASCII(const char *__restrict IDname, const char *__re
         }
         coord[0]++;
 
-        k = 0;
+        k   = 0;
         kOK = 0;
         while ((kOK == 0) && (k < naxis))
         {

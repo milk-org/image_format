@@ -7,7 +7,7 @@
  */
 
 #define MODULE_SHORTNAME_DEFAULT "imgformat"
-#define MODULE_DESCRIPTION "Conversion between image format, I/O"
+#define MODULE_DESCRIPTION       "Conversion between image format, I/O"
 
 #include "CommandLineInterface/CLIcore.h"
 

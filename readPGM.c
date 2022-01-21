@@ -12,9 +12,10 @@
  *
  * @note written to read output of "dcraw -t 0 -D -4 xxx.CR2" into FITS
  */
-imageID read_PGMimage(const char *__restrict fname, const char *__restrict ID_name)
+imageID read_PGMimage(const char *__restrict fname,
+                      const char *__restrict ID_name)
 {
-    FILE *fp;
+    FILE   *fp;
     imageID ID;
 
     if ((fp = fopen(fname, "r")) == NULL)
@@ -24,10 +25,10 @@ imageID read_PGMimage(const char *__restrict fname, const char *__restrict ID_na
     }
     else
     {
-        char line1[100];
-        long xsize, ysize;
-        long maxval;
-        long ii, jj;
+        char   line1[100];
+        long   xsize, ysize;
+        long   maxval;
+        long   ii, jj;
         double val;
 
         {
@@ -40,13 +41,17 @@ imageID read_PGMimage(const char *__restrict fname, const char *__restrict ID_na
                 }
                 else
                 {
-                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                    fprintf(stderr,
+                            "Error: fscanf reached end of file, no matching "
+                            "characters, no matching failure\n");
                 }
                 exit(EXIT_FAILURE);
             }
             else if (fscanfcnt != 1)
             {
-                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 1 expected\n",
+                fprintf(stderr,
+                        "Error: fscanf successfully matched and assigned %i "
+                        "input items, 1 expected\n",
                         fscanfcnt);
                 exit(EXIT_FAILURE);
             }
@@ -67,13 +72,17 @@ imageID read_PGMimage(const char *__restrict fname, const char *__restrict ID_na
                 }
                 else
                 {
-                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                    fprintf(stderr,
+                            "Error: fscanf reached end of file, no matching "
+                            "characters, no matching failure\n");
                 }
                 exit(EXIT_FAILURE);
             }
             else if (fscanfcnt != 2)
             {
-                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 2 expected\n",
+                fprintf(stderr,
+                        "Error: fscanf successfully matched and assigned %i "
+                        "input items, 2 expected\n",
                         fscanfcnt);
                 exit(EXIT_FAILURE);
             }
@@ -89,13 +98,17 @@ imageID read_PGMimage(const char *__restrict fname, const char *__restrict ID_na
                 }
                 else
                 {
-                    fprintf(stderr, "Error: fscanf reached end of file, no matching characters, no matching failure\n");
+                    fprintf(stderr,
+                            "Error: fscanf reached end of file, no matching "
+                            "characters, no matching failure\n");
                 }
                 exit(EXIT_FAILURE);
             }
             else if (fscanfcnt != 1)
             {
-                fprintf(stderr, "Error: fscanf successfully matched and assigned %i input items, 1 expected\n",
+                fprintf(stderr,
+                        "Error: fscanf successfully matched and assigned %i "
+                        "input items, 1 expected\n",
                         fscanfcnt);
                 exit(EXIT_FAILURE);
             }
@@ -113,8 +126,10 @@ imageID read_PGMimage(const char *__restrict fname, const char *__restrict ID_na
                 {
                     for (ii = 0; ii < xsize; ii++)
                     {
-                        val = 256.0 * ((int)fgetc(fp)) + 1.0 * ((int)fgetc(fp));
-                        data.image[ID].array.F[(ysize - jj - 1) * xsize + ii] = val;
+                        val =
+                            256.0 * ((int) fgetc(fp)) + 1.0 * ((int) fgetc(fp));
+                        data.image[ID].array.F[(ysize - jj - 1) * xsize + ii] =
+                            val;
                     }
                 }
             }

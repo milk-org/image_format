@@ -19,18 +19,35 @@
 #include "math.h"
 
 // Local variables pointers
-static char *in_name;
+static char    *in_name;
 static int32_t *ptr_n_frames;
-static double *ptr_timeout;
+static double  *ptr_timeout;
 
-static CLICMDARGDEF farg[] = {
-    {CLIARG_IMG, ".in_name", "input image", "in_name", CLIARG_VISIBLE_DEFAULT, (void **)&in_name, NULL},
-    {CLIARG_INT32, ".n_frames", "Stats every n frames max", "n_frames", CLIARG_VISIBLE_DEFAULT, (void **)&ptr_n_frames,
-     NULL},
-    {CLIARG_FLOAT64, ".timeout", "Stats at timeout (sec)", "timeout", CLIARG_VISIBLE_DEFAULT, (void **)&ptr_timeout,
-     NULL}};
+static CLICMDARGDEF farg[] = {{CLIARG_IMG,
+                               ".in_name",
+                               "input image",
+                               "in_name",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &in_name,
+                               NULL},
+                              {CLIARG_INT32,
+                               ".n_frames",
+                               "Stats every n frames max",
+                               "n_frames",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &ptr_n_frames,
+                               NULL},
+                              {CLIARG_FLOAT64,
+                               ".timeout",
+                               "Stats at timeout (sec)",
+                               "timeout",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &ptr_timeout,
+                               NULL}};
 
-static CLICMDDATA CLIcmddata = {"stream_av_std", "RT compute of ave/std of image streams", CLICMD_FIELDS_DEFAULTS};
+static CLICMDDATA CLIcmddata = {"stream_av_std",
+                                "RT compute of ave/std of image streams",
+                                CLICMD_FIELDS_DEFAULTS};
 
 static errno_t help_function()
 {
@@ -42,39 +59,40 @@ static errno_t help_function()
 THE IMPORTANT, CUSTOM PART
 */
 
-#define FOREACH_CAST(start, end, in_arr, out_type)                                                                     \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        int i;                                                                                                         \
-        int j = end;                                                                                                   \
-        out_type val;                                                                                                  \
-        out_type *ptr_sumx = (out_type *)sum_x;                                                                        \
-        out_type *ptr_sumxx = (out_type *)sum_xx;                                                                      \
-        for (i = start; i < j; i++)                                                                                    \
-        {                                                                                                              \
-            val = (out_type)in_img.im->array.in_arr[i];                                                                \
-            ptr_sumx[i] = val;                                                                                         \
-            ptr_sumxx[i] = val * val;                                                                                  \
-        }                                                                                                              \
+#define FOREACH_CAST(start, end, in_arr, out_type)                             \
+    do                                                                         \
+    {                                                                          \
+        int       i;                                                           \
+        int       j = end;                                                     \
+        out_type  val;                                                         \
+        out_type *ptr_sumx  = (out_type *) sum_x;                              \
+        out_type *ptr_sumxx = (out_type *) sum_xx;                             \
+        for (i = start; i < j; i++)                                            \
+        {                                                                      \
+            val          = (out_type) in_img.im->array.in_arr[i];              \
+            ptr_sumx[i]  = val;                                                \
+            ptr_sumxx[i] = val * val;                                          \
+        }                                                                      \
     } while (0)
 
-#define FOREACH_CASTADD(start, end, in_arr, out_type)                                                                  \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        int i;                                                                                                         \
-        int j = end;                                                                                                   \
-        out_type val;                                                                                                  \
-        out_type *ptr_sumx = (out_type *)sum_x;                                                                        \
-        out_type *ptr_sumxx = (out_type *)sum_xx;                                                                      \
-        for (i = start; i < j; i++)                                                                                    \
-        {                                                                                                              \
-            val = (out_type)in_img.im->array.in_arr[i];                                                                \
-            ptr_sumx[i] += val;                                                                                        \
-            ptr_sumxx[i] += val * val;                                                                                 \
-        }                                                                                                              \
+#define FOREACH_CASTADD(start, end, in_arr, out_type)                          \
+    do                                                                         \
+    {                                                                          \
+        int       i;                                                           \
+        int       j = end;                                                     \
+        out_type  val;                                                         \
+        out_type *ptr_sumx  = (out_type *) sum_x;                              \
+        out_type *ptr_sumxx = (out_type *) sum_xx;                             \
+        for (i = start; i < j; i++)                                            \
+        {                                                                      \
+            val = (out_type) in_img.im->array.in_arr[i];                       \
+            ptr_sumx[i] += val;                                                \
+            ptr_sumxx[i] += val * val;                                         \
+        }                                                                      \
     } while (0)
 
-static errno_t ave_std_accumulate(IMGID in_img, void *sum_x, void *sum_xx, int reset)
+static errno_t
+ave_std_accumulate(IMGID in_img, void *sum_x, void *sum_xx, int reset)
 {
     int n_pixels = in_img.md->size[0] * in_img.md->size[1];
     if (reset)
@@ -173,7 +191,7 @@ errno_t ave_finalize(IMGID out_ave_img, void *sum_x, int n_frames_acc)
     // Two possible datatypes: float or double
     if (out_ave_img.datatype == _DATATYPE_FLOAT)
     {
-        float *ptr_sumx = (float *)sum_x;
+        float *ptr_sumx = (float *) sum_x;
         for (int ii = 0; ii < n_pixels; ++ii)
         {
             out_ave_img.im->array.F[ii] = ptr_sumx[ii] / n_frames_acc;
@@ -181,7 +199,7 @@ errno_t ave_finalize(IMGID out_ave_img, void *sum_x, int n_frames_acc)
     }
     else if (out_ave_img.datatype == _DATATYPE_DOUBLE)
     {
-        double *ptr_sumx = (double *)sum_x;
+        double *ptr_sumx = (double *) sum_x;
         for (int ii = 0; ii < n_pixels; ++ii)
         {
             out_ave_img.im->array.D[ii] = ptr_sumx[ii] / n_frames_acc;
@@ -195,7 +213,8 @@ errno_t ave_finalize(IMGID out_ave_img, void *sum_x, int n_frames_acc)
     return RETURN_SUCCESS;
 }
 
-errno_t std_finalize(IMGID out_std_img, void *sum_x, void *sum_xx, int n_frames_acc)
+errno_t
+std_finalize(IMGID out_std_img, void *sum_x, void *sum_xx, int n_frames_acc)
 {
     int n_pixels = out_std_img.md->size[0] * out_std_img.md->size[1];
 
@@ -204,22 +223,26 @@ errno_t std_finalize(IMGID out_std_img, void *sum_x, void *sum_xx, int n_frames_
     // Two possible datatypes: float or double
     if (out_std_img.datatype == _DATATYPE_FLOAT)
     {
-        float *ptr_sumx = (float *)sum_x;
-        float *ptr_sumxx = (float *)sum_xx;
+        float *ptr_sumx  = (float *) sum_x;
+        float *ptr_sumxx = (float *) sum_xx;
         for (int ii = 0; ii < n_pixels; ++ii)
         {
-            out_std_img.im->array.F[ii] = sqrtf32(ptr_sumxx[ii] / (n_frames_acc - 1) -
-                                                  ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) / (n_frames_acc - 1));
+            out_std_img.im->array.F[ii] =
+                sqrtf32(ptr_sumxx[ii] / (n_frames_acc - 1) -
+                        ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) /
+                            (n_frames_acc - 1));
         }
     }
     else if (out_std_img.datatype == _DATATYPE_DOUBLE)
     {
-        double *ptr_sumx = (double *)sum_x;
-        double *ptr_sumxx = (double *)sum_xx;
+        double *ptr_sumx  = (double *) sum_x;
+        double *ptr_sumxx = (double *) sum_xx;
         for (int ii = 0; ii < n_pixels; ++ii)
         {
-            out_std_img.im->array.D[ii] = sqrtf64(ptr_sumxx[ii] / (n_frames_acc - 1) -
-                                                  ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) / (n_frames_acc - 1));
+            out_std_img.im->array.D[ii] =
+                sqrtf64(ptr_sumxx[ii] / (n_frames_acc - 1) -
+                        ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) /
+                            (n_frames_acc - 1));
         }
     }
     else
@@ -250,9 +273,9 @@ static errno_t compute_function()
     }
 
     // HANDLE DATATYPES
-    uint8_t _DATATYPE_INPUT = in_img.md->datatype;
-    uint8_t SIZEOF_DATATYPE_INPUT = ImageStreamIO_typesize(_DATATYPE_INPUT);
-    uint8_t _DATATYPE_OUTPUT = ImageStreamIO_floattype(_DATATYPE_INPUT);
+    uint8_t _DATATYPE_INPUT        = in_img.md->datatype;
+    uint8_t SIZEOF_DATATYPE_INPUT  = ImageStreamIO_typesize(_DATATYPE_INPUT);
+    uint8_t _DATATYPE_OUTPUT       = ImageStreamIO_floattype(_DATATYPE_INPUT);
     uint8_t SIZEOF_DATATYPE_OUTPUT = ImageStreamIO_typesize(_DATATYPE_OUTPUT);
 
     char out_ave_name[200];
@@ -267,7 +290,8 @@ static errno_t compute_function()
     IMGID out_ave_img = makeIMGID(out_ave_name);
     if (resolveIMGID(&out_ave_img, ERRMODE_WARN))
     {
-        PRINT_WARNING("WARNING - output average image not found and being created");
+        PRINT_WARNING(
+            "WARNING - output average image not found and being created");
         in_img.datatype = _DATATYPE_OUTPUT; // To be passed to out_ave_img
         imcreatelikewiseIMGID(&out_ave_img, &in_img);
         resolveIMGID(&out_ave_img, ERRMODE_ABORT);
@@ -291,12 +315,12 @@ static errno_t compute_function()
     {
         // AVE
         strcpy(out_ave_img.im->kw[kw].name, in_img.im->kw[kw].name);
-        out_ave_img.im->kw[kw].type = in_img.im->kw[kw].type;
+        out_ave_img.im->kw[kw].type  = in_img.im->kw[kw].type;
         out_ave_img.im->kw[kw].value = in_img.im->kw[kw].value;
         strcpy(out_ave_img.im->kw[kw].comment, in_img.im->kw[kw].comment);
         // STD
         strcpy(out_std_img.im->kw[kw].name, in_img.im->kw[kw].name);
-        out_std_img.im->kw[kw].type = in_img.im->kw[kw].type;
+        out_std_img.im->kw[kw].type  = in_img.im->kw[kw].type;
         out_std_img.im->kw[kw].value = in_img.im->kw[kw].value;
         strcpy(out_std_img.im->kw[kw].comment, in_img.im->kw[kw].comment);
     }
@@ -307,11 +331,11 @@ static errno_t compute_function()
 
     int n_pixels = in_img.md->size[0] * in_img.md->size[1];
 
-    void *sum_x = malloc(n_pixels * SIZEOF_DATATYPE_OUTPUT);
+    void *sum_x  = malloc(n_pixels * SIZEOF_DATATYPE_OUTPUT);
     void *sum_xx = malloc(n_pixels * SIZEOF_DATATYPE_OUTPUT);
 
     // HOUSEKEEPING
-    int n_frames_acc = 0;
+    int n_frames_acc   = 0;
     int just_published = FALSE;
 
     struct timespec time1;
@@ -350,7 +374,8 @@ static errno_t compute_function()
         */
         clock_gettime(CLOCK_MILK, &time2);
 
-        if ((n_frames_acc >= *ptr_n_frames || timespec_diff_double(time1, time2) > *ptr_timeout))
+        if ((n_frames_acc >= *ptr_n_frames ||
+             timespec_diff_double(time1, time2) > *ptr_timeout))
         {
             if (n_frames_acc >= 1)
             {
@@ -367,7 +392,8 @@ static errno_t compute_function()
                 if (n_frames_acc >= 2)
                 {
                     std_finalize(out_std_img, sum_x, sum_xx, n_frames_acc);
-                    processinfo_update_output_stream(processinfo, out_std_img.ID);
+                    processinfo_update_output_stream(processinfo,
+                                                     out_std_img.ID);
                 }
 
                 // TODO update the timeout timespec

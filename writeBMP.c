@@ -3,7 +3,7 @@
 
 #include "CommandLineInterface/CLIcore.h"
 
-const int BYTES_PER_PIXEL = 3; /// red, green, & blue
+const int BYTES_PER_PIXEL  = 3; /// red, green, & blue
 const int FILE_HEADER_SIZE = 14;
 const int INFO_HEADER_SIZE = 40;
 
@@ -13,13 +13,37 @@ static char *imRname;
 static char *imGname;
 static char *imBname;
 
-static CLICMDARGDEF farg[] = {
-    {CLIARG_STR, ".bmp_fname", "BMP file name", "out.bmp", CLIARG_VISIBLE_DEFAULT, (void **)&BMPfname, NULL},
-    {CLIARG_IMG, ".imRname", "Red channel image", "imR", CLIARG_VISIBLE_DEFAULT, (void **)&imRname, NULL},
-    {CLIARG_IMG, ".imGname", "Green channel image", "imG", CLIARG_VISIBLE_DEFAULT, (void **)&imGname, NULL},
-    {CLIARG_IMG, ".imBname", "Blue channel image", "imB", CLIARG_VISIBLE_DEFAULT, (void **)&imBname, NULL}};
+static CLICMDARGDEF farg[] = {{CLIARG_STR,
+                               ".bmp_fname",
+                               "BMP file name",
+                               "out.bmp",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &BMPfname,
+                               NULL},
+                              {CLIARG_IMG,
+                               ".imRname",
+                               "Red channel image",
+                               "imR",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &imRname,
+                               NULL},
+                              {CLIARG_IMG,
+                               ".imGname",
+                               "Green channel image",
+                               "imG",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &imGname,
+                               NULL},
+                              {CLIARG_IMG,
+                               ".imBname",
+                               "Blue channel image",
+                               "imB",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &imBname,
+                               NULL}};
 
-static CLICMDDATA CLIcmddata = {"mkBMPim", "make BMP image", CLICMD_FIELDS_DEFAULTS};
+static CLICMDDATA CLIcmddata = {
+    "mkBMPim", "make BMP image", CLICMD_FIELDS_DEFAULTS};
 
 // detailed help
 static errno_t help_function()
@@ -34,19 +58,29 @@ static unsigned char *createBitmapFileHeader(int height, int stride)
     int fileSize = FILE_HEADER_SIZE + INFO_HEADER_SIZE + (stride * height);
 
     static unsigned char fileHeader[] = {
-        0, 0,       /// signature
-        0, 0, 0, 0, /// image file size in bytes
-        0, 0, 0, 0, /// reserved
-        0, 0, 0, 0, /// start of pixel array
+        0,
+        0, /// signature
+        0,
+        0,
+        0,
+        0, /// image file size in bytes
+        0,
+        0,
+        0,
+        0, /// reserved
+        0,
+        0,
+        0,
+        0, /// start of pixel array
     };
 
-    fileHeader[0] = (unsigned char)('B');
-    fileHeader[1] = (unsigned char)('M');
-    fileHeader[2] = (unsigned char)(fileSize);
-    fileHeader[3] = (unsigned char)(fileSize >> 8);
-    fileHeader[4] = (unsigned char)(fileSize >> 16);
-    fileHeader[5] = (unsigned char)(fileSize >> 24);
-    fileHeader[10] = (unsigned char)(FILE_HEADER_SIZE + INFO_HEADER_SIZE);
+    fileHeader[0]  = (unsigned char) ('B');
+    fileHeader[1]  = (unsigned char) ('M');
+    fileHeader[2]  = (unsigned char) (fileSize);
+    fileHeader[3]  = (unsigned char) (fileSize >> 8);
+    fileHeader[4]  = (unsigned char) (fileSize >> 16);
+    fileHeader[5]  = (unsigned char) (fileSize >> 24);
+    fileHeader[10] = (unsigned char) (FILE_HEADER_SIZE + INFO_HEADER_SIZE);
 
     return fileHeader;
 }
@@ -67,27 +101,30 @@ static unsigned char *createBitmapInfoHeader(int height, int width)
         0, 0, 0, 0, /// important color count
     };
 
-    infoHeader[0] = (unsigned char)(INFO_HEADER_SIZE);
-    infoHeader[4] = (unsigned char)(width);
-    infoHeader[5] = (unsigned char)(width >> 8);
-    infoHeader[6] = (unsigned char)(width >> 16);
-    infoHeader[7] = (unsigned char)(width >> 24);
-    infoHeader[8] = (unsigned char)(height);
-    infoHeader[9] = (unsigned char)(height >> 8);
-    infoHeader[10] = (unsigned char)(height >> 16);
-    infoHeader[11] = (unsigned char)(height >> 24);
-    infoHeader[12] = (unsigned char)(1);
-    infoHeader[14] = (unsigned char)(BYTES_PER_PIXEL * 8);
+    infoHeader[0]  = (unsigned char) (INFO_HEADER_SIZE);
+    infoHeader[4]  = (unsigned char) (width);
+    infoHeader[5]  = (unsigned char) (width >> 8);
+    infoHeader[6]  = (unsigned char) (width >> 16);
+    infoHeader[7]  = (unsigned char) (width >> 24);
+    infoHeader[8]  = (unsigned char) (height);
+    infoHeader[9]  = (unsigned char) (height >> 8);
+    infoHeader[10] = (unsigned char) (height >> 16);
+    infoHeader[11] = (unsigned char) (height >> 24);
+    infoHeader[12] = (unsigned char) (1);
+    infoHeader[14] = (unsigned char) (BYTES_PER_PIXEL * 8);
 
     return infoHeader;
 }
 
-static void generateBitmapImage(unsigned char *image, int height, int width, char *imageFileName)
+static void generateBitmapImage(unsigned char *image,
+                                int            height,
+                                int            width,
+                                char          *imageFileName)
 {
     int widthInBytes = width * BYTES_PER_PIXEL;
 
-    unsigned char padding[3] = {0, 0, 0};
-    int paddingSize = (4 - (widthInBytes) % 4) % 4;
+    unsigned char padding[3]  = {0, 0, 0};
+    int           paddingSize = (4 - (widthInBytes) % 4) % 4;
 
     int stride = (widthInBytes) + paddingSize;
 
@@ -109,24 +146,27 @@ static void generateBitmapImage(unsigned char *image, int height, int width, cha
     fclose(imageFile);
 }
 
-errno_t image_writeBMP(const char *__restrict IDnameR, const char *__restrict IDnameG, const char *__restrict IDnameB,
+errno_t image_writeBMP(const char *__restrict IDnameR,
+                       const char *__restrict IDnameG,
+                       const char *__restrict IDnameB,
                        char *__restrict outname)
 {
-    imageID IDR, IDG, IDB;
-    uint32_t width;
-    uint32_t height;
+    imageID        IDR, IDG, IDB;
+    uint32_t       width;
+    uint32_t       height;
     unsigned char *array;
-    uint32_t ii, jj;
+    uint32_t       ii, jj;
 
     printf("Function %s\n", __FUNCTION__);
 
-    IDR = image_ID(IDnameR);
-    IDG = image_ID(IDnameG);
-    IDB = image_ID(IDnameB);
-    width = (uint32_t)data.image[IDR].md[0].size[0];
-    height = (uint32_t)data.image[IDR].md[0].size[1];
+    IDR    = image_ID(IDnameR);
+    IDG    = image_ID(IDnameG);
+    IDB    = image_ID(IDnameB);
+    width  = (uint32_t) data.image[IDR].md[0].size[0];
+    height = (uint32_t) data.image[IDR].md[0].size[1];
 
-    array = (unsigned char *)malloc(sizeof(unsigned char) * width * height * 3);
+    array =
+        (unsigned char *) malloc(sizeof(unsigned char) * width * height * 3);
     if (array == NULL)
     {
         PRINT_ERROR("malloc returns NULL pointer");
@@ -136,11 +176,17 @@ errno_t image_writeBMP(const char *__restrict IDnameR, const char *__restrict ID
     for (ii = 0; ii < width; ii++)
         for (jj = 0; jj < height; jj++)
         {
-            array[(jj * width + ii) * 3] = (unsigned char)(data.image[IDB].array.F[(height - jj - 1) * width + ii]);
+            array[(jj * width + ii) * 3] =
+                (unsigned char) (data.image[IDB]
+                                     .array.F[(height - jj - 1) * width + ii]);
 
-            array[(jj * width + ii) * 3 + 1] = (unsigned char)(data.image[IDG].array.F[(height - jj - 1) * width + ii]);
+            array[(jj * width + ii) * 3 + 1] =
+                (unsigned char) (data.image[IDG]
+                                     .array.F[(height - jj - 1) * width + ii]);
 
-            array[(jj * width + ii) * 3 + 2] = (unsigned char)(data.image[IDR].array.F[(height - jj - 1) * width + ii]);
+            array[(jj * width + ii) * 3 + 2] =
+                (unsigned char) (data.image[IDR]
+                                     .array.F[(height - jj - 1) * width + ii]);
         }
     generateBitmapImage(array, height, width, outname);
 

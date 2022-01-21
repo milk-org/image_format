@@ -16,22 +16,22 @@
 
 errno_t CR2tomov()
 {
-    char configfile[STRINGMAXLEN_FILENAME];
+    char    configfile[STRINGMAXLEN_FILENAME];
     imageID ID, IDr, IDg, IDb;
-    long ii, i;
-    long cnt = 0;
-    long cntmax;
-    char fname[STRINGMAXLEN_FULLFILENAME];
-    char fnamer[STRINGMAXLEN_FULLFILENAME];
-    char fnameg[STRINGMAXLEN_FULLFILENAME];
-    char fnameb[STRINGMAXLEN_FULLFILENAME];
-    char fnamestat[STRINGMAXLEN_FULLFILENAME];
-    char fnameoutr[STRINGMAXLEN_FULLFILENAME];
-    char fnameoutg[STRINGMAXLEN_FULLFILENAME];
-    char fnameoutb[STRINGMAXLEN_FULLFILENAME];
-    char fnamejpg[STRINGMAXLEN_FULLFILENAME];
-    FILE *fp;
-    FILE *fp1;
+    long    ii, i;
+    long    cnt = 0;
+    long    cntmax;
+    char    fname[STRINGMAXLEN_FULLFILENAME];
+    char    fnamer[STRINGMAXLEN_FULLFILENAME];
+    char    fnameg[STRINGMAXLEN_FULLFILENAME];
+    char    fnameb[STRINGMAXLEN_FULLFILENAME];
+    char    fnamestat[STRINGMAXLEN_FULLFILENAME];
+    char    fnameoutr[STRINGMAXLEN_FULLFILENAME];
+    char    fnameoutg[STRINGMAXLEN_FULLFILENAME];
+    char    fnameoutb[STRINGMAXLEN_FULLFILENAME];
+    char    fnamejpg[STRINGMAXLEN_FULLFILENAME];
+    FILE   *fp;
+    FILE   *fp1;
 
     long xsize, ysize;
 
@@ -44,17 +44,17 @@ errno_t CR2tomov()
     //double alpha = 0.7;
 
     // conversion from CR2 to FITS RGB
-    int CR2toFITSrgb;
-    int CR2TOFITSRGB_FORCE;
+    int  CR2toFITSrgb;
+    int  CR2TOFITSRGB_FORCE;
     long maxnbFITSfiles;
-    int binfact;
+    int  binfact;
 
     // conversion from FITS RGB to JPEG
-    int FITStoJPEG;
+    int    FITStoJPEG;
     double MINLEVEL;
     double MAXLEVEL;
 
-    int MAXLEVEL_AUTO;
+    int    MAXLEVEL_AUTO;
     double MAXLEVEL_AUTO_FLOOR;
     double MAXLEVEL_AUTO_CEIL;
 
@@ -85,18 +85,22 @@ errno_t CR2tomov()
 
     double ALPHA;
 
-    double vp01, vp05, vp10, vp20, vp50, vp80, vp90, vp95, vp99, vp995, vp998, vp999;
-    double vp01r, vp05r, vp10r, vp20r, vp50r, vp80r, vp90r, vp95r, vp99r, vp995r, vp998r, vp999r;
-    double vp01g, vp05g, vp10g, vp20g, vp50g, vp80g, vp90g, vp95g, vp99g, vp995g, vp998g, vp999g;
-    double vp01b, vp05b, vp10b, vp20b, vp50b, vp80b, vp90b, vp95b, vp99b, vp995b, vp998b, vp999b;
+    double vp01, vp05, vp10, vp20, vp50, vp80, vp90, vp95, vp99, vp995, vp998,
+        vp999;
+    double vp01r, vp05r, vp10r, vp20r, vp50r, vp80r, vp90r, vp95r, vp99r,
+        vp995r, vp998r, vp999r;
+    double vp01g, vp05g, vp10g, vp20g, vp50g, vp80g, vp90g, vp95g, vp99g,
+        vp995g, vp998g, vp999g;
+    double vp01b, vp05b, vp10b, vp20b, vp50b, vp80b, vp90b, vp95b, vp99b,
+        vp995b, vp998b, vp999b;
     double *maxlevel;
     double *maxlevel1;
     double *array;
-    double value, valuecnt;
-    long boxsize;
-    double sigma;
-    long j;
-    long jstart;
+    double  value, valuecnt;
+    long    boxsize;
+    double  sigma;
+    long    j;
+    long    jstart;
     //long jend;
     long j1;
 
@@ -115,7 +119,8 @@ errno_t CR2tomov()
 
     {
         // code block write image name
-        int slen = snprintf(configfile, STRINGMAXLEN_FILENAME, "cr2tojpegconf.txt");
+        int slen =
+            snprintf(configfile, STRINGMAXLEN_FILENAME, "cr2tojpegconf.txt");
         if (slen < 1)
         {
             PRINT_ERROR("snprintf wrote <1 char");
@@ -129,53 +134,69 @@ errno_t CR2tomov()
     } // end code block
 
     CR2toFITSrgb = read_config_parameter_int(configfile, "CR2TOFITSRGB");
-    CR2TOFITSRGB_FORCE = read_config_parameter_int(configfile, "CR2TOFITSRGB_FORCE");
-    maxnbFITSfiles = read_config_parameter_long(configfile, "CR2TOFITS_MAXNBFILE");
+    CR2TOFITSRGB_FORCE =
+        read_config_parameter_int(configfile, "CR2TOFITSRGB_FORCE");
+    maxnbFITSfiles =
+        read_config_parameter_long(configfile, "CR2TOFITS_MAXNBFILE");
     binfact = read_config_parameter_int(configfile, "CR2TOFITSBIN");
 
-    maxlevel = (double *)malloc(sizeof(double) * maxnbFITSfiles);
+    maxlevel = (double *) malloc(sizeof(double) * maxnbFITSfiles);
 
     FITStoJPEG = read_config_parameter_int(configfile, "FITStoJPEG");
-    MINLEVEL = read_config_parameter_float(configfile, "MINLEVEL");
-    MAXLEVEL = read_config_parameter_float(configfile, "MAXLEVEL");
+    MINLEVEL   = read_config_parameter_float(configfile, "MINLEVEL");
+    MAXLEVEL   = read_config_parameter_float(configfile, "MAXLEVEL");
 
     MAXLEVEL_AUTO = read_config_parameter_int(configfile, "MAXLEVEL_AUTO");
-    MAXLEVEL_AUTO_FLOOR = read_config_parameter_float(configfile, "MAXLEVEL_AUTO_FLOOR");
+    MAXLEVEL_AUTO_FLOOR =
+        read_config_parameter_float(configfile, "MAXLEVEL_AUTO_FLOOR");
 
     if (read_config_parameter_exists(configfile, "MAXLEVEL_AUTO_CEIL") == 1)
     {
-        MAXLEVEL_AUTO_CEIL = read_config_parameter_float(configfile, "MAXLEVEL_AUTO_CEIL");
+        MAXLEVEL_AUTO_CEIL =
+            read_config_parameter_float(configfile, "MAXLEVEL_AUTO_CEIL");
     }
     else
     {
         MAXLEVEL_AUTO_CEIL = 100000.0;
     }
 
-    MAX_PERC01_COEFF = read_config_parameter_float(configfile, "MAX_PERC01_COEFF");
-    MAX_PERC05_COEFF = read_config_parameter_float(configfile, "MAX_PERC05_COEFF");
-    MAX_PERC10_COEFF = read_config_parameter_float(configfile, "MAX_PERC10_COEFF");
-    MAX_PERC20_COEFF = read_config_parameter_float(configfile, "MAX_PERC20_COEFF");
-    MAX_PERC50_COEFF = read_config_parameter_float(configfile, "MAX_PERC50_COEFF");
-    MAX_PERC80_COEFF = read_config_parameter_float(configfile, "MAX_PERC80_COEFF");
-    MAX_PERC90_COEFF = read_config_parameter_float(configfile, "MAX_PERC90_COEFF");
-    MAX_PERC95_COEFF = read_config_parameter_float(configfile, "MAX_PERC95_COEFF");
-    MAX_PERC99_COEFF = read_config_parameter_float(configfile, "MAX_PERC99_COEFF");
-    MAX_PERC995_COEFF = read_config_parameter_float(configfile, "MAX_PERC995_COEFF");
-    MAX_PERC998_COEFF = read_config_parameter_float(configfile, "MAX_PERC998_COEFF");
-    MAX_PERC999_COEFF = read_config_parameter_float(configfile, "MAX_PERC999_COEFF");
+    MAX_PERC01_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC01_COEFF");
+    MAX_PERC05_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC05_COEFF");
+    MAX_PERC10_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC10_COEFF");
+    MAX_PERC20_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC20_COEFF");
+    MAX_PERC50_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC50_COEFF");
+    MAX_PERC80_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC80_COEFF");
+    MAX_PERC90_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC90_COEFF");
+    MAX_PERC95_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC95_COEFF");
+    MAX_PERC99_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC99_COEFF");
+    MAX_PERC995_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC995_COEFF");
+    MAX_PERC998_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC998_COEFF");
+    MAX_PERC999_COEFF =
+        read_config_parameter_float(configfile, "MAX_PERC999_COEFF");
 
-    RGBM_RR = read_config_parameter_float(configfile, "RGBM_RR");
-    RGBM_RG = read_config_parameter_float(configfile, "RGBM_RG");
-    RGBM_RB = read_config_parameter_float(configfile, "RGBM_RB");
-    RGBM_GR = read_config_parameter_float(configfile, "RGBM_GR");
-    RGBM_GG = read_config_parameter_float(configfile, "RGBM_GG");
-    RGBM_GB = read_config_parameter_float(configfile, "RGBM_GB");
-    RGBM_BR = read_config_parameter_float(configfile, "RGBM_BR");
-    RGBM_BG = read_config_parameter_float(configfile, "RGBM_BG");
-    RGBM_BB = read_config_parameter_float(configfile, "RGBM_BB");
-    LUMR = read_config_parameter_float(configfile, "LUMR");
-    LUMG = read_config_parameter_float(configfile, "LUMG");
-    LUMB = read_config_parameter_float(configfile, "LUMB");
+    RGBM_RR  = read_config_parameter_float(configfile, "RGBM_RR");
+    RGBM_RG  = read_config_parameter_float(configfile, "RGBM_RG");
+    RGBM_RB  = read_config_parameter_float(configfile, "RGBM_RB");
+    RGBM_GR  = read_config_parameter_float(configfile, "RGBM_GR");
+    RGBM_GG  = read_config_parameter_float(configfile, "RGBM_GG");
+    RGBM_GB  = read_config_parameter_float(configfile, "RGBM_GB");
+    RGBM_BR  = read_config_parameter_float(configfile, "RGBM_BR");
+    RGBM_BG  = read_config_parameter_float(configfile, "RGBM_BG");
+    RGBM_BB  = read_config_parameter_float(configfile, "RGBM_BB");
+    LUMR     = read_config_parameter_float(configfile, "LUMR");
+    LUMG     = read_config_parameter_float(configfile, "LUMG");
+    LUMB     = read_config_parameter_float(configfile, "LUMB");
     COLORSAT = read_config_parameter_float(configfile, "COLORSAT");
 
     //NLCONV = 0;
@@ -196,7 +217,7 @@ errno_t CR2tomov()
     ID = variable_ID("SKIP");
     if (ID != 1)
     {
-        SKIP = (long)(data.variable[ID].value.f + 0.1);
+        SKIP = (long) (data.variable[ID].value.f + 0.1);
     }
     printf("SKIP = %ld\n", SKIP);
 
@@ -222,10 +243,14 @@ errno_t CR2tomov()
             WRITE_FULLFILENAME(fnameoutb, "./FITS/imb%05ld.fits", cnt);
 
             MKim = 0;
-            if ((file_exists(fnameoutr) == 1) && (file_exists(fnameoutg) == 1) && (file_exists(fnameoutb) == 1) &&
-                (CR2TOFITSRGB_FORCE == 0))
+            if ((file_exists(fnameoutr) == 1) &&
+                (file_exists(fnameoutg) == 1) &&
+                (file_exists(fnameoutb) == 1) && (CR2TOFITSRGB_FORCE == 0))
             {
-                printf("Files %s %s %s exist, no need to recreate\n", fnameoutr, fnameoutg, fnameoutb);
+                printf("Files %s %s %s exist, no need to recreate\n",
+                       fnameoutr,
+                       fnameoutg,
+                       fnameoutb);
             }
             else
             {
@@ -247,7 +272,7 @@ errno_t CR2tomov()
                         delete_image_ID("imb", DELETE_IMAGE_ERRMODE_WARNING);
                         chname_image_ID("imbc","imb");
                         }*/
-                    ID = image_ID("imr");
+                    ID    = image_ID("imr");
                     xsize = data.image[ID].md[0].size[0];
                     ysize = data.image[ID].md[0].size[1];
 
@@ -269,9 +294,12 @@ errno_t CR2tomov()
                         data.image[IDg].array.F[ii] /= binfact * binfact;
                         data.image[IDb].array.F[ii] /= binfact * binfact;
 
-                        data.image[IDrtot].array.F[ii] += data.image[IDr].array.F[ii];
-                        data.image[IDgtot].array.F[ii] += data.image[IDg].array.F[ii];
-                        data.image[IDbtot].array.F[ii] += data.image[IDb].array.F[ii];
+                        data.image[IDrtot].array.F[ii] +=
+                            data.image[IDr].array.F[ii];
+                        data.image[IDgtot].array.F[ii] +=
+                            data.image[IDg].array.F[ii];
+                        data.image[IDbtot].array.F[ii] +=
+                            data.image[IDb].array.F[ii];
                     }
                     save_fl_fits("imrtot", "imrtot.fits");
                     save_fl_fits("imgtot", "imgtot.fits");
@@ -286,7 +314,8 @@ errno_t CR2tomov()
                 }
             }
 
-            if (((MKim == 1) || (file_exists(fnamestat) == 0)) && (SKIPcnt == 0))
+            if (((MKim == 1) || (file_exists(fnamestat) == 0)) &&
+                (SKIPcnt == 0))
             {
                 printf("[%ld] working on file %s (statistics)\n", cnt, fname);
                 if (MKim == 0)
@@ -300,93 +329,128 @@ errno_t CR2tomov()
                 }
 
                 info_image_stats("imr", "");
-                ID = variable_ID("vp01");
-                vp01r = data.variable[ID].value.f;
-                ID = variable_ID("vp05");
-                vp05r = data.variable[ID].value.f;
-                ID = variable_ID("vp10");
-                vp10r = data.variable[ID].value.f;
-                ID = variable_ID("vp20");
-                vp20r = data.variable[ID].value.f;
-                ID = variable_ID("vp50");
-                vp50r = data.variable[ID].value.f;
-                ID = variable_ID("vp80");
-                vp80r = data.variable[ID].value.f;
-                ID = variable_ID("vp90");
-                vp90r = data.variable[ID].value.f;
-                ID = variable_ID("vp95");
-                vp95r = data.variable[ID].value.f;
-                ID = variable_ID("vp99");
-                vp99r = data.variable[ID].value.f;
-                ID = variable_ID("vp995");
+                ID     = variable_ID("vp01");
+                vp01r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp05");
+                vp05r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp10");
+                vp10r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp20");
+                vp20r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp50");
+                vp50r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp80");
+                vp80r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp90");
+                vp90r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp95");
+                vp95r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp99");
+                vp99r  = data.variable[ID].value.f;
+                ID     = variable_ID("vp995");
                 vp995r = data.variable[ID].value.f;
-                ID = variable_ID("vp998");
+                ID     = variable_ID("vp998");
                 vp998r = data.variable[ID].value.f;
-                ID = variable_ID("vp999");
+                ID     = variable_ID("vp999");
                 vp999r = data.variable[ID].value.f;
                 delete_image_ID("imr", DELETE_IMAGE_ERRMODE_WARNING);
 
                 info_image_stats("img", "");
-                ID = variable_ID("vp01");
-                vp01g = data.variable[ID].value.f;
-                ID = variable_ID("vp05");
-                vp05g = data.variable[ID].value.f;
-                ID = variable_ID("vp10");
-                vp10g = data.variable[ID].value.f;
-                ID = variable_ID("vp20");
-                vp20g = data.variable[ID].value.f;
-                ID = variable_ID("vp50");
-                vp50g = data.variable[ID].value.f;
-                ID = variable_ID("vp80");
-                vp80g = data.variable[ID].value.f;
-                ID = variable_ID("vp90");
-                vp90g = data.variable[ID].value.f;
-                ID = variable_ID("vp95");
-                vp95g = data.variable[ID].value.f;
-                ID = variable_ID("vp99");
-                vp99g = data.variable[ID].value.f;
-                ID = variable_ID("vp995");
+                ID     = variable_ID("vp01");
+                vp01g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp05");
+                vp05g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp10");
+                vp10g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp20");
+                vp20g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp50");
+                vp50g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp80");
+                vp80g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp90");
+                vp90g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp95");
+                vp95g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp99");
+                vp99g  = data.variable[ID].value.f;
+                ID     = variable_ID("vp995");
                 vp995g = data.variable[ID].value.f;
-                ID = variable_ID("vp998");
+                ID     = variable_ID("vp998");
                 vp998g = data.variable[ID].value.f;
-                ID = variable_ID("vp999");
+                ID     = variable_ID("vp999");
                 vp999g = data.variable[ID].value.f;
                 delete_image_ID("img", DELETE_IMAGE_ERRMODE_WARNING);
 
                 info_image_stats("imb", "");
-                ID = variable_ID("vp01");
-                vp01b = data.variable[ID].value.f;
-                ID = variable_ID("vp05");
-                vp05b = data.variable[ID].value.f;
-                ID = variable_ID("vp10");
-                vp10b = data.variable[ID].value.f;
-                ID = variable_ID("vp20");
-                vp20b = data.variable[ID].value.f;
-                ID = variable_ID("vp50");
-                vp50b = data.variable[ID].value.f;
-                ID = variable_ID("vp80");
-                vp80b = data.variable[ID].value.f;
-                ID = variable_ID("vp90");
-                vp90b = data.variable[ID].value.f;
-                ID = variable_ID("vp95");
-                vp95b = data.variable[ID].value.f;
-                ID = variable_ID("vp99");
-                vp99b = data.variable[ID].value.f;
-                ID = variable_ID("vp995");
+                ID     = variable_ID("vp01");
+                vp01b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp05");
+                vp05b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp10");
+                vp10b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp20");
+                vp20b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp50");
+                vp50b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp80");
+                vp80b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp90");
+                vp90b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp95");
+                vp95b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp99");
+                vp99b  = data.variable[ID].value.f;
+                ID     = variable_ID("vp995");
                 vp995b = data.variable[ID].value.f;
-                ID = variable_ID("vp998");
+                ID     = variable_ID("vp998");
                 vp998b = data.variable[ID].value.f;
-                ID = variable_ID("vp999");
+                ID     = variable_ID("vp999");
                 vp999b = data.variable[ID].value.f;
                 delete_image_ID("imb", DELETE_IMAGE_ERRMODE_WARNING);
 
                 fp1 = fopen(fnamestat, "w");
                 fprintf(fp1,
-                        "%05ld %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g "
+                        "%05ld %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g %g "
+                        "%g %g %g %g %g %g %g %g %g %g %g %g %g "
                         "%g %g %g %g %g %g %g\n",
-                        cnt, vp01r, vp05r, vp10r, vp20r, vp50r, vp80r, vp90r, vp95r, vp99r, vp995r, vp998r, vp999r,
-                        vp01g, vp05g, vp10g, vp20g, vp50g, vp80g, vp90g, vp95g, vp99g, vp995g, vp998g, vp999g, vp01b,
-                        vp05b, vp10b, vp20b, vp50b, vp80b, vp90b, vp95b, vp99b, vp995b, vp998b, vp999b);
+                        cnt,
+                        vp01r,
+                        vp05r,
+                        vp10r,
+                        vp20r,
+                        vp50r,
+                        vp80r,
+                        vp90r,
+                        vp95r,
+                        vp99r,
+                        vp995r,
+                        vp998r,
+                        vp999r,
+                        vp01g,
+                        vp05g,
+                        vp10g,
+                        vp20g,
+                        vp50g,
+                        vp80g,
+                        vp90g,
+                        vp95g,
+                        vp99g,
+                        vp995g,
+                        vp998g,
+                        vp999g,
+                        vp01b,
+                        vp05b,
+                        vp10b,
+                        vp20b,
+                        vp50b,
+                        vp80b,
+                        vp90b,
+                        vp95b,
+                        vp99b,
+                        vp995b,
+                        vp998b,
+                        vp999b);
                 fclose(fp1);
 
                 if (MKim == 0)
@@ -437,34 +501,73 @@ errno_t CR2tomov()
         {
             PRINT_ERROR("Cannot open file");
         }
-        while (fscanf(fp,
-                      "%05ld %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
-                      "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
-                      &cnt, &vp01r, &vp05r, &vp10r, &vp20r, &vp50r, &vp80r, &vp90r, &vp95r, &vp99r, &vp995r, &vp998r,
-                      &vp999r, &vp01g, &vp05g, &vp10g, &vp20g, &vp50g, &vp80g, &vp90g, &vp95g, &vp99g, &vp995g, &vp998g,
-                      &vp999g, &vp01b, &vp05b, &vp10b, &vp20b, &vp50b, &vp80b, &vp90b, &vp95b, &vp99b, &vp995b, &vp998b,
-                      &vp999b) == 37)
+        while (
+            fscanf(fp,
+                   "%05ld %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf "
+                   "%lf %lf %lf %lf %lf %lf %lf %lf %lf "
+                   "%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf\n",
+                   &cnt,
+                   &vp01r,
+                   &vp05r,
+                   &vp10r,
+                   &vp20r,
+                   &vp50r,
+                   &vp80r,
+                   &vp90r,
+                   &vp95r,
+                   &vp99r,
+                   &vp995r,
+                   &vp998r,
+                   &vp999r,
+                   &vp01g,
+                   &vp05g,
+                   &vp10g,
+                   &vp20g,
+                   &vp50g,
+                   &vp80g,
+                   &vp90g,
+                   &vp95g,
+                   &vp99g,
+                   &vp995g,
+                   &vp998g,
+                   &vp999g,
+                   &vp01b,
+                   &vp05b,
+                   &vp10b,
+                   &vp20b,
+                   &vp50b,
+                   &vp80b,
+                   &vp90b,
+                   &vp95b,
+                   &vp99b,
+                   &vp995b,
+                   &vp998b,
+                   &vp999b) == 37)
         {
-            vp01 = (vp01r + vp01g + vp01b) / 3.0;
-            vp05 = (vp05r + vp05g + vp05b) / 3.0;
-            vp10 = (vp10r + vp10g + vp10b) / 3.0;
-            vp20 = (vp20r + vp20g + vp20b) / 3.0;
-            vp50 = (vp50r + vp50g + vp50b) / 3.0;
-            vp80 = (vp80r + vp80g + vp80b) / 3.0;
-            vp90 = (vp90r + vp90g + vp90b) / 3.0;
-            vp95 = (vp95r + vp95g + vp95b) / 3.0;
-            vp99 = (vp99r + vp99g + vp99b) / 3.0;
+            vp01  = (vp01r + vp01g + vp01b) / 3.0;
+            vp05  = (vp05r + vp05g + vp05b) / 3.0;
+            vp10  = (vp10r + vp10g + vp10b) / 3.0;
+            vp20  = (vp20r + vp20g + vp20b) / 3.0;
+            vp50  = (vp50r + vp50g + vp50b) / 3.0;
+            vp80  = (vp80r + vp80g + vp80b) / 3.0;
+            vp90  = (vp90r + vp90g + vp90b) / 3.0;
+            vp95  = (vp95r + vp95g + vp95b) / 3.0;
+            vp99  = (vp99r + vp99g + vp99b) / 3.0;
             vp995 = (vp995r + vp995g + vp995b) / 3.0;
             vp998 = (vp998r + vp998g + vp998b) / 3.0;
             vp999 = (vp999r + vp999g + vp999b) / 3.0;
             if (cnt < maxnbFITSfiles)
             {
-                maxlevel[cnt] = vp01 * MAX_PERC01_COEFF + vp05 * MAX_PERC05_COEFF + vp10 * MAX_PERC10_COEFF +
-                                vp20 * MAX_PERC20_COEFF + vp50 * MAX_PERC50_COEFF + vp80 * MAX_PERC80_COEFF +
-                                vp90 * MAX_PERC90_COEFF + vp95 * MAX_PERC95_COEFF + vp99 * MAX_PERC99_COEFF +
-                                vp995 * MAX_PERC995_COEFF + vp998 * MAX_PERC998_COEFF + vp999 * MAX_PERC999_COEFF;
+                maxlevel[cnt] =
+                    vp01 * MAX_PERC01_COEFF + vp05 * MAX_PERC05_COEFF +
+                    vp10 * MAX_PERC10_COEFF + vp20 * MAX_PERC20_COEFF +
+                    vp50 * MAX_PERC50_COEFF + vp80 * MAX_PERC80_COEFF +
+                    vp90 * MAX_PERC90_COEFF + vp95 * MAX_PERC95_COEFF +
+                    vp99 * MAX_PERC99_COEFF + vp995 * MAX_PERC995_COEFF +
+                    vp998 * MAX_PERC998_COEFF + vp999 * MAX_PERC999_COEFF;
                 printf("[%ld %g]   ", cnt, maxlevel[cnt]);
-                maxlevel[cnt] = sqrt(maxlevel[cnt] * maxlevel[cnt] + MAXLEVEL_AUTO_FLOOR * MAXLEVEL_AUTO_FLOOR);
+                maxlevel[cnt] = sqrt(maxlevel[cnt] * maxlevel[cnt] +
+                                     MAXLEVEL_AUTO_FLOOR * MAXLEVEL_AUTO_FLOOR);
                 if (maxlevel[cnt] > MAXLEVEL_AUTO_CEIL)
                 {
                     maxlevel[cnt] = MAXLEVEL_AUTO_CEIL;
@@ -488,7 +591,7 @@ errno_t CR2tomov()
             boxsize = 100;
             if (boxsize > 0.1 * cntmax)
             {
-                boxsize = (long)(0.1 * cntmax);
+                boxsize = (long) (0.1 * cntmax);
             }
             sigma = 0.2 * boxsize;
 
@@ -498,8 +601,8 @@ errno_t CR2tomov()
             }
             printf("boxsize = %ld\n", boxsize);
 
-            array = (double *)malloc(sizeof(double) * (2 * boxsize + 1));
-            maxlevel1 = (double *)malloc(sizeof(double) * cntmax);
+            array     = (double *) malloc(sizeof(double) * (2 * boxsize + 1));
+            maxlevel1 = (double *) malloc(sizeof(double) * cntmax);
             for (i = 0; i < cntmax; i++)
             {
                 jstart = i - boxsize;
@@ -537,14 +640,15 @@ errno_t CR2tomov()
 
                 quick_sort_double(array, 2 * boxsize + 1);
 
-                value = 0.0;
+                value    = 0.0;
                 valuecnt = 0.0;
                 for (ii = 0; ii < 2 * boxsize + 1; ii++)
                 {
                     double tmp1;
 
                     tmp1 = 1.0 * (ii - boxsize);
-                    value += log10(array[ii]) * exp(-tmp1 * tmp1 / sigma / sigma);
+                    value +=
+                        log10(array[ii]) * exp(-tmp1 * tmp1 / sigma / sigma);
                     valuecnt += exp(-tmp1 * tmp1 / sigma / sigma);
                 }
 
@@ -555,7 +659,10 @@ errno_t CR2tomov()
             fp = fopen("maxlevel.log", "w");
             for (i = 0; i < cntmax; i++)
             {
-                printf("%ld MAXLEVEL : %g ---> %g\n", i, maxlevel[i], maxlevel1[i]);
+                printf("%ld MAXLEVEL : %g ---> %g\n",
+                       i,
+                       maxlevel[i],
+                       maxlevel1[i]);
                 fprintf(fp, "%ld %g %g\n", i, maxlevel[i], maxlevel1[i]);
                 maxlevel[i] = maxlevel1[i];
             }
@@ -573,7 +680,7 @@ errno_t CR2tomov()
         ID = variable_ID("SKIP_FITStoJPEG");
         if (ID != 1)
         {
-            SKIP_FITStoJPEG = (long)(data.variable[ID].value.f + 0.1);
+            SKIP_FITStoJPEG = (long) (data.variable[ID].value.f + 0.1);
         }
         printf("SKIP FITS to JPEG = %ld\n", SKIP_FITStoJPEG);
 
@@ -602,7 +709,9 @@ errno_t CR2tomov()
                         }
                         else
                         {
-                            WRITE_FULLFILENAME(fnamer, "./FITS/imr%05ld.fits", i);
+                            WRITE_FULLFILENAME(fnamer,
+                                               "./FITS/imr%05ld.fits",
+                                               i);
                             load_fits(fnamer, "imr", 1, &IDr);
                         }
 
@@ -613,7 +722,9 @@ errno_t CR2tomov()
                         }
                         else
                         {
-                            WRITE_FULLFILENAME(fnameg, "./FITS/img%05ld.fits", i);
+                            WRITE_FULLFILENAME(fnameg,
+                                               "./FITS/img%05ld.fits",
+                                               i);
                             load_fits(fnameg, "img", 1, &IDg);
                         }
 
@@ -624,7 +735,9 @@ errno_t CR2tomov()
                         }
                         else
                         {
-                            WRITE_FULLFILENAME(fnameb, "./FITS/imb%05ld.fits", i);
+                            WRITE_FULLFILENAME(fnameb,
+                                               "./FITS/imb%05ld.fits",
+                                               i);
                             load_fits(fnameb, "imb", 1, &IDb);
                         }
 
@@ -653,11 +766,16 @@ errno_t CR2tomov()
                             tmpg = r0 * RGBM_GR + g0 * RGBM_GG + b0 * RGBM_GB;
                             tmpb = r0 * RGBM_BR + g0 * RGBM_BG + b0 * RGBM_BB;
 
-                            tmpr1 = tmpr * ((1.0 - COLORSAT) * LUMR + COLORSAT) + tmpg * ((1.0 - COLORSAT) * LUMG) +
-                                    tmpb * ((1.0 - COLORSAT) * LUMB);
-                            tmpg1 = tmpr * ((1.0 - COLORSAT) * LUMR) + tmpg * ((1.0 - COLORSAT) * LUMG + COLORSAT) +
-                                    tmpb * ((1.0 - COLORSAT) * LUMB);
-                            tmpb1 = tmpr * ((1.0 - COLORSAT) * LUMR) + tmpg * ((1.0 - COLORSAT) * LUMG) +
+                            tmpr1 =
+                                tmpr * ((1.0 - COLORSAT) * LUMR + COLORSAT) +
+                                tmpg * ((1.0 - COLORSAT) * LUMG) +
+                                tmpb * ((1.0 - COLORSAT) * LUMB);
+                            tmpg1 =
+                                tmpr * ((1.0 - COLORSAT) * LUMR) +
+                                tmpg * ((1.0 - COLORSAT) * LUMG + COLORSAT) +
+                                tmpb * ((1.0 - COLORSAT) * LUMB);
+                            tmpb1 = tmpr * ((1.0 - COLORSAT) * LUMR) +
+                                    tmpg * ((1.0 - COLORSAT) * LUMG) +
                                     tmpb * ((1.0 - COLORSAT) * LUMB + COLORSAT);
 
                             data.image[IDr].array.F[ii] = tmpr1;
@@ -795,7 +913,9 @@ errno_t CR2tomov()
                         //		  WRITE_FULLFILENAME(fnamejpg,"./JPEG/im%05ld.jpg",i);
 
                         EXECUTE_SYSTEM_COMMAND(
-                            "bmptoppm imrgb.bmp | ppmtojpeg --quality 95 > _tmpjpeg.jpg; mv _tmpjpeg.jpg %s", fnamejpg);
+                            "bmptoppm imrgb.bmp | ppmtojpeg --quality 95 > "
+                            "_tmpjpeg.jpg; mv _tmpjpeg.jpg %s",
+                            fnamejpg);
                         EXECUTE_SYSTEM_COMMAND("rm imrgb.bmp");
                     }
                     SKIPcnt_FITStoJPEG++;

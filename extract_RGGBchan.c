@@ -9,8 +9,10 @@
 // Forward declaration(s)
 // ==========================================
 
-errno_t image_format_extract_RGGBchan(const char *__restrict ID_name, const char *__restrict IDoutR_name,
-                                      const char *__restrict IDoutG1_name, const char *__restrict IDoutG2_name,
+errno_t image_format_extract_RGGBchan(const char *__restrict ID_name,
+                                      const char *__restrict IDoutR_name,
+                                      const char *__restrict IDoutG1_name,
+                                      const char *__restrict IDoutG2_name,
                                       const char *__restrict IDoutB_name);
 
 // ==========================================
@@ -19,10 +21,14 @@ errno_t image_format_extract_RGGBchan(const char *__restrict ID_name, const char
 
 static errno_t IMAGE_FORMAT_extract_RGGBchan_cli()
 {
-    if (CLI_checkarg(1, 4) + CLI_checkarg(2, 3) + CLI_checkarg(3, 3) + CLI_checkarg(4, 3) + CLI_checkarg(5, 3) == 0)
+    if (CLI_checkarg(1, 4) + CLI_checkarg(2, 3) + CLI_checkarg(3, 3) +
+            CLI_checkarg(4, 3) + CLI_checkarg(5, 3) ==
+        0)
     {
-        image_format_extract_RGGBchan(data.cmdargtoken[1].val.string, data.cmdargtoken[2].val.string,
-                                      data.cmdargtoken[3].val.string, data.cmdargtoken[4].val.string,
+        image_format_extract_RGGBchan(data.cmdargtoken[1].val.string,
+                                      data.cmdargtoken[2].val.string,
+                                      data.cmdargtoken[3].val.string,
+                                      data.cmdargtoken[4].val.string,
                                       data.cmdargtoken[5].val.string);
         return RETURN_SUCCESS;
     }
@@ -39,11 +45,16 @@ static errno_t IMAGE_FORMAT_extract_RGGBchan_cli()
 errno_t extract_RGGBchan_addCLIcmd()
 {
 
-    RegisterCLIcommand("extractRGGBchan", __FILE__, IMAGE_FORMAT_extract_RGGBchan_cli,
-                       "extract RGGB channels from color image", "<input image> <imR> <imG1> <imG2> <imB>",
-                       "extractRGGBchan im imR imG1 imG2 imB",
-                       "int image_format_extract_RGGBchan(const char *ID_name, const char *IDoutR_name, const char "
-                       "*IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)");
+    RegisterCLIcommand(
+        "extractRGGBchan",
+        __FILE__,
+        IMAGE_FORMAT_extract_RGGBchan_cli,
+        "extract RGGB channels from color image",
+        "<input image> <imR> <imG1> <imG2> <imB>",
+        "extractRGGBchan im imR imG1 imG2 imB",
+        "int image_format_extract_RGGBchan(const char *ID_name, const char "
+        "*IDoutR_name, const char "
+        "*IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)");
 
     return RETURN_SUCCESS;
 }
@@ -52,19 +63,21 @@ errno_t extract_RGGBchan_addCLIcmd()
 // separates a single RGB image into its 4 channels
 // output written in im_r, im_g1, im_g2 and im_b
 //
-errno_t image_format_extract_RGGBchan(const char *__restrict ID_name, const char *__restrict IDoutR_name,
-                                      const char *__restrict IDoutG1_name, const char *__restrict IDoutG2_name,
+errno_t image_format_extract_RGGBchan(const char *__restrict ID_name,
+                                      const char *__restrict IDoutR_name,
+                                      const char *__restrict IDoutG1_name,
+                                      const char *__restrict IDoutG2_name,
                                       const char *__restrict IDoutB_name)
 {
     imageID ID;
-    long Xsize, Ysize;
+    long    Xsize, Ysize;
     imageID IDr, IDg1, IDg2, IDb;
-    long xsize2, ysize2;
-    long ii, jj, ii1, jj1;
-    int RGBmode = 0;
+    long    xsize2, ysize2;
+    long    ii, jj, ii1, jj1;
+    int     RGBmode = 0;
     imageID ID00, ID01, ID10, ID11;
 
-    ID = image_ID(ID_name);
+    ID    = image_ID(ID_name);
     Xsize = data.image[ID].md[0].size[0];
     Ysize = data.image[ID].md[0].size[1];
 
@@ -123,13 +136,17 @@ errno_t image_format_extract_RGGBchan(const char *__restrict ID_name, const char
             ii1 = 2 * ii;
             jj1 = 2 * jj;
 
-            data.image[ID01].array.F[jj * xsize2 + ii] = data.image[ID].array.F[(jj1 + 1) * Xsize + ii1];
+            data.image[ID01].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[(jj1 + 1) * Xsize + ii1];
 
-            data.image[ID00].array.F[jj * xsize2 + ii] = data.image[ID].array.F[jj1 * Xsize + ii1];
+            data.image[ID00].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[jj1 * Xsize + ii1];
 
-            data.image[ID11].array.F[jj * xsize2 + ii] = data.image[ID].array.F[(jj1 + 1) * Xsize + (ii1 + 1)];
+            data.image[ID11].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[(jj1 + 1) * Xsize + (ii1 + 1)];
 
-            data.image[ID10].array.F[jj * xsize2 + ii] = data.image[ID].array.F[jj1 * Xsize + (ii1 + 1)];
+            data.image[ID10].array.F[jj * xsize2 + ii] =
+                data.image[ID].array.F[jj1 * Xsize + (ii1 + 1)];
         }
 
     return RETURN_SUCCESS;

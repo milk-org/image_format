@@ -16,25 +16,27 @@ static float FLUXFACTOR = 1.0;
 // IMPORTANT: input will be modified
 // Sampling factor : 0=full resolution (slow), 1=half resolution (fast), 2=quarter resolution (very fast)
 // Fast mode does not reject bad pixels
-errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, const char *__restrict ID_name_r,
-                                             const char *__restrict ID_name_g, const char *__restrict ID_name_b,
+errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name,
+                                             const char *__restrict ID_name_r,
+                                             const char *__restrict ID_name_g,
+                                             const char *__restrict ID_name_b,
                                              int SamplFactor)
 {
     imageID ID;
-    long Xsize, Ysize;
+    long    Xsize, Ysize;
     imageID IDr, IDg, IDb, IDrc, IDgc, IDbc, IDbp;
     imageID IDbadpix;
     imageID IDflat;
     imageID IDdark;
     imageID IDbias;
-    long ii, jj, ii1, jj1, ii2, jj2, iistart, iiend, jjstart, jjend, dii, djj;
+    long   ii, jj, ii1, jj1, ii2, jj2, iistart, iiend, jjstart, jjend, dii, djj;
     double v1, v2, v, vc, tmp1;
-    long cnt;
+    long   cnt;
     double coeff;
     imageID ID00, ID01, ID10, ID11;
     imageID ID00c, ID01c, ID10c, ID11c;
-    double eps = 1.0e-8;
-    int RGBmode = 0;
+    double  eps     = 1.0e-8;
+    int     RGBmode = 0;
 
     int FastMode = 0;
 
@@ -43,7 +45,7 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
         FastMode = 1;
     }
 
-    ID = image_ID(ID_name);
+    ID    = image_ID(ID_name);
     Xsize = data.image[ID].md[0].size[0];
     Ysize = data.image[ID].md[0].size[1];
 
@@ -134,7 +136,8 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
             for (ii = 0; ii < Xsize; ii++)
                 for (jj = 0; jj < Ysize; jj++)
                 {
-                    data.image[ID].array.F[jj * Xsize + ii] -= data.image[IDbias].array.F[jj * Xsize + ii];
+                    data.image[ID].array.F[jj * Xsize + ii] -=
+                        data.image[IDbias].array.F[jj * Xsize + ii];
                 }
         }
         // remove dark
@@ -143,7 +146,8 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
             for (ii = 0; ii < Xsize; ii++)
                 for (jj = 0; jj < Ysize; jj++)
                 {
-                    data.image[ID].array.F[jj * Xsize + ii] -= data.image[IDdark].array.F[jj * Xsize + ii];
+                    data.image[ID].array.F[jj * Xsize + ii] -=
+                        data.image[IDdark].array.F[jj * Xsize + ii];
                 }
         }
 
@@ -152,9 +156,9 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
         for (ii = 0; ii < Xsize; ii++)
             for (jj = 0; jj < Ysize; jj++)
             {
-                v1 = data.image[ID].array.F[jj * Xsize + ii];
+                v1      = data.image[ID].array.F[jj * Xsize + ii];
                 iistart = ii - 2;
-                iiend = ii + 2;
+                iiend   = ii + 2;
                 if (iistart < 0)
                 {
                     iistart = 0;
@@ -164,7 +168,7 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                     iiend = Xsize - 1;
                 }
                 jjstart = jj - 2;
-                jjend = jj + 2;
+                jjend   = jj + 2;
                 if (jjstart < 0)
                 {
                     jjstart = 0;
@@ -228,31 +232,31 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
 
         if (RGBmode == 1) // GBRG
         {
-            ID00 = IDg;
+            ID00  = IDg;
             ID00c = IDgc;
 
-            ID10 = IDb;
+            ID10  = IDb;
             ID10c = IDbc;
 
-            ID01 = IDr;
+            ID01  = IDr;
             ID01c = IDrc;
 
-            ID11 = IDg;
+            ID11  = IDg;
             ID11c = IDgc;
         }
 
         if (RGBmode == 2)
         {
-            ID00 = IDr;
+            ID00  = IDr;
             ID00c = IDrc;
 
-            ID10 = IDg;
+            ID10  = IDg;
             ID10c = IDgc;
 
-            ID01 = IDg;
+            ID01  = IDg;
             ID01c = IDgc;
 
-            ID11 = IDb;
+            ID11  = IDb;
             ID11c = IDbc;
         }
 
@@ -267,26 +271,34 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                     ii2 = ii;
                     jj2 = jj + 1;
                     data.image[ID01].array.F[jj2 * Xsize + ii2] =
-                        data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID01c].array.F[jj2 * Xsize + ii2] = 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                        data.image[ID].array.F[jj2 * Xsize + ii2] /
+                        data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID01c].array.F[jj2 * Xsize + ii2] =
+                        1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                     ii2 = ii + 1;
                     jj2 = jj + 1;
                     data.image[ID11].array.F[jj2 * Xsize + ii2] =
-                        data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID11c].array.F[jj2 * Xsize + ii2] = 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                        data.image[ID].array.F[jj2 * Xsize + ii2] /
+                        data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID11c].array.F[jj2 * Xsize + ii2] =
+                        1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                     ii2 = ii;
                     jj2 = jj;
                     data.image[ID00].array.F[jj2 * Xsize + ii2] =
-                        data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID00c].array.F[jj2 * Xsize + ii2] = 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                        data.image[ID].array.F[jj2 * Xsize + ii2] /
+                        data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID00c].array.F[jj2 * Xsize + ii2] =
+                        1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                     ii2 = ii + 1;
                     jj2 = jj;
                     data.image[ID10].array.F[jj2 * Xsize + ii2] =
-                        data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                    data.image[ID10c].array.F[jj2 * Xsize + ii2] = 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                        data.image[ID].array.F[jj2 * Xsize + ii2] /
+                        data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                    data.image[ID10c].array.F[jj2 * Xsize + ii2] =
+                        1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
                 }
 
             for (ii = 0; ii < Xsize; ii++)
@@ -294,21 +306,28 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                 {
                     if (data.image[IDrc].array.F[jj * Xsize + ii] < 0.5)
                     {
-                        v = 0.0;
+                        v  = 0.0;
                         vc = 0.0;
                         for (dii = -2; dii < 3; dii++)
                             for (djj = -2; djj < 3; djj++)
                             {
                                 ii1 = ii + dii;
                                 jj1 = jj + djj;
-                                if ((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                if ((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) &&
+                                    (jj1 < Ysize))
                                     if ((dii != 0) || (djj != 0))
                                     {
-                                        if (data.image[IDrc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                        if (data.image[IDrc]
+                                                .array.F[jj1 * Xsize + ii1] >
+                                            0.5)
                                         {
-                                            coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                            coeff = exp(
+                                                -5.0 * (dii * dii + djj * djj));
                                             vc += coeff;
-                                            v += data.image[IDr].array.F[jj1 * Xsize + ii1] * coeff;
+                                            v += data.image[IDr]
+                                                     .array
+                                                     .F[jj1 * Xsize + ii1] *
+                                                 coeff;
                                         }
                                     }
                             }
@@ -317,21 +336,28 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
 
                     if (data.image[IDgc].array.F[jj * Xsize + ii] < 0.5)
                     {
-                        v = 0.0;
+                        v  = 0.0;
                         vc = 0.0;
                         for (dii = -2; dii < 3; dii++)
                             for (djj = -2; djj < 3; djj++)
                             {
                                 ii1 = ii + dii;
                                 jj1 = jj + djj;
-                                if ((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                if ((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) &&
+                                    (jj1 < Ysize))
                                     if ((dii != 0) || (djj != 0))
                                     {
-                                        if (data.image[IDgc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                        if (data.image[IDgc]
+                                                .array.F[jj1 * Xsize + ii1] >
+                                            0.5)
                                         {
-                                            coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                            coeff = exp(
+                                                -5.0 * (dii * dii + djj * djj));
                                             vc += coeff;
-                                            v += data.image[IDg].array.F[jj1 * Xsize + ii1] * coeff;
+                                            v += data.image[IDg]
+                                                     .array
+                                                     .F[jj1 * Xsize + ii1] *
+                                                 coeff;
                                         }
                                     }
                             }
@@ -340,21 +366,28 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
 
                     if (data.image[IDbc].array.F[jj * Xsize + ii] < 0.5)
                     {
-                        v = 0.0;
+                        v  = 0.0;
                         vc = 0.0;
                         for (dii = -2; dii < 3; dii++)
                             for (djj = -2; djj < 3; djj++)
                             {
                                 ii1 = ii + dii;
                                 jj1 = jj + djj;
-                                if ((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) && (jj1 < Ysize))
+                                if ((ii1 > -1) && (jj1 > -1) && (ii1 < Xsize) &&
+                                    (jj1 < Ysize))
                                     if ((dii != 0) || (djj != 0))
                                     {
-                                        if (data.image[IDbc].array.F[jj1 * Xsize + ii1] > 0.5)
+                                        if (data.image[IDbc]
+                                                .array.F[jj1 * Xsize + ii1] >
+                                            0.5)
                                         {
-                                            coeff = exp(-5.0 * (dii * dii + djj * djj));
+                                            coeff = exp(
+                                                -5.0 * (dii * dii + djj * djj));
                                             vc += coeff;
-                                            v += data.image[IDb].array.F[jj1 * Xsize + ii1] * coeff;
+                                            v += data.image[IDb]
+                                                     .array
+                                                     .F[jj1 * Xsize + ii1] *
+                                                 coeff;
                                         }
                                     }
                             }
@@ -375,10 +408,12 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
 
                         ii2 = ii;
                         jj2 = jj;
-                        data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize + ii2];
+                        data.image[IDg].array.F[jj2 * Xsize + ii2] =
+                            data.image[ID].array.F[jj2 * Xsize + ii2];
                         ii2 = ii + 1;
                         jj2 = jj + 1;
-                        data.image[IDg].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize + ii2];
+                        data.image[IDg].array.F[jj2 * Xsize + ii2] =
+                            data.image[ID].array.F[jj2 * Xsize + ii2];
                     }
                 // replace blue pixels
                 for (ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
@@ -390,10 +425,11 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii + 1;
                         jj2 = jj;
                         data.image[IDg].array.F[jj2 * Xsize + ii2] =
-                            0.25 * (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
-                                    data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)] +
-                                    data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
-                                    data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
+                            0.25 *
+                            (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
+                             data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)] +
+                             data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
+                             data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
                     }
                 // replace red pixels
                 for (ii1 = 1; ii1 < Xsize / 2; ii1++)
@@ -405,21 +441,23 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii;
                         jj2 = jj + 1;
                         data.image[IDg].array.F[jj2 * Xsize + ii2] =
-                            0.25 * (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
-                                    data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)] +
-                                    data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
-                                    data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
+                            0.25 *
+                            (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
+                             data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)] +
+                             data.image[ID].array.F[(jj2 + 1) * Xsize + ii2] +
+                             data.image[ID].array.F[(jj2 - 1) * Xsize + ii2]);
                     }
 
                 // R
                 for (ii1 = 0; ii1 < Xsize / 2; ii1++)
                     for (jj1 = 0; jj1 < Ysize / 2; jj1++)
                     {
-                        ii = ii1 * 2;
-                        jj = jj1 * 2;
+                        ii  = ii1 * 2;
+                        jj  = jj1 * 2;
                         ii2 = ii;
                         jj2 = jj + 1;
-                        data.image[IDr].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize + ii2];
+                        data.image[IDr].array.F[jj2 * Xsize + ii2] =
+                            data.image[ID].array.F[jj2 * Xsize + ii2];
                     }
                 // replace g1 pixels
                 for (ii1 = 0; ii1 < Xsize / 2; ii1++)
@@ -431,8 +469,9 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii;
                         jj2 = jj;
                         data.image[IDr].array.F[jj2 * Xsize + ii2] =
-                            0.5 * (data.image[ID].array.F[(jj2 - 1) * Xsize + ii2] +
-                                   data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
+                            0.5 *
+                            (data.image[ID].array.F[(jj2 - 1) * Xsize + ii2] +
+                             data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
                     }
                 // replace g2 pixels
                 for (ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
@@ -444,8 +483,9 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii + 1;
                         jj2 = jj + 1;
                         data.image[IDr].array.F[jj2 * Xsize + ii2] =
-                            0.5 * (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
-                                   data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
+                            0.5 *
+                            (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
+                             data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
                     }
                 // replace b pixels
                 for (ii1 = 0; ii1 < Xsize / 2 - 1; ii1++)
@@ -457,21 +497,27 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii + 1;
                         jj2 = jj;
                         data.image[IDr].array.F[jj2 * Xsize + ii2] =
-                            0.25 * (data.image[ID].array.F[(jj2 - 1) * Xsize + (ii2 - 1)] +
-                                    data.image[ID].array.F[(jj2 - 1) * Xsize + (ii2 + 1)] +
-                                    data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 - 1)] +
-                                    data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
+                            0.25 *
+                            (data.image[ID]
+                                 .array.F[(jj2 - 1) * Xsize + (ii2 - 1)] +
+                             data.image[ID]
+                                 .array.F[(jj2 - 1) * Xsize + (ii2 + 1)] +
+                             data.image[ID]
+                                 .array.F[(jj2 + 1) * Xsize + (ii2 - 1)] +
+                             data.image[ID]
+                                 .array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
                     }
 
                 // B
                 for (ii1 = 0; ii1 < Xsize / 2; ii1++)
                     for (jj1 = 0; jj1 < Ysize / 2; jj1++)
                     {
-                        ii = ii1 * 2;
-                        jj = jj1 * 2;
+                        ii  = ii1 * 2;
+                        jj  = jj1 * 2;
                         ii2 = ii + 1;
                         jj2 = jj;
-                        data.image[IDb].array.F[jj2 * Xsize + ii2] = data.image[ID].array.F[jj2 * Xsize + ii2];
+                        data.image[IDb].array.F[jj2 * Xsize + ii2] =
+                            data.image[ID].array.F[jj2 * Xsize + ii2];
                     }
 
                 // replace g2 pixels
@@ -484,8 +530,9 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii + 1;
                         jj2 = jj + 1;
                         data.image[IDb].array.F[jj2 * Xsize + ii2] =
-                            0.5 * (data.image[ID].array.F[(jj2 - 1) * Xsize + ii2] +
-                                   data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
+                            0.5 *
+                            (data.image[ID].array.F[(jj2 - 1) * Xsize + ii2] +
+                             data.image[ID].array.F[(jj2 + 1) * Xsize + ii2]);
                     }
                 // replace g1 pixels
                 for (ii1 = 1; ii1 < Xsize / 2; ii1++)
@@ -497,8 +544,9 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii;
                         jj2 = jj;
                         data.image[IDb].array.F[jj2 * Xsize + ii2] =
-                            0.5 * (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
-                                   data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
+                            0.5 *
+                            (data.image[ID].array.F[jj2 * Xsize + (ii2 - 1)] +
+                             data.image[ID].array.F[jj2 * Xsize + (ii2 + 1)]);
                     }
                 // replace r pixels
                 for (ii1 = 1; ii1 < Xsize / 2; ii1++)
@@ -510,10 +558,15 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                         ii2 = ii;
                         jj2 = jj + 1;
                         data.image[IDb].array.F[jj2 * Xsize + ii2] =
-                            0.25 * (data.image[ID].array.F[(jj2 - 1) * Xsize + (ii2 - 1)] +
-                                    data.image[ID].array.F[(jj2 - 1) * Xsize + (ii2 + 1)] +
-                                    data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 - 1)] +
-                                    data.image[ID].array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
+                            0.25 *
+                            (data.image[ID]
+                                 .array.F[(jj2 - 1) * Xsize + (ii2 - 1)] +
+                             data.image[ID]
+                                 .array.F[(jj2 - 1) * Xsize + (ii2 + 1)] +
+                             data.image[ID]
+                                 .array.F[(jj2 + 1) * Xsize + (ii2 - 1)] +
+                             data.image[ID]
+                                 .array.F[(jj2 + 1) * Xsize + (ii2 + 1)]);
                     }
             }
         }
@@ -550,31 +603,31 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
 
         if (RGBmode == 1) // GBRG
         {
-            ID00 = IDg;
+            ID00  = IDg;
             ID00c = IDgc;
 
-            ID10 = IDb;
+            ID10  = IDb;
             ID10c = IDbc;
 
-            ID01 = IDr;
+            ID01  = IDr;
             ID01c = IDrc;
 
-            ID11 = IDg;
+            ID11  = IDg;
             ID11c = IDgc;
         }
 
         if (RGBmode == 2)
         {
-            ID00 = IDr;
+            ID00  = IDr;
             ID00c = IDrc;
 
-            ID10 = IDg;
+            ID10  = IDg;
             ID10c = IDgc;
 
-            ID01 = IDg;
+            ID01  = IDg;
             ID01c = IDgc;
 
-            ID11 = IDb;
+            ID11  = IDb;
             ID11c = IDbc;
         }
 
@@ -587,30 +640,41 @@ errno_t convert_rawbayerFITStorgbFITS_simple(const char *__restrict ID_name, con
                 ii2 = ii;
                 jj2 = jj + 1;
                 data.image[ID01].array.F[jj1 * Xsize / 2 + ii1] +=
-                    data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                data.image[ID01c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                    data.image[ID].array.F[jj2 * Xsize + ii2] /
+                    data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID01c].array.F[jj1 * Xsize / 2 + ii1] +=
+                    1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                 ii2 = ii + 1;
                 jj2 = jj + 1;
                 data.image[ID11].array.F[jj1 * Xsize / 2 + ii1] +=
-                    data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                data.image[ID11c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                    data.image[ID].array.F[jj2 * Xsize + ii2] /
+                    data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID11c].array.F[jj1 * Xsize / 2 + ii1] +=
+                    1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                 ii2 = ii;
                 jj2 = jj;
                 data.image[ID00].array.F[jj1 * Xsize / 2 + ii1] +=
-                    data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                data.image[ID00c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                    data.image[ID].array.F[jj2 * Xsize + ii2] /
+                    data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID00c].array.F[jj1 * Xsize / 2 + ii1] +=
+                    1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
                 ii2 = ii + 1;
                 jj2 = jj;
                 data.image[ID10].array.F[jj1 * Xsize / 2 + ii1] +=
-                    data.image[ID].array.F[jj2 * Xsize + ii2] / data.image[IDflat].array.F[jj2 * Xsize + ii2];
-                data.image[ID10c].array.F[jj1 * Xsize / 2 + ii1] += 1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
+                    data.image[ID].array.F[jj2 * Xsize + ii2] /
+                    data.image[IDflat].array.F[jj2 * Xsize + ii2];
+                data.image[ID10c].array.F[jj1 * Xsize / 2 + ii1] +=
+                    1.0 - data.image[IDbp].array.F[jj2 * Xsize + ii2];
 
-                data.image[IDr].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDrc].array.F[jj1 * Xsize / 2 + ii1] + eps;
-                data.image[IDg].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDgc].array.F[jj1 * Xsize / 2 + ii1] + eps;
-                data.image[IDb].array.F[jj1 * Xsize / 2 + ii1] /= data.image[IDbc].array.F[jj1 * Xsize / 2 + ii1] + eps;
+                data.image[IDr].array.F[jj1 * Xsize / 2 + ii1] /=
+                    data.image[IDrc].array.F[jj1 * Xsize / 2 + ii1] + eps;
+                data.image[IDg].array.F[jj1 * Xsize / 2 + ii1] /=
+                    data.image[IDgc].array.F[jj1 * Xsize / 2 + ii1] + eps;
+                data.image[IDb].array.F[jj1 * Xsize / 2 + ii1] /=
+                    data.image[IDbc].array.F[jj1 * Xsize / 2 + ii1] + eps;
             }
 
         delete_image_ID("imrc", DELETE_IMAGE_ERRMODE_WARNING);
