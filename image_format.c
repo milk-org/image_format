@@ -15,6 +15,7 @@
 #include "FITS_to_floatbin_lock.h"
 #include "FITS_to_ushortintbin_lock.h"
 #include "combineHDR.h"
+#include "stream_temporal_stats.h"
 #include "extract_RGGBchan.h"
 #include "extract_utr.h"
 #include "imtoASCII.h"
@@ -41,8 +42,8 @@ static errno_t init_module_CLI()
 {
 
     CLIADDCMD_image_format__combineHDR();
-    CLIADDCMD_uptheramp__cred_cds_utr();
-    CLIADDCMD_temporal_stats();
+    CLIADDCMD_image_format__cred_cds_utr();
+    CLIADDCMD_image_format__temporal_stats();
 
     imtoASCII_addCLIcmd();
 

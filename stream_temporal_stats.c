@@ -425,7 +425,7 @@ INSERT_STD_FPSCLIfunctions
 
     // Register function in CLI
     errno_t
-    CLIADDCMD_temporal_stats()
+    CLIADDCMD_image_format__temporal_stats()
 {
     INSERT_STD_CLIREGISTERFUNC
 

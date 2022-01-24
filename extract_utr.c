@@ -767,7 +767,7 @@ INSERT_STD_FPSCLIfunctions
 
     // Register function in CLI
     errno_t
-    CLIADDCMD_uptheramp__cred_cds_utr()
+    CLIADDCMD_image_format__cred_cds_utr()
 {
     INSERT_STD_CLIREGISTERFUNC
 
