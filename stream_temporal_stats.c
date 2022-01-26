@@ -274,7 +274,6 @@ static errno_t compute_function()
 
     // HANDLE DATATYPES
     uint8_t _DATATYPE_INPUT        = in_img.md->datatype;
-    uint8_t SIZEOF_DATATYPE_INPUT  = ImageStreamIO_typesize(_DATATYPE_INPUT);
     uint8_t _DATATYPE_OUTPUT       = ImageStreamIO_floattype(_DATATYPE_INPUT);
     uint8_t SIZEOF_DATATYPE_OUTPUT = ImageStreamIO_typesize(_DATATYPE_OUTPUT);
 
@@ -309,7 +308,6 @@ static errno_t compute_function()
     /*
      Keyword setup - initialization
     */
-    int ndr_kw_loc = -1;
 
     for (int kw = 0; kw < in_img.md->NBkw; ++kw)
     {

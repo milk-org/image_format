@@ -215,16 +215,14 @@ static errno_t utr_reset_buffers(float  *sum_x,
     return RETURN_SUCCESS;
 }
 
-static errno_t utr_finalize(float  *sum_x,
-                            float  *sum_y,
-                            float  *sum_xy,
-                            float  *sum_xx,
-                            float  *sum_yy,
-                            int    *frame_count,
-                            u_char *frame_valid,
-                            int     tot_num_frames,
-                            int     n_pixels,
-                            float  *out_buf)
+static errno_t utr_finalize(float *sum_x,
+                            float *sum_y,
+                            float *sum_xy,
+                            float *sum_xx,
+                            int   *frame_count,
+                            int    tot_num_frames,
+                            int    n_pixels,
+                            float *out_buf)
 {
 
     int   fcii;
@@ -268,8 +266,6 @@ static errno_t simple_desat_finalize(float *last_valid,
                                      int    invert,
                                      float *out_buf)
 {
-    int val;
-
     if (!invert)
     {
         for (int ii = 0; ii < n_pixels; ++ii)
@@ -367,11 +363,8 @@ static errno_t compute_function()
     int ndr_value     = 0;
     int old_ndr_value = 0;
 
-    int n_pixels = in_img.md->size[0] * in_img.md->size[1];
-
-    float cds_scaling;
-
-    long buf_pp = 0;
+    int  n_pixels = in_img.md->size[0] * in_img.md->size[1];
+    long buf_pp   = 0;
 
     float *sum_x[2];
     float *sum_xx[2];
@@ -379,10 +372,10 @@ static errno_t compute_function()
     float *sum_xy[2];
     float *sum_yy[2];
 
-    int   *frame_count[2];
-    char  *frame_valid[2];
-    float *last_valid[2];
-    float *save_first_read[2];
+    int    *frame_count[2];
+    u_char *frame_valid[2];
+    float  *last_valid[2];
+    float  *save_first_read[2];
 
     for (long pp = 0; pp < 2; ++pp)
     {
@@ -393,7 +386,7 @@ static errno_t compute_function()
         sum_yy[pp] = (float *) malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
 
         frame_count[pp] = (int *) malloc(n_pixels * SIZEOF_DATATYPE_INT32);
-        frame_valid[pp] = (char *) malloc(n_pixels * SIZEOF_DATATYPE_INT8);
+        frame_valid[pp] = (u_char *) malloc(n_pixels * SIZEOF_DATATYPE_INT8);
         last_valid[pp]  = (float *) malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
         save_first_read[pp] =
             (float *) malloc(n_pixels * SIZEOF_DATATYPE_FLOAT);
@@ -715,9 +708,7 @@ static errno_t compute_function()
                                  &sum_y[1 - buf_pp][warp_offset],
                                  &sum_xy[1 - buf_pp][warp_offset],
                                  &sum_xx[1 - buf_pp][warp_offset],
-                                 &sum_yy[1 - buf_pp][warp_offset],
                                  &frame_count[1 - buf_pp][warp_offset],
-                                 &frame_valid[1 - buf_pp][warp_offset],
                                  ndr_value,
                                  n_pixels_in_warp,
                                  &(out_img.im->array.F[warp_offset]));

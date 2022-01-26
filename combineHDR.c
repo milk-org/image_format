@@ -394,7 +394,7 @@ errno_t combine_HDR_image(const char *__restrict flistname,
                 etimearray[layer1];
 
             double alpha0 = 10.0;
-            double alpha1 = 2.5;
+            //double alpha1 = 2.5;
             /*
             double alpha1 = 6.0;
             double alpha3 = 3.0;
