@@ -261,7 +261,7 @@ static errno_t compute_function()
 {
     DEBUG_TRACE_FSTART();
 
-    IMGID in_img = makeIMGID(in_name);
+    IMGID in_img = mkIMGID_from_name(in_name);
     resolveIMGID(&in_img, ERRMODE_ABORT);
 
     // Set in_img to be the trigger
@@ -286,7 +286,7 @@ static errno_t compute_function()
     strcat(out_std_name, "_std");
 
     // Resolve or create outputs, per need
-    IMGID out_ave_img = makeIMGID(out_ave_name);
+    IMGID out_ave_img = mkIMGID_from_name(out_ave_name);
     if (resolveIMGID(&out_ave_img, ERRMODE_WARN))
     {
         PRINT_WARNING(
@@ -296,7 +296,7 @@ static errno_t compute_function()
         resolveIMGID(&out_ave_img, ERRMODE_ABORT);
     }
 
-    IMGID out_std_img = makeIMGID(out_std_name);
+    IMGID out_std_img = mkIMGID_from_name(out_std_name);
     if (resolveIMGID(&out_std_img, ERRMODE_WARN))
     {
         PRINT_WARNING("WARNING - output std image not found and being created");
