@@ -13,10 +13,12 @@
  * Output: Post UTR reduced stream (float 32)
  */
 
+#include <math.h>
+
 #include "CommandLineInterface/CLIcore.h"
 #include "CommandLineInterface/timeutils.c"
 #include "CommandLineInterface/timeutils.h"
-#include "math.h"
+
 
 // Local variables pointers
 static char    *in_name;
@@ -228,9 +230,9 @@ std_finalize(IMGID out_std_img, void *sum_x, void *sum_xx, int n_frames_acc)
         for (int ii = 0; ii < n_pixels; ++ii)
         {
             out_std_img.im->array.F[ii] =
-                sqrtf32(ptr_sumxx[ii] / (n_frames_acc - 1) -
-                        ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) /
-                            (n_frames_acc - 1));
+                sqrt(ptr_sumxx[ii] / (n_frames_acc - 1) -
+                     ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) /
+                         (n_frames_acc - 1));
         }
     }
     else if (out_std_img.datatype == _DATATYPE_DOUBLE)
@@ -240,9 +242,9 @@ std_finalize(IMGID out_std_img, void *sum_x, void *sum_xx, int n_frames_acc)
         for (int ii = 0; ii < n_pixels; ++ii)
         {
             out_std_img.im->array.D[ii] =
-                sqrtf64(ptr_sumxx[ii] / (n_frames_acc - 1) -
-                        ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) /
-                            (n_frames_acc - 1));
+                sqrt(ptr_sumxx[ii] / (n_frames_acc - 1) -
+                     ptr_sumx[ii] * (ptr_sumx[ii] / n_frames_acc) /
+                         (n_frames_acc - 1));
         }
     }
     else
