@@ -62,7 +62,6 @@ THE IMPORTANT, CUSTOM PART
 */
 
 #define FOREACH_CAST(start, end, in_arr, out_type)                             \
-    do                                                                         \
     {                                                                          \
         int       i;                                                           \
         int       j = end;                                                     \
@@ -71,14 +70,13 @@ THE IMPORTANT, CUSTOM PART
         out_type *ptr_sumxx = (out_type *) sum_xx;                             \
         for (i = start; i < j; i++)                                            \
         {                                                                      \
-            val          = (out_type) in_img.im->array.in_arr[i];              \
+            val          = (out_type) (in_img.im->array.in_arr[i]);            \
             ptr_sumx[i]  = val;                                                \
             ptr_sumxx[i] = val * val;                                          \
         }                                                                      \
-    } while (0)
+    }
 
 #define FOREACH_CASTADD(start, end, in_arr, out_type)                          \
-    do                                                                         \
     {                                                                          \
         int       i;                                                           \
         int       j = end;                                                     \
@@ -87,16 +85,17 @@ THE IMPORTANT, CUSTOM PART
         out_type *ptr_sumxx = (out_type *) sum_xx;                             \
         for (i = start; i < j; i++)                                            \
         {                                                                      \
-            val = (out_type) in_img.im->array.in_arr[i];                       \
+            val = (out_type) (in_img.im->array.in_arr[i]);                     \
             ptr_sumx[i] += val;                                                \
             ptr_sumxx[i] += val * val;                                         \
         }                                                                      \
-    } while (0)
+    }
 
 static errno_t
 ave_std_accumulate(IMGID in_img, void *sum_x, void *sum_xx, int reset)
 {
     int n_pixels = in_img.md->size[0] * in_img.md->size[1];
+
     if (reset)
     {
         switch (in_img.datatype)
@@ -179,6 +178,7 @@ ave_std_accumulate(IMGID in_img, void *sum_x, void *sum_xx, int reset)
             return RETURN_FAILURE;
         }
     }
+
 
     return RETURN_SUCCESS;
 }
@@ -306,6 +306,7 @@ static errno_t compute_function()
         imcreatelikewiseIMGID(&out_std_img, &in_img);
         resolveIMGID(&out_std_img, ERRMODE_ABORT);
     }
+    in_img.datatype = _DATATYPE_INPUT; // Revert !
 
     /*
      Keyword setup - initialization

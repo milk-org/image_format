@@ -177,9 +177,9 @@ static errno_t utr_iterate(float  *sum_x,
             in_val_px = (float) in_img.im->array.UI16[ii];
 
             // Detect saturation - which can have several forms for CRED1 / CRED2 / clipping to some max
-            k               = (in_val_px <= sat_val);
-            frame_valid[ii] = k;
+            k = (in_val_px <= sat_val);
 
+            frame_valid[ii] = k;
             frame_count[ii] += k; // At reset: 0 or 1
 
             // Only perform those accumulations for unsat pixels, but this avoids if statements.
@@ -356,9 +356,9 @@ static errno_t compute_function()
     int px_check = 0;
 
     // For counting frames and avoiding double processing when catching up with the semaphore
-    int frame_counter           = 0;
-    int prev_frame_counter      = 0;
-    int frame_counter_last_init = 0;
+    long frame_counter           = 0;
+    long prev_frame_counter      = 0;
+    long frame_counter_last_init = 0;
 
     int ndr_value     = 0;
     int old_ndr_value = 0;
@@ -436,10 +436,15 @@ static errno_t compute_function()
         old_ndr_value = ndr_value;
 
         prev_frame_counter = frame_counter;
-        frame_counter      = in_img.im->array.UI16[0];
-        if (frame_counter == prev_frame_counter)
+        frame_counter      = in_img.im->array.UI16[0] |
+                        (in_img.im->array.UI16[1] << 16); // 32 bit counter
+
+        if (frame_counter <= prev_frame_counter)
         {
             // Do not process the same frame twice if late on the semaphores.
+            // This will trigger when the framegrabber garbages out
+            // This will trigger when we wraparound after 2**32 frames
+
             continue; // This applies to the loop started and closed in PROCINFO macros
         }
 
@@ -501,6 +506,7 @@ static errno_t compute_function()
             cred_counter_repeat = 0;
         }
 
+        just_init = FALSE;
         if (ndr_value == 1 ||
             (in_img.md->datatype == _DATATYPE_UINT16 &&
              (cred_counter_repeat == 10 || !(px_check == 0))) ||
@@ -533,10 +539,6 @@ static errno_t compute_function()
             cred_counter_last_init  = cred_counter;
             just_init               = TRUE;
         }
-        else
-        {
-            just_init = FALSE;
-        }
 
         // Did we skip a frame ? last clause is to avoid counter reset
         if (ndr_value > 1 && frame_counter != prev_frame_counter + 1 &&
@@ -552,6 +554,7 @@ static errno_t compute_function()
                           old_ndr_value,
                           ndr_value);
         }
+
         tot_fin_warps = ndr_value == 1 ? 1 : 2;
 
         // PRINT_WARNING("%d, %d, %d", in_img.im->array.UI16[0], in_img.im->array.UI16[2], in_img.im->array.UI16[39185]);
@@ -637,6 +640,7 @@ static errno_t compute_function()
         */
         if (pending_fin_warps)
         {
+            // PREPARE WARP INDICES
             if (next_fin_warp == 0) // First warp
             {
                 warp_offset      = 8; // Skip the telemetry counters
@@ -655,6 +659,7 @@ static errno_t compute_function()
                 }
             }
 
+            // WARP!
             if (ndr_value == 1) // PASSTHROUGH
             {
                 // ndr_value == 1: single reads OR rawimages off passthrough mode
@@ -672,47 +677,42 @@ static errno_t compute_function()
                                       n_pixels_in_warp);
                 }
             }
-            else
+            else if (ndr_value <= 6) // CDS
             {
-                if (ndr_value <= 6) // CDS
+                if (next_fin_warp == 0 &&
+                    frame_counter != frame_counter_last_init + ndr_value - 1)
                 {
-                    if (next_fin_warp == 0 &&
-                        frame_counter !=
-                            (frame_counter_last_init + ndr_value - 1) % 65536)
-                    {
-                        // Did we get two reads to do a proper CDS ?
-                        // Compute the exposure scaling in case we missed the first read !
-                        // This will be very important in CDS at high speed
-                        PRINT_WARNING(
-                            "CDS / DESAT finalize: not enough reads.");
-                        publishable_output = FALSE; // Abort finalization
-                        next_fin_warp      = tot_fin_warps - 1;
-                    }
-                    else
-                    {
-                        out_img.im->md->write = TRUE;
-                        simple_desat_finalize(
-                            &last_valid[1 - buf_pp][warp_offset],
-                            &save_first_read[1 - buf_pp][warp_offset],
-                            &frame_count[1 - buf_pp][warp_offset],
-                            ndr_value,
-                            n_pixels_in_warp,
-                            FALSE, // No inversion even CRED1 CDS
-                            &(out_img.im->array.F[warp_offset]));
-                    }
+                    // Did we get two reads to do a proper CDS ?
+                    // Compute the exposure scaling in case we missed the first read !
+                    // This will be very important in CDS at high speed
+                    PRINT_WARNING("CDS / DESAT finalize: not enough reads.");
+                    publishable_output = FALSE; // Abort finalization
+                    next_fin_warp      = tot_fin_warps - 1;
                 }
-                else // UTR
+                else
                 {
                     out_img.im->md->write = TRUE;
-                    utr_finalize(&sum_x[1 - buf_pp][warp_offset],
-                                 &sum_y[1 - buf_pp][warp_offset],
-                                 &sum_xy[1 - buf_pp][warp_offset],
-                                 &sum_xx[1 - buf_pp][warp_offset],
-                                 &frame_count[1 - buf_pp][warp_offset],
-                                 ndr_value,
-                                 n_pixels_in_warp,
-                                 &(out_img.im->array.F[warp_offset]));
+                    simple_desat_finalize(
+                        &last_valid[1 - buf_pp][warp_offset],
+                        &save_first_read[1 - buf_pp][warp_offset],
+                        &frame_count[1 - buf_pp][warp_offset],
+                        ndr_value,
+                        n_pixels_in_warp,
+                        FALSE, // No inversion even CRED1 CDS
+                        &(out_img.im->array.F[warp_offset]));
                 }
+            }
+            else // UTR
+            {
+                out_img.im->md->write = TRUE;
+                utr_finalize(&sum_x[1 - buf_pp][warp_offset],
+                             &sum_y[1 - buf_pp][warp_offset],
+                             &sum_xy[1 - buf_pp][warp_offset],
+                             &sum_xx[1 - buf_pp][warp_offset],
+                             &frame_count[1 - buf_pp][warp_offset],
+                             ndr_value,
+                             n_pixels_in_warp,
+                             &(out_img.im->array.F[warp_offset]));
             }
 
             if (next_fin_warp == tot_fin_warps - 1)
