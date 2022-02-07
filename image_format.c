@@ -23,6 +23,8 @@
 #include "read_binary32f.h"
 #include "writeBMP.h"
 
+
+
 /*typedef struct
 {
     int rows;
@@ -41,6 +43,8 @@ INIT_MODULE_LIB(image_format)
 static errno_t init_module_CLI()
 {
 
+    CLIADDCMD_image_format__extractRGGBchan();
+
     CLIADDCMD_image_format__combineHDR();
     CLIADDCMD_image_format__cred_cds_utr();
     CLIADDCMD_image_format__temporal_stats();
@@ -51,7 +55,6 @@ static errno_t init_module_CLI()
     //	writeBMP_addCLIcmd();
 
     CR2toFITS_addCLIcmd();
-    extract_RGGBchan_addCLIcmd();
     loadCR2toFITSRGB_addCLIcmd();
     FITS_to_floatbin_lock_addCLIcmd();
     FITS_to_ushortintbin_lock_addCLIcmd();

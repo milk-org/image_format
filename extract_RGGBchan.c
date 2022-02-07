@@ -5,149 +5,229 @@
 
 #include "COREMOD_memory/COREMOD_memory.h"
 
-// ==========================================
-// Forward declaration(s)
-// ==========================================
 
-errno_t image_format_extract_RGGBchan(const char *__restrict ID_name,
-                                      const char *__restrict IDoutR_name,
-                                      const char *__restrict IDoutG1_name,
-                                      const char *__restrict IDoutG2_name,
-                                      const char *__restrict IDoutB_name);
 
-// ==========================================
-// Command line interface wrapper function(s)
-// ==========================================
 
-static errno_t IMAGE_FORMAT_extract_RGGBchan_cli()
+static char *inim;
+static long  fpi_inim;
+
+static char *outimR;
+static long  fpi_outimR;
+
+static char *outimG1;
+static long  fpi_outimG1;
+
+static char *outimG2;
+static long  fpi_outimG2;
+
+static char *outimB;
+static long  fpi_outimB;
+
+
+
+
+static CLICMDARGDEF farg[] = {{CLIARG_STR,
+                               ".inim",
+                               "input RGGB image",
+                               "inim",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &inim,
+                               &fpi_inim},
+                              {CLIARG_STR,
+                               ".outimR",
+                               "output R image",
+                               "inim",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &outimR,
+                               &fpi_outimR},
+                              {CLIARG_STR,
+                               ".outimG1",
+                               "output G1 image",
+                               "outimG1",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &outimG1,
+                               &fpi_outimG1},
+                              {CLIARG_STR,
+                               ".outimG2",
+                               "output G2 image",
+                               "outimG2",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &outimG2,
+                               &fpi_outimG2},
+                              {CLIARG_STR,
+                               ".outimB",
+                               "output B image",
+                               "outimB",
+                               CLIARG_VISIBLE_DEFAULT,
+                               (void **) &outimB,
+                               &fpi_outimB}};
+
+
+
+
+static CLICMDDATA CLIcmddata = {"extractRGGBchan",
+                                "extract RGGB channels from color image",
+                                CLICMD_FIELDS_DEFAULTS};
+
+
+
+// detailed help
+static errno_t help_function()
 {
-    if (CLI_checkarg(1, 4) + CLI_checkarg(2, 3) + CLI_checkarg(3, 3) +
-            CLI_checkarg(4, 3) + CLI_checkarg(5, 3) ==
-        0)
-    {
-        image_format_extract_RGGBchan(data.cmdargtoken[1].val.string,
-                                      data.cmdargtoken[2].val.string,
-                                      data.cmdargtoken[3].val.string,
-                                      data.cmdargtoken[4].val.string,
-                                      data.cmdargtoken[5].val.string);
-        return RETURN_SUCCESS;
-    }
-    else
-    {
-        return RETURN_FAILURE;
-    }
-}
-
-// ==========================================
-// Register CLI command(s)
-// ==========================================
-
-errno_t extract_RGGBchan_addCLIcmd()
-{
-
-    RegisterCLIcommand(
-        "extractRGGBchan",
-        __FILE__,
-        IMAGE_FORMAT_extract_RGGBchan_cli,
-        "extract RGGB channels from color image",
-        "<input image> <imR> <imG1> <imG2> <imB>",
-        "extractRGGBchan im imR imG1 imG2 imB",
-        "int image_format_extract_RGGBchan(const char *ID_name, const char "
-        "*IDoutR_name, const char "
-        "*IDoutG1_name, const char *IDoutG2_name, const char *IDoutB_name)");
-
     return RETURN_SUCCESS;
 }
+
+
+
+
+/*
+    IMGID imgoutR,
+    IMGID imgoutG1,
+    IMGID imgoutG2,
+    IMGID imgoutB
+*/
 
 //
 // separates a single RGB image into its 4 channels
 // output written in im_r, im_g1, im_g2 and im_b
 //
-errno_t image_format_extract_RGGBchan(const char *__restrict ID_name,
-                                      const char *__restrict IDoutR_name,
-                                      const char *__restrict IDoutG1_name,
-                                      const char *__restrict IDoutG2_name,
-                                      const char *__restrict IDoutB_name)
+errno_t image_format_extract_RGGBchan(
+    IMGID imgin, IMGID imgoutR, IMGID imgoutG1, IMGID imgoutG2, IMGID imgoutB)
 {
-    imageID ID;
-    long    Xsize, Ysize;
-    imageID IDr, IDg1, IDg2, IDb;
-    long    xsize2, ysize2;
-    long    ii, jj, ii1, jj1;
-    int     RGBmode = 0;
-    imageID ID00, ID01, ID10, ID11;
+    DEBUG_TRACE_FSTART();
 
-    ID    = image_ID(ID_name);
-    Xsize = data.image[ID].md[0].size[0];
-    Ysize = data.image[ID].md[0].size[1];
+    // input image is required
+    resolveIMGID(&imgin, ERRMODE_ABORT);
 
-    printf("ID = %ld\n", ID);
-    printf("size = %ld %ld\n", Xsize, Ysize);
 
-    if ((Xsize == 4770) && (Ysize == 3178))
+
+    copyIMGID(&imgin, &imgoutR);
+    imgoutR.size[0] = imgin.size[0] / 2;
+    imgoutR.size[1] = imgin.size[1] / 2;
+
+    copyIMGID(&imgoutR, &imgoutG1);
+    copyIMGID(&imgoutR, &imgoutG2);
+    copyIMGID(&imgoutR, &imgoutB);
+
+    createimagefromIMGID(&imgoutR);
+    createimagefromIMGID(&imgoutG1);
+    createimagefromIMGID(&imgoutG2);
+    createimagefromIMGID(&imgoutB);
+
+    uint32_t xsize = imgin.size[0];
+
+    list_image_ID();
+
+
+
+    switch (imgin.datatype)
     {
-        RGBmode = 1;
+
+    case _DATATYPE_FLOAT:
+        for (uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
+            for (uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
+            {
+                uint32_t ii1  = 2 * ii;
+                uint32_t jj1  = 2 * jj;
+                uint64_t pixi = jj * imgoutR.size[0] + ii;
+
+                imgoutR.im->array.F[pixi] =
+                    imgin.im->array.F[(jj1 + 1) * xsize + ii1];
+                imgoutG1.im->array.F[pixi] =
+                    imgin.im->array.F[jj1 * xsize + ii1];
+                imgoutG2.im->array.F[pixi] =
+                    imgin.im->array.F[(jj1 + 1) * xsize + (ii1 + 1)];
+                imgoutB.im->array.F[pixi] =
+                    imgin.im->array.F[jj1 * xsize + (ii1 + 1)];
+            }
+        break;
+
+    case _DATATYPE_DOUBLE:
+        for (uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
+            for (uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
+            {
+                uint32_t ii1  = 2 * ii;
+                uint32_t jj1  = 2 * jj;
+                uint64_t pixi = jj * imgoutR.size[0] + ii;
+
+                imgoutR.im->array.D[pixi] =
+                    imgin.im->array.D[(jj1 + 1) * xsize + ii1];
+                imgoutG1.im->array.D[pixi] =
+                    imgin.im->array.D[jj1 * xsize + ii1];
+                imgoutG2.im->array.D[pixi] =
+                    imgin.im->array.D[(jj1 + 1) * xsize + (ii1 + 1)];
+                imgoutB.im->array.D[pixi] =
+                    imgin.im->array.D[jj1 * xsize + (ii1 + 1)];
+            }
+        break;
+
+
+    case _DATATYPE_UINT16:
+        for (uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
+            for (uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
+            {
+                uint32_t ii1  = 2 * ii;
+                uint32_t jj1  = 2 * jj;
+                uint64_t pixi = jj * imgoutR.size[0] + ii;
+
+                imgoutR.im->array.UI16[pixi] =
+                    imgin.im->array.UI16[(jj1 + 1) * xsize + ii1];
+                imgoutG1.im->array.UI16[pixi] =
+                    imgin.im->array.UI16[jj1 * xsize + ii1];
+                imgoutG2.im->array.UI16[pixi] =
+                    imgin.im->array.UI16[(jj1 + 1) * xsize + (ii1 + 1)];
+                imgoutB.im->array.UI16[pixi] =
+                    imgin.im->array.UI16[jj1 * xsize + (ii1 + 1)];
+            }
+        break;
     }
-    if ((Xsize == 5202) && (Ysize == 3465))
-    {
-        RGBmode = 2;
-    }
 
-    if (RGBmode == 0)
-    {
-        //PRINT_ERROR("Unknown RGB image mode\n");
-        //exit(0);
-        RGBmode = 1;
-    }
 
-    xsize2 = Xsize / 2;
-    ysize2 = Ysize / 2;
+    DEBUG_TRACE_FEXIT();
+    return RETURN_SUCCESS;
+}
 
-    printf("Creating color channel images, %ld x %ld\n", xsize2, ysize2);
-    fflush(stdout);
 
-    create_2Dimage_ID(IDoutR_name, xsize2, ysize2, &IDr);
-    create_2Dimage_ID(IDoutG1_name, xsize2, ysize2, &IDg1);
-    create_2Dimage_ID(IDoutG2_name, xsize2, ysize2, &IDg2);
-    create_2Dimage_ID(IDoutB_name, xsize2, ysize2, &IDb);
 
-    printf("STEP 2\n");
-    fflush(stdout);
 
-    if (RGBmode == 1) // GBRG
-    {
-        ID00 = IDg1;
-        ID10 = IDb;
-        ID01 = IDr;
-        ID11 = IDg2;
-    }
+/**
+ * @brief Wrapper function, used by all CLI calls
+ *
+ * INSERT_STD_PROCINFO statements enable processinfo support
+ */
+static errno_t compute_function()
+{
+    DEBUG_TRACE_FSTART();
 
-    if (RGBmode == 2)
-    {
-        ID00 = IDr;
-        ID10 = IDg1;
-        ID01 = IDg2;
-        ID11 = IDb;
-    }
 
-    for (ii = 0; ii < xsize2; ii++)
-        for (jj = 0; jj < ysize2; jj++)
-        {
-            ii1 = 2 * ii;
-            jj1 = 2 * jj;
 
-            data.image[ID01].array.F[jj * xsize2 + ii] =
-                data.image[ID].array.F[(jj1 + 1) * Xsize + ii1];
+    INSERT_STD_PROCINFO_COMPUTEFUNC_START
 
-            data.image[ID00].array.F[jj * xsize2 + ii] =
-                data.image[ID].array.F[jj1 * Xsize + ii1];
+    image_format_extract_RGGBchan(mkIMGID_from_name(inim),
+                                  mkIMGID_from_name(outimR),
+                                  mkIMGID_from_name(outimG1),
+                                  mkIMGID_from_name(outimG2),
+                                  mkIMGID_from_name(outimB));
 
-            data.image[ID11].array.F[jj * xsize2 + ii] =
-                data.image[ID].array.F[(jj1 + 1) * Xsize + (ii1 + 1)];
 
-            data.image[ID10].array.F[jj * xsize2 + ii] =
-                data.image[ID].array.F[jj1 * Xsize + (ii1 + 1)];
-        }
+    INSERT_STD_PROCINFO_COMPUTEFUNC_END
+
+    DEBUG_TRACE_FEXIT();
+    return RETURN_SUCCESS;
+}
+
+
+
+
+INSERT_STD_FPSCLIfunctions
+
+
+
+    // Register function in CLI
+    errno_t
+    CLIADDCMD_image_format__extractRGGBchan()
+{
+    INSERT_STD_CLIREGISTERFUNC
 
     return RETURN_SUCCESS;
 }
