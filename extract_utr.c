@@ -347,10 +347,11 @@ static errno_t compute_function()
     SETUP
     */
     // For counting NRD reads
-    int cred_counter           = 0;
-    int prev_cred_counter      = 0;
-    int cred_counter_last_init = 0;
-    int cred_counter_repeat    = 0;
+    int  cred_counter           = 0;
+    int  prev_cred_counter      = 0;
+    int  cred_counter_last_init = 0;
+    int  cred_counter_repeat    = 0;
+    long time_acq_us            = 0; // Time acq embedded at pixel 8
 
     // For the imagetags
     int px_check = 0;
@@ -444,7 +445,9 @@ static errno_t compute_function()
             // Do not process the same frame twice if late on the semaphores.
             // This will trigger when the framegrabber garbages out
             // This will trigger when we wraparound after 2**32 frames
-
+            PRINT_WARNING("Continue issued at %ld, %ld",
+                          prev_frame_counter,
+                          frame_counter);
             continue; // This applies to the loop started and closed in PROCINFO macros
         }
 
@@ -454,13 +457,6 @@ static errno_t compute_function()
 
         px_check = in_img.im->array.UI16[3];
 
-        // Check the absolute FC
-        if (frame_counter > prev_frame_counter + 1)
-        {
-            // PRINT_WARNING("FRAME MISS %d (%d) %d (%d) - fyi NDR is: %d", frame_counter,
-            //               prev_frame_counter, cred_counter, prev_cred_counter, ndr_value);
-            //  TODO don't forget you're missing the first frame of the ramp almost all the time.
-        }
         /*
         INITIALIZE NDR FROM KW
         */
@@ -540,9 +536,8 @@ static errno_t compute_function()
             just_init               = TRUE;
         }
 
-        // Did we skip a frame ? last clause is to avoid counter reset
-        if (ndr_value > 1 && frame_counter != prev_frame_counter + 1 &&
-            frame_counter != 0)
+        // Did we skip a frame ?
+        if (ndr_value > 1 && frame_counter != prev_frame_counter + 1)
         {
             // TELEMETRY
             ++miss_count;
@@ -604,8 +599,18 @@ static errno_t compute_function()
             out_img.im->array.F[4] = (float)
                 ndr_value; // Value by which stuff is normalized, and type of processing done.
             out_img.im->array.F[5] = (float) cred_counter_last_init;
-            out_img.im->array.F[6] = (float) frame_counter_last_init;
+            out_img.im->array.F[6] =
+                ((float) frame_counter_last_init) /
+                1e6; // Divide by 1e6 to avoid messing up scaling
             out_img.im->array.F[7] = (float) miss_count;
+
+            // Fetch the time of acquisition that's been embedded by edttake at pixel 8 as a raw long.
+            time_acq_us = *((long *) &in_img.im->array.UI16[8]);
+            // Store 6 digits per pixel
+            out_img.im->array.F[8] = (float) (time_acq_us / 1000000000000L);
+            out_img.im->array.F[9] =
+                (float) ((time_acq_us / 1000000L) % 1000000L);
+            out_img.im->array.F[10] = (float) (time_acq_us % 1000000L);
 
             /*
             Keyword value carry-over
@@ -643,8 +648,8 @@ static errno_t compute_function()
             // PREPARE WARP INDICES
             if (next_fin_warp == 0) // First warp
             {
-                warp_offset      = 8; // Skip the telemetry counters
-                n_pixels_in_warp = n_pixels / tot_fin_warps - 8;
+                warp_offset      = 12; // Skip the telemetry counters
+                n_pixels_in_warp = n_pixels / tot_fin_warps - 12;
             }
             else
             {
