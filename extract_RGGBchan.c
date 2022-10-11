@@ -26,48 +26,60 @@ static long  fpi_outimB;
 
 
 
-static CLICMDARGDEF farg[] = {{CLIARG_STR,
-                               ".inim",
-                               "input RGGB image",
-                               "inim",
-                               CLIARG_VISIBLE_DEFAULT,
-                               (void **) &inim,
-                               &fpi_inim},
-                              {CLIARG_STR,
-                               ".outimR",
-                               "output R image",
-                               "inim",
-                               CLIARG_VISIBLE_DEFAULT,
-                               (void **) &outimR,
-                               &fpi_outimR},
-                              {CLIARG_STR,
-                               ".outimG1",
-                               "output G1 image",
-                               "outimG1",
-                               CLIARG_VISIBLE_DEFAULT,
-                               (void **) &outimG1,
-                               &fpi_outimG1},
-                              {CLIARG_STR,
-                               ".outimG2",
-                               "output G2 image",
-                               "outimG2",
-                               CLIARG_VISIBLE_DEFAULT,
-                               (void **) &outimG2,
-                               &fpi_outimG2},
-                              {CLIARG_STR,
-                               ".outimB",
-                               "output B image",
-                               "outimB",
-                               CLIARG_VISIBLE_DEFAULT,
-                               (void **) &outimB,
-                               &fpi_outimB}};
+static CLICMDARGDEF farg[] = {{
+        CLIARG_STR,
+        ".inim",
+        "input RGGB image",
+        "inim",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &inim,
+        &fpi_inim
+    },
+    {
+        CLIARG_STR,
+        ".outimR",
+        "output R image",
+        "inim",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &outimR,
+        &fpi_outimR
+    },
+    {
+        CLIARG_STR,
+        ".outimG1",
+        "output G1 image",
+        "outimG1",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &outimG1,
+        &fpi_outimG1
+    },
+    {
+        CLIARG_STR,
+        ".outimG2",
+        "output G2 image",
+        "outimG2",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &outimG2,
+        &fpi_outimG2
+    },
+    {
+        CLIARG_STR,
+        ".outimB",
+        "output B image",
+        "outimB",
+        CLIARG_VISIBLE_DEFAULT,
+        (void **) &outimB,
+        &fpi_outimB
+    }
+};
 
 
 
 
 static CLICMDDATA CLIcmddata = {"extractRGGBchan",
                                 "extract RGGB channels from color image",
-                                CLICMD_FIELDS_DEFAULTS};
+                                CLICMD_FIELDS_DEFAULTS
+                               };
 
 
 
@@ -120,66 +132,66 @@ errno_t image_format_extract_RGGBchan(
 
 
 
-    switch (imgin.datatype)
+    switch(imgin.datatype)
     {
 
-    case _DATATYPE_FLOAT:
-        for (uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
-            for (uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
-            {
-                uint32_t ii1  = 2 * ii;
-                uint32_t jj1  = 2 * jj;
-                uint64_t pixi = jj * imgoutR.size[0] + ii;
+        case _DATATYPE_FLOAT:
+            for(uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
+                for(uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
+                {
+                    uint32_t ii1  = 2 * ii;
+                    uint32_t jj1  = 2 * jj;
+                    uint64_t pixi = jj * imgoutR.size[0] + ii;
 
-                imgoutR.im->array.F[pixi] =
-                    imgin.im->array.F[(jj1 + 1) * xsize + ii1];
-                imgoutG1.im->array.F[pixi] =
-                    imgin.im->array.F[jj1 * xsize + ii1];
-                imgoutG2.im->array.F[pixi] =
-                    imgin.im->array.F[(jj1 + 1) * xsize + (ii1 + 1)];
-                imgoutB.im->array.F[pixi] =
-                    imgin.im->array.F[jj1 * xsize + (ii1 + 1)];
-            }
-        break;
+                    imgoutR.im->array.F[pixi] =
+                        imgin.im->array.F[(jj1 + 1) * xsize + ii1];
+                    imgoutG1.im->array.F[pixi] =
+                        imgin.im->array.F[jj1 * xsize + ii1];
+                    imgoutG2.im->array.F[pixi] =
+                        imgin.im->array.F[(jj1 + 1) * xsize + (ii1 + 1)];
+                    imgoutB.im->array.F[pixi] =
+                        imgin.im->array.F[jj1 * xsize + (ii1 + 1)];
+                }
+            break;
 
-    case _DATATYPE_DOUBLE:
-        for (uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
-            for (uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
-            {
-                uint32_t ii1  = 2 * ii;
-                uint32_t jj1  = 2 * jj;
-                uint64_t pixi = jj * imgoutR.size[0] + ii;
+        case _DATATYPE_DOUBLE:
+            for(uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
+                for(uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
+                {
+                    uint32_t ii1  = 2 * ii;
+                    uint32_t jj1  = 2 * jj;
+                    uint64_t pixi = jj * imgoutR.size[0] + ii;
 
-                imgoutR.im->array.D[pixi] =
-                    imgin.im->array.D[(jj1 + 1) * xsize + ii1];
-                imgoutG1.im->array.D[pixi] =
-                    imgin.im->array.D[jj1 * xsize + ii1];
-                imgoutG2.im->array.D[pixi] =
-                    imgin.im->array.D[(jj1 + 1) * xsize + (ii1 + 1)];
-                imgoutB.im->array.D[pixi] =
-                    imgin.im->array.D[jj1 * xsize + (ii1 + 1)];
-            }
-        break;
+                    imgoutR.im->array.D[pixi] =
+                        imgin.im->array.D[(jj1 + 1) * xsize + ii1];
+                    imgoutG1.im->array.D[pixi] =
+                        imgin.im->array.D[jj1 * xsize + ii1];
+                    imgoutG2.im->array.D[pixi] =
+                        imgin.im->array.D[(jj1 + 1) * xsize + (ii1 + 1)];
+                    imgoutB.im->array.D[pixi] =
+                        imgin.im->array.D[jj1 * xsize + (ii1 + 1)];
+                }
+            break;
 
 
-    case _DATATYPE_UINT16:
-        for (uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
-            for (uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
-            {
-                uint32_t ii1  = 2 * ii;
-                uint32_t jj1  = 2 * jj;
-                uint64_t pixi = jj * imgoutR.size[0] + ii;
+        case _DATATYPE_UINT16:
+            for(uint32_t ii = 0; ii < imgoutR.size[0]; ii++)
+                for(uint32_t jj = 0; jj < imgoutR.size[1]; jj++)
+                {
+                    uint32_t ii1  = 2 * ii;
+                    uint32_t jj1  = 2 * jj;
+                    uint64_t pixi = jj * imgoutR.size[0] + ii;
 
-                imgoutR.im->array.UI16[pixi] =
-                    imgin.im->array.UI16[(jj1 + 1) * xsize + ii1];
-                imgoutG1.im->array.UI16[pixi] =
-                    imgin.im->array.UI16[jj1 * xsize + ii1];
-                imgoutG2.im->array.UI16[pixi] =
-                    imgin.im->array.UI16[(jj1 + 1) * xsize + (ii1 + 1)];
-                imgoutB.im->array.UI16[pixi] =
-                    imgin.im->array.UI16[jj1 * xsize + (ii1 + 1)];
-            }
-        break;
+                    imgoutR.im->array.UI16[pixi] =
+                        imgin.im->array.UI16[(jj1 + 1) * xsize + ii1];
+                    imgoutG1.im->array.UI16[pixi] =
+                        imgin.im->array.UI16[jj1 * xsize + ii1];
+                    imgoutG2.im->array.UI16[pixi] =
+                        imgin.im->array.UI16[(jj1 + 1) * xsize + (ii1 + 1)];
+                    imgoutB.im->array.UI16[pixi] =
+                        imgin.im->array.UI16[jj1 * xsize + (ii1 + 1)];
+                }
+            break;
     }
 
 
@@ -223,9 +235,9 @@ INSERT_STD_FPSCLIfunctions
 
 
 
-    // Register function in CLI
-    errno_t
-    CLIADDCMD_image_format__extractRGGBchan()
+// Register function in CLI
+errno_t
+CLIADDCMD_image_format__extractRGGBchan()
 {
     INSERT_STD_CLIREGISTERFUNC
 

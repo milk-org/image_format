@@ -20,9 +20,9 @@ imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname,
 
 static errno_t IMAGE_FORMAT_read_binary32f_cli()
 {
-    if (CLI_checkarg(1, 3) + CLI_checkarg(2, 2) + CLI_checkarg(3, 2) +
+    if(CLI_checkarg(1, 3) + CLI_checkarg(2, 2) + CLI_checkarg(3, 2) +
             CLI_checkarg(4, 3) ==
-        0)
+            0)
     {
         IMAGE_FORMAT_read_binary32f(data.cmdargtoken[1].val.string,
                                     data.cmdargtoken[2].val.numl,
@@ -70,7 +70,7 @@ imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname,
     //long v1;
 
     //Open file
-    if ((fp = fopen(fname, "rb")) == NULL)
+    if((fp = fopen(fname, "rb")) == NULL)
     {
         PRINT_ERROR("Cannot open file");
         return (0);
@@ -83,7 +83,7 @@ imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname,
 
     //Allocate memory
     buffer = (float *) malloc(fileLen + 1);
-    if (!buffer)
+    if(!buffer)
     {
         fprintf(stderr, "Memory error!");
         fclose(fp);
@@ -91,7 +91,7 @@ imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname,
     }
 
     //Read file contents into buffer
-    if (fread(buffer, fileLen, 1, fp) < 1)
+    if(fread(buffer, fileLen, 1, fp) < 1)
     {
         PRINT_ERROR("fread() returns <1 value");
     }
@@ -100,8 +100,8 @@ imageID IMAGE_FORMAT_read_binary32f(const char *__restrict fname,
     FUNC_CHECK_RETURN(create_2Dimage_ID(IDname, xsize, ysize, &ID));
 
     i = 0;
-    for (jj = 0; jj < ysize; jj++)
-        for (ii = 0; ii < xsize; ii++)
+    for(jj = 0; jj < ysize; jj++)
+        for(ii = 0; ii < xsize; ii++)
         {
             data.image[ID].array.F[jj * xsize + ii] = buffer[i];
             i++;

@@ -73,29 +73,29 @@ imageID CR2toFITS(const char *__restrict fnameCR2,
     EXECUTE_SYSTEM_COMMAND("dcraw -t 0 -D -4 -c %s > _tmppgm.pgm", fnameCR2);
 
     ID = read_PGMimage("_tmppgm.pgm", "tmpfits1");
-    if (system("rm _tmppgm.pgm") != 0)
+    if(system("rm _tmppgm.pgm") != 0)
     {
         PRINT_ERROR("system() returns non-zero value");
     }
 
-    if (CR2toFITS_NORM == 1)
+    if(CR2toFITS_NORM == 1)
     {
         EXECUTE_SYSTEM_COMMAND(
             "dcraw -i -v %s | grep \"ISO speed\"| awk '{print $3}' > "
             "iso_tmp.txt",
             fnameCR2);
 
-        if ((fp = fopen("iso_tmp.txt", "r")) == NULL)
+        if((fp = fopen("iso_tmp.txt", "r")) == NULL)
         {
             PRINT_ERROR("Cannot open file");
         }
-        if (fscanf(fp, "%f\n", &iso) != 1)
+        if(fscanf(fp, "%f\n", &iso) != 1)
         {
             PRINT_ERROR("fscanf returns value != 1");
         }
         fclose(fp);
 
-        if (system("rm iso_tmp.txt") != 0)
+        if(system("rm iso_tmp.txt") != 0)
         {
             PRINT_ERROR("system() returns non-zero value");
         }
@@ -107,18 +107,18 @@ imageID CR2toFITS(const char *__restrict fnameCR2,
             "shutter_tmp.txt",
             fnameCR2);
 
-        if ((fp = fopen("shutter_tmp.txt", "r")) == NULL)
+        if((fp = fopen("shutter_tmp.txt", "r")) == NULL)
         {
             PRINT_ERROR("Cannot open file");
         }
 
-        if (fscanf(fp, "%f\n", &shutter) != 1)
+        if(fscanf(fp, "%f\n", &shutter) != 1)
         {
             PRINT_ERROR("fscanf returns value != 1");
         }
         fclose(fp);
 
-        if (system("rm shutter_tmp.txt") != 0)
+        if(system("rm shutter_tmp.txt") != 0)
         {
             PRINT_ERROR("system() returns non-zero value");
         }
@@ -129,17 +129,17 @@ imageID CR2toFITS(const char *__restrict fnameCR2,
             "aperture_tmp.txt",
             fnameCR2);
 
-        if ((fp = fopen("aperture_tmp.txt", "r")) == NULL)
+        if((fp = fopen("aperture_tmp.txt", "r")) == NULL)
         {
             PRINT_ERROR("Cannot open file");
         }
-        if (fscanf(fp, "f/%f\n", &aperture) != 1)
+        if(fscanf(fp, "f/%f\n", &aperture) != 1)
         {
             PRINT_ERROR("fscanf returns value != 1");
         }
         fclose(fp);
 
-        if (system("rm aperture_tmp.txt") != 0)
+        if(system("rm aperture_tmp.txt") != 0)
         {
             PRINT_ERROR("system() returns non-zero value");
         }
@@ -150,7 +150,7 @@ imageID CR2toFITS(const char *__restrict fnameCR2,
         xsize = data.image[ID].md[0].size[0];
         ysize = data.image[ID].md[0].size[1];
 
-        for (ii = 0; ii < xsize * ysize; ii++)
+        for(ii = 0; ii < xsize * ysize; ii++)
         {
             data.image[ID].array.F[ii] /= (shutter * aperture * aperture * iso);
         }

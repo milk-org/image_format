@@ -28,9 +28,9 @@ errno_t loadCR2toFITSRGB(const char *__restrict fnameCR2,
 
 static errno_t IMAGE_FORMAT_loadCR2toFITSRGB_cli()
 {
-    if (CLI_checkarg(1, 4) + CLI_checkarg(2, 3) + CLI_checkarg(3, 3) +
+    if(CLI_checkarg(1, 4) + CLI_checkarg(2, 3) + CLI_checkarg(3, 3) +
             CLI_checkarg(4, 3) ==
-        0)
+            0)
     {
         loadCR2toFITSRGB(data.cmdargtoken[1].val.string,
                          data.cmdargtoken[2].val.string,
@@ -75,7 +75,7 @@ errno_t loadCR2toFITSRGB(const char *__restrict fnameCR2,
     read_PGMimage("_tmppgm.pgm", "tmpfits1");
     //  r = system("rm _tmppgm.pgm");
 
-    if (CR2toFITS_NORM == 1)
+    if(CR2toFITS_NORM == 1)
     {
         FILE *fp;
         float iso;
@@ -89,17 +89,17 @@ errno_t loadCR2toFITSRGB(const char *__restrict fnameCR2,
             "iso_tmp.txt",
             fnameCR2);
 
-        if ((fp = fopen("iso_tmp.txt", "r")) == NULL)
+        if((fp = fopen("iso_tmp.txt", "r")) == NULL)
         {
             PRINT_ERROR("Cannot open file");
         }
-        if (fscanf(fp, "%f\n", &iso) != 1)
+        if(fscanf(fp, "%f\n", &iso) != 1)
         {
             PRINT_ERROR("fscanf returns value != 1");
         }
         fclose(fp);
 
-        if (system("rm iso_tmp.txt") != 0)
+        if(system("rm iso_tmp.txt") != 0)
         {
             PRINT_ERROR("system() returns non-zero value");
         }
@@ -110,18 +110,18 @@ errno_t loadCR2toFITSRGB(const char *__restrict fnameCR2,
             "shutter_tmp.txt",
             fnameCR2);
 
-        if ((fp = fopen("shutter_tmp.txt", "r")) == NULL)
+        if((fp = fopen("shutter_tmp.txt", "r")) == NULL)
         {
             PRINT_ERROR("Cannot open file");
         }
 
-        if (fscanf(fp, "%f\n", &shutter) != 1)
+        if(fscanf(fp, "%f\n", &shutter) != 1)
         {
             PRINT_ERROR("fscanf returns value != 1");
         }
         fclose(fp);
 
-        if (system("rm shutter_tmp.txt") != 0)
+        if(system("rm shutter_tmp.txt") != 0)
         {
             PRINT_ERROR("system() returns non-zero value");
         }
@@ -132,17 +132,17 @@ errno_t loadCR2toFITSRGB(const char *__restrict fnameCR2,
             "aperture_tmp.txt",
             fnameCR2);
 
-        if ((fp = fopen("aperture_tmp.txt", "r")) == NULL)
+        if((fp = fopen("aperture_tmp.txt", "r")) == NULL)
         {
             PRINT_ERROR("Cannot open file");
         }
-        if (fscanf(fp, "f/%f\n", &aperture) != 1)
+        if(fscanf(fp, "f/%f\n", &aperture) != 1)
         {
             PRINT_ERROR("fscanf returns value != 1");
         }
         fclose(fp);
 
-        if (system("rm aperture_tmp.txt") != 0)
+        if(system("rm aperture_tmp.txt") != 0)
         {
             PRINT_ERROR("system() returns non-zero value");
         }
@@ -161,7 +161,7 @@ errno_t loadCR2toFITSRGB(const char *__restrict fnameCR2,
 
     printf("FLUXFACTOR = %g\n", FLUXFACTOR);
 
-    if (variable_ID("RGBfullres") == -1)
+    if(variable_ID("RGBfullres") == -1)
     {
         convert_rawbayerFITStorgbFITS_simple("tmpfits1",
                                              fnameFITSr,
