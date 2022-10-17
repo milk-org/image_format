@@ -303,6 +303,7 @@ static errno_t compute_function()
             "WARNING - output average image not found and being created");
         in_img.datatype = _DATATYPE_OUTPUT; // To be passed to out_ave_img
         imcreatelikewiseIMGID(&out_ave_img, &in_img);
+        in_img.datatype = _DATATYPE_INPUT; // Revert !
         resolveIMGID(&out_ave_img, ERRMODE_ABORT);
     }
 
@@ -312,9 +313,9 @@ static errno_t compute_function()
         PRINT_WARNING("WARNING - output std image not found and being created");
         in_img.datatype = _DATATYPE_OUTPUT; // To be passed to out_std_img
         imcreatelikewiseIMGID(&out_std_img, &in_img);
+        in_img.datatype = _DATATYPE_INPUT; // Revert !
         resolveIMGID(&out_std_img, ERRMODE_ABORT);
     }
-    in_img.datatype = _DATATYPE_INPUT; // Revert !
 
     /*
      Keyword setup - initialization
