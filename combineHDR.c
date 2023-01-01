@@ -25,7 +25,7 @@ static CLICMDARGDEF farg[] = {{
         NULL
     },
     {
-        CLIARG_FLOAT,
+        CLIARG_FLOAT64,
         ".satlevel",
         "Saturation level",
         "satval",
@@ -34,7 +34,7 @@ static CLICMDARGDEF farg[] = {{
         NULL
     },
     {
-        CLIARG_FLOAT,
+        CLIARG_FLOAT64,
         ".biaslevel",
         "Bias level",
         "biasval",
